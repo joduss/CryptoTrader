@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "JoLibrary",
+        "repositoryURL": "git@github.com:joduss/JoLibrary.git",
+        "state": {
+          "branch": "main",
+          "revision": "ae5a25c7c2b83846fbfc6dc6c8e0f3e729f05dc6",
+          "version": null
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
+          "version": "0.3.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
