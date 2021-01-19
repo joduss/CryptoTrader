@@ -14,17 +14,16 @@ struct PriceRecord: Codable {
 
 class PriceRecorder: TradingPlatformDelegate {
     
+    private let filePath: String
     private var prices: [PriceRecord] = []
-    private let fileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("prices.json")
     
     let api : TradingPlatform
     
-    private var filePath: String {
-        return fileUrl.absoluteURL.path
-    }
     
-    init(api: TradingPlatform) {
+    init(api: TradingPlatform, filePath: String) {
         self.api = api
+        self.filePath = filePath
+        
         prices.reserveCapacity(100000)
         api.listenBtcUsdPrice()
         self.api.delegate = self

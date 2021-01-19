@@ -7,10 +7,7 @@
 
 import Foundation
 
+/// Prints as if it was a log: [Date] [Class name] Message
 func sourcePrint(_ message: String, _ source: String = #file) {
     print("[\(Date())] [\(source.fileName())] \(message)")
-}
-
-func timedPrint(_ message: String) {
-    print("[\(Date())] \(message)")
 }

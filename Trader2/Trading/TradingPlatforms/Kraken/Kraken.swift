@@ -49,7 +49,7 @@ public class Kraken: WebSocketDelegate, TradingPlatform {
     
     public func process(response: String) {
         if response.starts(with: "[") {
-            let serverResponse = Response(response: response)
+            let serverResponse = KrakenTickerResponse(response: response)
             delegate?.priceUpdated(newPrice: serverResponse.price ?? 0)
         }
     }

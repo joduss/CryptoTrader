@@ -126,7 +126,7 @@ class Trader: TradingPlatformDelegate {
             if slope5Minutes > price / 1000 {
                 // Slight increase
                 // Must be very variable!
-                if (variability5Minutes.variabilityRatioToPrice >= 0.5 / 100 && variability30Minutes.spikes07Percent >= 1) {
+                if (variability5Minutes.variabilityRatioToPrice >= 0.5 / 100 && variability60Minutes.spikes07Percent >= 1) {
                     self.buy(price: price)
                     return
                 }
