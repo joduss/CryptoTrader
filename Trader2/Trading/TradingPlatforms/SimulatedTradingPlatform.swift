@@ -28,7 +28,7 @@ class SimulatedTradingPlatform: TradingPlatform {
         print("Simulation started")
         
         for priceRecord in self.prices {
-            CurrentDate.instance.date = priceRecord.time
+            DateFactory.now = priceRecord.time
             self.delegate?.priceUpdated(newPrice: priceRecord.price)
         }
         completed()

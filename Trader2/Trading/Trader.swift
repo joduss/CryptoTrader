@@ -42,7 +42,7 @@ class Trader: TradingPlatformDelegate {
     
     var canBuy: Bool {
         return balance > orderSize &&
-            (orders.count == 0 || !orders.contains(where: {order in return Date.Now() - order.date < TimeInterval.fromMinutes(5)}))
+            (orders.count == 0 || !orders.contains(where: {order in return DateFactory.now - order.date < TimeInterval.fromMinutes(5)}))
     }
     
     let fileUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("prices2.json")
@@ -62,7 +62,7 @@ class Trader: TradingPlatformDelegate {
     }
     
     func decide(price: Double) {
-        print("[\(Date.Now())] Must decide with price \(price)")
+        print("[\(DateFactory.now)] Must decide with price \(price)")
         guard marketAnalyzer.hasRecordFromAtLeastPastInterval(TimeInterval.fromMinutes(60)) else { return }
         
         //        let s = marketAnalyzer.prices(last: 3600)
@@ -153,7 +153,7 @@ class Trader: TradingPlatformDelegate {
                 return
             }
             
-            if (!orders.contains(where: {Date.Now() - $0.date < TimeInterval.fromHours(1)})) {
+            if (!orders.contains(where: {DateFactory.now - $0.date < TimeInterval.fromHours(1)})) {
                 self.buy(price: price)
                 return
             }
@@ -185,10 +185,10 @@ class Trader: TradingPlatformDelegate {
         balance -= orderSize
         
         let qty = (orderSize / price) * (1 - fees)
-        let order = Order(date: Date.Now(), price: price, qty: qty)
+        let order = Order(date: DateFactory.now, price: price, qty: qty)
         self.orders.append(order)
         
-        print("At \(Date.Now()) Bought \(qty) for \(price)")
+        print("At \(DateFactory.now) Bought \(qty) for \(price)")
     }
     
     func sell(order: Order, at price: Double) {

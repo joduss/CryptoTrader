@@ -22,7 +22,7 @@ class MarketHistory {
     }
     
     func record(_ price: Double) {
-        prices.append(PriceRecord(time: Date.Now(), price: price))
+        prices.append(PriceRecord(time: DateFactory.now, price: price))
         
         lastCleanup += 1
         
@@ -35,14 +35,14 @@ class MarketHistory {
     func hasRecordFromAtLeastPastInterval(_ interval: TimeInterval) -> Bool {
         guard let firstRecord = prices.first else { return false }
         
-        return firstRecord.time <= Date.Now().advanced(by: -interval )
+        return firstRecord.time <= DateFactory.now.advanced(by: -interval )
     }
     
     private func cleanup() {
         for index in 0..<prices.endIndex {
             let price = prices[index]
             
-            if (Date.Now() - price.time > TimeInterval.fromHours(1.01)) {
+            if (DateFactory.now - price.time > TimeInterval.fromHours(1.01)) {
                 continue
             }
             
@@ -54,7 +54,7 @@ class MarketHistory {
     }
     
     func prices(last interval: TimeInterval) -> MarketHistorySlice {
-        return pricesInInterval(beginDate: Date.Now().advanced(by: -interval))
+        return pricesInInterval(beginDate: DateFactory.now.advanced(by: -interval))
     }
     
     func pricesInInterval(beginDate: Date, endDate: Date? = nil) -> MarketHistorySlice {
