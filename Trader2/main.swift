@@ -40,7 +40,7 @@ struct Trader2: ParsableCommand {
             
             sourcePrint("Running trader with Binance api.")
             let api = Kraken()
-            let trader = PriceRecorder(api: api, filePath: (filePath as NSString).expandingTildeInPath)
+            let trader = FileMarketRecorder(api: api, filePath: (filePath as NSString).expandingTildeInPath)
             break
         case .trade:
             sourcePrint("Trading is not yet supported.")
