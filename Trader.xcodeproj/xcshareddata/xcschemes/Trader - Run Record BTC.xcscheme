@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-               BuildableName = "Trader2"
-               BlueprintName = "Trader2"
-               ReferencedContainer = "container:Trader2.xcodeproj">
+               BuildableName = "Trader"
+               BlueprintName = "Trader"
+               ReferencedContainer = "container:Trader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "Trader2"
-            BlueprintName = "Trader2"
-            ReferencedContainer = "container:Trader2.xcodeproj">
+            BuildableName = "Trader"
+            BlueprintName = "Trader"
+            ReferencedContainer = "container:Trader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -68,9 +68,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "Trader2"
-            BlueprintName = "Trader2"
-            ReferencedContainer = "container:Trader2.xcodeproj">
+            BuildableName = "Trader"
+            BlueprintName = "Trader"
+            ReferencedContainer = "container:Trader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
