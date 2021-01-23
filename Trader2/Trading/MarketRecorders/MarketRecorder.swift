@@ -1,6 +1,6 @@
 import Foundation
 
 /// An object recording market events and state.
-protocol MarketRecorder: TradingPlatformDelegate {
+protocol MarketRecorder: TradingPlatformSubscriber {
     
 }
