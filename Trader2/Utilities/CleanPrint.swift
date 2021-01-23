@@ -11,3 +11,8 @@ import Foundation
 func sourcePrint(_ message: String, _ source: String = #file) {
     print("[\(Date())] [\(source.fileName())] \(message)")
 }
+
+func sourceReplacablePrint(_ message: String, _ source: String = #file) {
+    print("\u{1B}[2K\u{1B}7[\(Date())] [\(source.fileName())] \(message) \u{1B}8", terminator: "")
+    fflush(stdout)
+}
