@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--record --btc ~/Documents/prices_btc.json"
+            argument = "--record --btc_usd ~/Documents/ records"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
