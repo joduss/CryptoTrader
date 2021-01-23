@@ -25,6 +25,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     private var session: URLSession!
     
     public var delegate: WebSocketDelegate?
+    public var pingInterval: Double = 120
 
     
     init(url: URL) {
@@ -48,15 +49,21 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
         session = nil
     }
     
-    func ping() {
-        webSocketTask?.sendPing { error in
+    /// Sends a ping to the server. When the result is back, 'OnCompleted' is called with the result of the ping.
+    func ping(onCompleted: ((Bool) -> ())? = nil) {
+        webSocketTask?.sendPing { [weak self] error in
+            
+            guard let strongSelf = self else { return }
+            
             if let error = error {
                 sourcePrint("Error when sending PING \(error)")
-                self.delegate?.error()
+                onCompleted?(false)
+                strongSelf.delegate?.error()
             } else {
                 sourcePrint("Web Socket connection is alive")
-                DispatchQueue.global().asyncAfter(deadline: .now() + 10) { [self] in
-                    ping()
+                onCompleted?(true)
+                DispatchQueue.global().asyncAfter(deadline: .now() + strongSelf.pingInterval) { [weak self] in
+                    self?.ping()
                 }
             }
         }
@@ -75,6 +82,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
         }
     }
     
+    /// Receive a message from the server
     private func receive() {
         webSocketTask?.receive { result in
             switch result {
