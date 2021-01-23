@@ -9,13 +9,13 @@ import Foundation
 
 class MarketHistorySlice {
     
-    let prices: ArraySlice<PriceRecord>
+    let prices: ArraySlice<MarketAggregatedTrade>
     
     private var averagePrice: Double!
     private var min: Double!
     private var max: Double!
     
-    init(prices: ArraySlice<PriceRecord>) {
+    init(prices: ArraySlice<MarketAggregatedTrade>) {
         self.prices = prices
     }
     
@@ -31,10 +31,10 @@ class MarketHistorySlice {
         priceDic.reserveCapacity(prices.count)
         
         for price in prices {
-            priceDic[round(price.time.timeIntervalSinceReferenceDate)] = price.price
+            priceDic[round(price.date.timeIntervalSinceReferenceDate)] = price.price
         }
         
-        let firstItemRoundedTimestamp = round(self.prices.first!.time.timeIntervalSinceReferenceDate)
+        let firstItemRoundedTimestamp = round(self.prices.first!.date.timeIntervalSinceReferenceDate)
         
         var slope = 0.0
         var last: (TimeInterval, Double) = (TimeInterval(firstItemRoundedTimestamp), priceDic[firstItemRoundedTimestamp]!)

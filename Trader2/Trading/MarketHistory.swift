@@ -6,23 +6,23 @@
 //
 
 import Foundation
-import JoLibrary
 
 class MarketHistory {
     
     private let intervalToKeep: TimeInterval
     
-    private var prices: ContiguousArray<PriceRecord> = ContiguousArray<PriceRecord>()
-    
+    private var tickers: ContiguousArray<MarketAggregatedTrade> = ContiguousArray<MarketAggregatedTrade>()
     private var lastCleanup = 0
     
+    
     init(intervalToKeep: TimeInterval) {
-        prices.reserveCapacity(100000)
+        tickers.reserveCapacity(100000)
         self.intervalToKeep = intervalToKeep
     }
     
-    func record(_ price: Double) {
-        prices.append(PriceRecord(time: DateFactory.now, price: price))
+    /// Add a record to the market history.
+    func record(_ trade: MarketAggregatedTrade) {
+        tickers.append(trade)
         
         lastCleanup += 1
         
@@ -32,74 +32,78 @@ class MarketHistory {
         }
     }
     
+    /// Returns true if there is history in the past in a time interval from now.
     func hasRecordFromAtLeastPastInterval(_ interval: TimeInterval) -> Bool {
-        guard let firstRecord = prices.first else { return false }
+        guard let firstRecord = tickers.first else { return false }
         
-        return firstRecord.time <= DateFactory.now.advanced(by: -interval )
+        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
     }
     
+    /// Remove too old data.
     private func cleanup() {
-        for index in 0..<prices.endIndex {
-            let price = prices[index]
+        for index in 0..<tickers.endIndex {
+            let price = tickers[index]
             
-            if (DateFactory.now - price.time > TimeInterval.fromHours(1.01)) {
+            if (DateFactory.now - price.date > TimeInterval.fromHours(1.01)) {
                 continue
             }
             
             if index == 0 { return }
             
-            self.prices = ContiguousArray(self.prices[index..<self.prices.endIndex])
+            self.tickers = ContiguousArray(self.tickers[index..<self.tickers.endIndex])
             return
         }
     }
     
+    /// Returns a market history up to a given point back in the past.
     func prices(last interval: TimeInterval) -> MarketHistorySlice {
         return pricesInInterval(beginDate: DateFactory.now.advanced(by: -interval))
     }
     
+    /// Returns a market history from a given date to the end or to a specific date.
     func pricesInInterval(beginDate: Date, endDate: Date? = nil) -> MarketHistorySlice {
         
-        guard self.prices.count > 0 else { return MarketHistorySlice(prices: ArraySlice()) }
+        guard self.tickers.count > 0 else { return MarketHistorySlice(prices: ArraySlice()) }
         let startIdx = findSortedIdx(dateAtLeast: beginDate)!
 
         if let endDate = endDate {
-            exit(1)
-            return MarketHistorySlice(prices: ArraySlice())
-//            let startIdx = findSortedIdx(dateAtMax: beginDate)!
-//            return MarketHistorySlice(values: self.prices[startIdx..<self.prices.endIndex])
+            let endIdx = findSortedIdx(dateAtMax: endDate)!
+            return MarketHistorySlice(prices: self.tickers[startIdx..<endIdx])
         }
         else {
-            return MarketHistorySlice(prices: self.prices[startIdx..<self.prices.endIndex])
+            return MarketHistorySlice(prices: self.tickers[startIdx..<self.tickers.endIndex])
         }
     }
     
+    /// Find the index of the largest date smaller or equal than a given date in a sorted array.
+    /// Uses the binary search algorithm.
     func findSortedIdx(dateAtMax date: Date) -> Int? {
-        guard prices.count > 0 else { return nil }
+        guard tickers.count > 0 else { return nil }
         
-        if prices.first!.time > date {
+        if tickers.first!.date > date {
             return nil
         }
         
-        if prices.last!.time <= date {
-            return prices.endIndex-1
+        if tickers.last!.date <= date {
+            return tickers.endIndex-1
         }
         
-        var rangeToSearch = 0...(prices.count-1)
+        var rangeToSearch = 0...(tickers.count-1)
         
         while(rangeToSearch.upperBound != rangeToSearch.lowerBound) {
 
             // In case there are only 2 elements in the range.
             // If the larger element is too large, the smaller might be ok. It still might be larger, so we need to take the one below.
             if rangeToSearch.upperBound - 1 == rangeToSearch.lowerBound {
-                if prices[rangeToSearch.upperBound].time > date {
-                    return prices[rangeToSearch.lowerBound].time > date ? rangeToSearch.lowerBound - 1 : rangeToSearch.lowerBound
+                if tickers[rangeToSearch.upperBound].date > date {
+                    return tickers[rangeToSearch.lowerBound].date > date ? rangeToSearch.lowerBound - 1 : rangeToSearch.lowerBound
                 }
                 return rangeToSearch.upperBound
             }
             
             let centerRange = Int(round(Double((rangeToSearch.upperBound + rangeToSearch.lowerBound)) / 2.0))
             
-            if prices[centerRange].time > date {
+            if tickers[centerRange].date > date {
                 // If the value is larger or equal, we should search smaller values.
                 rangeToSearch =  (rangeToSearch.lowerBound)...(centerRange-1)
             }
@@ -114,18 +118,20 @@ class MarketHistory {
         return rangeToSearch.lowerBound
     }
 
+    /// Find the index of the largest date smaller or equal than a given date in a sorted array.
+    /// Uses the binary search algorithm.
     func findSortedIdx(dateAtLeast date: Date) -> Int? {
-        guard prices.count > 0 else { return nil }
+        guard tickers.count > 0 else { return nil }
         
-        if prices.first!.time >= date {
+        if tickers.first!.date >= date {
             return 0
         }
         
-        if prices.last!.time < date {
+        if tickers.last!.date < date {
             return nil
         }
         
-        var rangeToSearch = 0...(prices.count-1)
+        var rangeToSearch = 0...(tickers.count-1)
         
         while(rangeToSearch.upperBound != rangeToSearch.lowerBound) {
 
@@ -133,15 +139,15 @@ class MarketHistory {
             // If the smaller element is too small, we take the larger. It might still be too small. In such case,
             // we take the one above.
             if rangeToSearch.upperBound - 1 == rangeToSearch.lowerBound {
-                if prices[rangeToSearch.lowerBound].time < date {
-                    return prices[rangeToSearch.upperBound].time >= date ? rangeToSearch.upperBound : rangeToSearch.upperBound + 1
+                if tickers[rangeToSearch.lowerBound].date < date {
+                    return tickers[rangeToSearch.upperBound].date >= date ? rangeToSearch.upperBound : rangeToSearch.upperBound + 1
                 }
                 return rangeToSearch.lowerBound
             }
             
             let centerRange = Int(round(Double((rangeToSearch.upperBound + rangeToSearch.lowerBound)) / 2.0))
             
-            if prices[centerRange].time >= date {
+            if tickers[centerRange].date >= date {
                 // If the value is larger or equal, we should search smaller values right large enough on the left.
                 rangeToSearch =  (rangeToSearch.lowerBound)...centerRange
             }

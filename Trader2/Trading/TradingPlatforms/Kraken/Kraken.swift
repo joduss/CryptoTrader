@@ -8,30 +8,40 @@
 import Foundation
 
 
-public class Kraken: WebSocketDelegate, TradingPlatform {
+public class Kraken: TradingPlatform, WebSocketDelegate {
     
-    let url = "wss://ws.kraken.com"
-    var socket: WebSocket
+    private(set) public var subscribedToTickerStream: Bool = false
+    private(set) public var subscribedToAggregatedTradeStream: Bool = false
+    private(set) public var subscribedToMarketDepthStream: Bool = false
     
-    public var delegate: TradingPlatformDelegate?
+    private let baseUrl = URL(string: "wss://ws.kraken.com")!
+    public let webSocketHandler: WebSocketHandler
     
-    public init() {
-        socket = WebSocket(url: URL(string: url)!)
-        socket.delegate = self
-        socket.connect()
+    private var socket: WebSocket {
+        
+        if webSocketHandler.socket == nil {
+            webSocketHandler.createSocket()
+        }
+        
+        return webSocketHandler.socket!
     }
     
-    private func createSocket() {
-        socket = WebSocket(url: URL(string: url)!)
-        socket.delegate = self
-        socket.connect()
+    public var subscriber: TradingPlatformSubscriber?
+    public let marketPair: MarketPair
+    
+    public init(marketPair: MarketPair) {
+        self.marketPair = marketPair
         
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10, execute: {
-            self.listenBtcUsdPrice()
-        })
+        webSocketHandler = WebSocketHandler(url: baseUrl)
+        webSocketHandler.websocketDelegate = self
+        webSocketHandler.createSocket()
     }
 
-    public func listenBtcUsdPrice() {
+    // MARK: - TradingPlatform
+    
+    public func subscribeToTickerStream() {
+        self.subscribedToTickerStream = true
+        
         socket.send(message: """
             {
               "event": "subscribe",
@@ -45,31 +55,17 @@ public class Kraken: WebSocketDelegate, TradingPlatform {
             """)
     }
     
+    public func subscribeToAggregatedTradeStream() { }
+    
+    public func subscribeToMarketDepthStream() {}
+
+    
     // MARK: - WebSocketDelegate
     
     public func process(response: String) {
         if response.starts(with: "[") {
             let serverResponse = KrakenTickerResponse(response: response)
-            delegate?.priceUpdated(newPrice: serverResponse.price ?? 0)
-        }
-    }
-    
-    public func error() {
-        sourcePrint("Websocket connection did encounter an error...")
-        socket.delegate = nil
-        socket.disconnect()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) { [self] in
-            createSocket()
-        }
-    }
-    
-    public func didClose() {
-        sourcePrint("Websocket connection did close...")
-        socket.delegate = nil
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) { [self] in
-            createSocket()
+            subscriber?.process(trade: MarketAggregatedTrade(date: Date(), symbol: marketPair.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
         }
     }
 }

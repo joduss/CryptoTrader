@@ -1,12 +1,5 @@
-//
-//  Trader.swift
-//  Trader2
-//
-//  Created by Jonathan Duss on 09.01.21.
-//
-
 import Foundation
-import JoLibrary
+
 
 struct Order: Codable {
     var date: Date
@@ -28,7 +21,8 @@ struct Variability {
 }
 
 
-class Trader: TradingPlatformDelegate {
+class SimpleTrader: TradingPlatformSubscriber {
+    
     let marketAnalyzer = MarketHistory(intervalToKeep: TimeInterval.fromHours(1.05))
     var api : TradingPlatform
     
@@ -52,13 +46,21 @@ class Trader: TradingPlatformDelegate {
     
     init(api: TradingPlatform) {
         self.api = api
-        api.listenBtcUsdPrice()
-        self.api.delegate = self
+        api.subscribeToTickerStream()
+        self.api.subscriber = self
     }
     
-    func priceUpdated(newPrice: Double) {
-        marketAnalyzer.record(newPrice)
-        decide(price: newPrice)
+    func process(ticker: MarketTicker) {
+
+    }
+    
+    func process(trade: MarketAggregatedTrade) {
+        marketAnalyzer.record(trade)
+        decide(price: trade.price)
+    }
+    
+    func process(depthUpdate: MarketDepth) {
+        
     }
     
     func decide(price: Double) {
@@ -146,7 +148,7 @@ class Trader: TradingPlatformDelegate {
                 return
             }
             
-            let var10 = market10Last.variability()
+//            let var10 = market10Last.variability()
             let avg10 = market10Last.average()
             if (avg10 - price) / avg10 > (0.5 / 100.0) {
                 self.buy(price: price)
