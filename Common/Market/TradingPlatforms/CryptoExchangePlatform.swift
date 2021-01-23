@@ -1,27 +1,20 @@
-//
-//  TradingPlatform.swift
-//  Trader2
-//
-//  Created by Jonathan Duss on 09.01.21.
-//
-
 import Foundation
 
-public protocol TradingPlatformSubscriber: class {
+public protocol CryptoExchangePlatformSubscriber: class {
     func process(ticker: MarketTicker)
     func process(trade: MarketAggregatedTrade)
     func process(depthUpdate: MarketDepth)
 
 }
 
-public protocol TradingPlatform: class, WebSocketDelegate {
+public protocol CryptoExchangePlatform: class, WebSocketDelegate {
     var subscribedToTickerStream: Bool { get }
     var subscribedToAggregatedTradeStream: Bool { get }
     var subscribedToMarketDepthStream: Bool { get }
 
     var webSocketHandler: WebSocketHandler { get }
     var marketPair: MarketPair { get }
-    var subscriber: TradingPlatformSubscriber? { get set }
+    var subscriber: CryptoExchangePlatformSubscriber? { get set }
     
     func subscribeToTickerStream()
     func subscribeToAggregatedTradeStream()
@@ -29,7 +22,7 @@ public protocol TradingPlatform: class, WebSocketDelegate {
 
 }
 
-extension TradingPlatform {
+extension CryptoExchangePlatform {
     
     func resubscribe() {
         if subscribedToTickerStream {

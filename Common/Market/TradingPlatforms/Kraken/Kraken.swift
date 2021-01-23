@@ -8,7 +8,7 @@
 import Foundation
 
 
-public class Kraken: TradingPlatform, WebSocketDelegate {
+public class Kraken: CryptoExchangePlatform, WebSocketDelegate {
     
     private(set) public var subscribedToTickerStream: Bool = false
     private(set) public var subscribedToAggregatedTradeStream: Bool = false
@@ -26,7 +26,7 @@ public class Kraken: TradingPlatform, WebSocketDelegate {
         return webSocketHandler.socket!
     }
     
-    public var subscriber: TradingPlatformSubscriber?
+    public var subscriber: CryptoExchangePlatformSubscriber?
     public let marketPair: MarketPair
     
     public init(marketPair: MarketPair) {

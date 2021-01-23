@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-               BuildableName = "Trader"
-               BlueprintName = "Trader"
-               ReferencedContainer = "container:Trader.xcodeproj">
+               BuildableName = "CryptoTrader"
+               BlueprintName = "CryptoTrader"
+               ReferencedContainer = "container:CryptoTrader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "Trader"
-            BlueprintName = "Trader"
-            ReferencedContainer = "container:Trader.xcodeproj">
+            BuildableName = "CryptoTrader"
+            BlueprintName = "CryptoTrader"
+            ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "Trader"
-            BlueprintName = "Trader"
-            ReferencedContainer = "container:Trader.xcodeproj">
+            BuildableName = "CryptoTrader"
+            BlueprintName = "CryptoTrader"
+            ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
@@ -72,7 +72,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

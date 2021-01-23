@@ -21,10 +21,10 @@ struct Variability {
 }
 
 
-class SimpleTrader: TradingPlatformSubscriber {
+class SimpleTrader: CryptoExchangePlatformSubscriber {
     
     let marketAnalyzer = MarketHistory(intervalToKeep: TimeInterval.fromHours(1.05))
-    var api : TradingPlatform
+    var api : CryptoExchangePlatform
     
     var orderSize: Double = 69
     var balance: Double = 210.0
@@ -44,7 +44,7 @@ class SimpleTrader: TradingPlatformSubscriber {
         return fileUrl.absoluteURL.path
     }
     
-    init(api: TradingPlatform) {
+    init(api: CryptoExchangePlatform) {
         self.api = api
         api.subscribeToTickerStream()
         self.api.subscriber = self

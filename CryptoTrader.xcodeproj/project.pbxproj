@@ -12,7 +12,7 @@
 		6B3E98D725AB259F004509E2 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E98D625AB259F004509E2 /* DateExtensions.swift */; };
 		6B3E98DA25AB9068004509E2 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E98D925AB9068004509E2 /* WebSocket.swift */; };
 		6B48DAD525A9F6BA00F2CD6D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAD425A9F6BA00F2CD6D /* main.swift */; };
-		6B48DADE25A9FD8E00F2CD6D /* TradingPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DADD25A9FD8E00F2CD6D /* TradingPlatform.swift */; };
+		6B48DADE25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */; };
 		6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAE125A9FDB200F2CD6D /* Kraken.swift */; };
 		6B48DAE525A9FE3800F2CD6D /* SimpleTrader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAE425A9FE3800F2CD6D /* SimpleTrader.swift */; };
 		6B5600E225AE0D05002F8CE1 /* JoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6B5600E125AE0D05002F8CE1 /* JoLibrary */; };
@@ -37,7 +37,7 @@
 		6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F6225AD80C4002D245C /* CleanPrint.swift */; };
 		6BFC306925BCD6B100BDD732 /* MarketTicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7116D825BB1DE300D34447 /* MarketTicker.swift */; };
 		6BFC306A25BCD6B100BDD732 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E98D925AB9068004509E2 /* WebSocket.swift */; };
-		6BFC306B25BCD6B100BDD732 /* TradingPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DADD25A9FD8E00F2CD6D /* TradingPlatform.swift */; };
+		6BFC306B25BCD6B100BDD732 /* CryptoExchangePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */; };
 		6BFC306C25BCD6B100BDD732 /* Kraken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAE125A9FDB200F2CD6D /* Kraken.swift */; };
 		6BFC306D25BCD6B100BDD732 /* CleanPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F6225AD80C4002D245C /* CleanPrint.swift */; };
 		6BFC306E25BCD6B100BDD732 /* DateFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9D049F25B7837F00EC53E1 /* DateFactory.swift */; };
@@ -57,7 +57,7 @@
 		6BFC307C25BCD6B100BDD732 /* BinanceDepthUpdateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9D04A225B787ED00EC53E1 /* BinanceDepthUpdateResponse.swift */; };
 		6BFC308125BCD6D600BDD732 /* MarketRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BDE061625BB15EC00731878 /* MarketRecorder.swift */; };
 		6BFC308225BCD6D600BDD732 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFC305925BCD5CA00BDD732 /* main.swift */; };
-		6BFC308325BCD6D600BDD732 /* FileMarketRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAE725A9FE5D00F2CD6D /* FileMarketRecorder.swift */; };
+		6BFC308325BCD6D600BDD732 /* MarketFileRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DAE725A9FE5D00F2CD6D /* MarketFileRecorder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -86,12 +86,12 @@
 		6B3E98D325AB23D4004509E2 /* MarketHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketHistory.swift; sourceTree = "<group>"; };
 		6B3E98D625AB259F004509E2 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
 		6B3E98D925AB9068004509E2 /* WebSocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
-		6B48DAD125A9F6BA00F2CD6D /* Trader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Trader; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoTrader; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B48DAD425A9F6BA00F2CD6D /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		6B48DADD25A9FD8E00F2CD6D /* TradingPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingPlatform.swift; sourceTree = "<group>"; };
+		6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoExchangePlatform.swift; sourceTree = "<group>"; };
 		6B48DAE125A9FDB200F2CD6D /* Kraken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kraken.swift; sourceTree = "<group>"; };
 		6B48DAE425A9FE3800F2CD6D /* SimpleTrader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTrader.swift; sourceTree = "<group>"; };
-		6B48DAE725A9FE5D00F2CD6D /* FileMarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMarketRecorder.swift; sourceTree = "<group>"; };
+		6B48DAE725A9FE5D00F2CD6D /* MarketFileRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketFileRecorder.swift; sourceTree = "<group>"; };
 		6B7116D825BB1DE300D34447 /* MarketTicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketTicker.swift; sourceTree = "<group>"; };
 		6B7116E225BB25B900D34447 /* MarketPair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketPair.swift; sourceTree = "<group>"; };
 		6B7116ED25BB360900D34447 /* WebSocketHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketHandler.swift; sourceTree = "<group>"; };
@@ -112,7 +112,7 @@
 		6BBF4F5C25AD7E8F002D245C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BBF4F6225AD80C4002D245C /* CleanPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPrint.swift; sourceTree = "<group>"; };
 		6BDE061625BB15EC00731878 /* MarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketRecorder.swift; sourceTree = "<group>"; };
-		6BFC305725BCD5CA00BDD732 /* MarketRecorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MarketRecorder; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoMarketRecorder; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BFC305925BCD5CA00BDD732 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -150,8 +150,8 @@
 			isa = PBXGroup;
 			children = (
 				6BFC305125BCD58800BDD732 /* Common */,
-				6B48DAD325A9F6BA00F2CD6D /* Trader */,
-				6BFC305825BCD5CA00BDD732 /* MarketRecorder */,
+				6B48DAD325A9F6BA00F2CD6D /* CryptoTrader */,
+				6BFC305825BCD5CA00BDD732 /* CryptoMarketRecorder */,
 				6B48DAD225A9F6BA00F2CD6D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -159,20 +159,20 @@
 		6B48DAD225A9F6BA00F2CD6D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6B48DAD125A9F6BA00F2CD6D /* Trader */,
-				6BFC305725BCD5CA00BDD732 /* MarketRecorder */,
+				6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */,
+				6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6B48DAD325A9F6BA00F2CD6D /* Trader */ = {
+		6B48DAD325A9F6BA00F2CD6D /* CryptoTrader */ = {
 			isa = PBXGroup;
 			children = (
 				6B8D17CA25B757FD0021B64E /* Trading */,
 				6B48DAD425A9F6BA00F2CD6D /* main.swift */,
 				6BBF4F5C25AD7E8F002D245C /* Info.plist */,
 			);
-			path = Trader;
+			path = CryptoTrader;
 			sourceTree = "<group>";
 		};
 		6B48DADC25A9FD4300F2CD6D /* TradingPlatforms */ = {
@@ -180,7 +180,7 @@
 			children = (
 				6B8D17BA25B7443A0021B64E /* Binance */,
 				6B3E98DD25AB92BE004509E2 /* Kraken */,
-				6B48DADD25A9FD8E00F2CD6D /* TradingPlatform.swift */,
+				6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */,
 			);
 			path = TradingPlatforms;
 			sourceTree = "<group>";
@@ -257,7 +257,7 @@
 		6B9D04A925B8C13E00EC53E1 /* Recorders */ = {
 			isa = PBXGroup;
 			children = (
-				6B48DAE725A9FE5D00F2CD6D /* FileMarketRecorder.swift */,
+				6B48DAE725A9FE5D00F2CD6D /* MarketFileRecorder.swift */,
 				6BDE061625BB15EC00731878 /* MarketRecorder.swift */,
 			);
 			path = Recorders;
@@ -284,13 +284,13 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		6BFC305825BCD5CA00BDD732 /* MarketRecorder */ = {
+		6BFC305825BCD5CA00BDD732 /* CryptoMarketRecorder */ = {
 			isa = PBXGroup;
 			children = (
 				6B9D04A925B8C13E00EC53E1 /* Recorders */,
 				6BFC305925BCD5CA00BDD732 /* main.swift */,
 			);
-			path = MarketRecorder;
+			path = CryptoMarketRecorder;
 			sourceTree = "<group>";
 		};
 		6BFC306025BCD5FB00BDD732 /* Market */ = {
@@ -305,9 +305,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6B48DAD025A9F6BA00F2CD6D /* Trader */ = {
+		6B48DAD025A9F6BA00F2CD6D /* CryptoTrader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6B48DAD825A9F6BA00F2CD6D /* Build configuration list for PBXNativeTarget "Trader" */;
+			buildConfigurationList = 6B48DAD825A9F6BA00F2CD6D /* Build configuration list for PBXNativeTarget "CryptoTrader" */;
 			buildPhases = (
 				6B48DACD25A9F6BA00F2CD6D /* Sources */,
 				6B48DACE25A9F6BA00F2CD6D /* Frameworks */,
@@ -317,18 +317,18 @@
 			);
 			dependencies = (
 			);
-			name = Trader;
+			name = CryptoTrader;
 			packageProductDependencies = (
 				6B5600E125AE0D05002F8CE1 /* JoLibrary */,
 				6B8D17BD25B745360021B64E /* ArgumentParser */,
 			);
 			productName = Trader2;
-			productReference = 6B48DAD125A9F6BA00F2CD6D /* Trader */;
+			productReference = 6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */;
 			productType = "com.apple.product-type.tool";
 		};
-		6BFC305625BCD5CA00BDD732 /* MarketRecorder */ = {
+		6BFC305625BCD5CA00BDD732 /* CryptoMarketRecorder */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6BFC305B25BCD5CA00BDD732 /* Build configuration list for PBXNativeTarget "MarketRecorder" */;
+			buildConfigurationList = 6BFC305B25BCD5CA00BDD732 /* Build configuration list for PBXNativeTarget "CryptoMarketRecorder" */;
 			buildPhases = (
 				6BFC305325BCD5CA00BDD732 /* Sources */,
 				6BFC305425BCD5CA00BDD732 /* Frameworks */,
@@ -338,9 +338,9 @@
 			);
 			dependencies = (
 			);
-			name = MarketRecorder;
+			name = CryptoMarketRecorder;
 			productName = MarketRecorder;
-			productReference = 6BFC305725BCD5CA00BDD732 /* MarketRecorder */;
+			productReference = 6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -360,7 +360,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6B48DACC25A9F6BA00F2CD6D /* Build configuration list for PBXProject "Trader" */;
+			buildConfigurationList = 6B48DACC25A9F6BA00F2CD6D /* Build configuration list for PBXProject "CryptoTrader" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -377,8 +377,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6B48DAD025A9F6BA00F2CD6D /* Trader */,
-				6BFC305625BCD5CA00BDD732 /* MarketRecorder */,
+				6B48DAD025A9F6BA00F2CD6D /* CryptoTrader */,
+				6BFC305625BCD5CA00BDD732 /* CryptoMarketRecorder */,
 			);
 		};
 /* End PBXProject section */
@@ -397,7 +397,7 @@
 				6BA1C53925B4D6FA00ECEB5F /* KrakenTickerResponse.swift in Sources */,
 				6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */,
 				6B48DAE525A9FE3800F2CD6D /* SimpleTrader.swift in Sources */,
-				6B48DADE25A9FD8E00F2CD6D /* TradingPlatform.swift in Sources */,
+				6B48DADE25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift in Sources */,
 				6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */,
 				6B9D04A625B7885100EC53E1 /* BinanceAggregatedTradeResponse.swift in Sources */,
 				6B3E98D725AB259F004509E2 /* DateExtensions.swift in Sources */,
@@ -432,14 +432,14 @@
 				6BFC307025BCD6B100BDD732 /* MixedArray.swift in Sources */,
 				6BFC307225BCD6B100BDD732 /* KrakenTickerResponse.swift in Sources */,
 				6BFC307C25BCD6B100BDD732 /* BinanceDepthUpdateResponse.swift in Sources */,
-				6BFC306B25BCD6B100BDD732 /* TradingPlatform.swift in Sources */,
+				6BFC306B25BCD6B100BDD732 /* CryptoExchangePlatform.swift in Sources */,
 				6BFC306D25BCD6B100BDD732 /* CleanPrint.swift in Sources */,
 				6BFC307A25BCD6B100BDD732 /* DateExtensions.swift in Sources */,
 				6BFC306925BCD6B100BDD732 /* MarketTicker.swift in Sources */,
 				6BFC306A25BCD6B100BDD732 /* WebSocket.swift in Sources */,
 				6BFC308125BCD6D600BDD732 /* MarketRecorder.swift in Sources */,
 				6BFC306C25BCD6B100BDD732 /* Kraken.swift in Sources */,
-				6BFC308325BCD6D600BDD732 /* FileMarketRecorder.swift in Sources */,
+				6BFC308325BCD6D600BDD732 /* MarketFileRecorder.swift in Sources */,
 				6BFC308225BCD6D600BDD732 /* main.swift in Sources */,
 				6BFC307725BCD6B100BDD732 /* Binance.swift in Sources */,
 				6BFC307325BCD6B100BDD732 /* BinanceTickerResponse.swift in Sources */,
@@ -624,7 +624,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6B48DACC25A9F6BA00F2CD6D /* Build configuration list for PBXProject "Trader" */ = {
+		6B48DACC25A9F6BA00F2CD6D /* Build configuration list for PBXProject "CryptoTrader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6B48DAD625A9F6BA00F2CD6D /* Debug */,
@@ -633,7 +633,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6B48DAD825A9F6BA00F2CD6D /* Build configuration list for PBXNativeTarget "Trader" */ = {
+		6B48DAD825A9F6BA00F2CD6D /* Build configuration list for PBXNativeTarget "CryptoTrader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6B48DAD925A9F6BA00F2CD6D /* Debug */,
@@ -642,7 +642,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6BFC305B25BCD5CA00BDD732 /* Build configuration list for PBXNativeTarget "MarketRecorder" */ = {
+		6BFC305B25BCD5CA00BDD732 /* Build configuration list for PBXNativeTarget "CryptoMarketRecorder" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6BFC305C25BCD5CA00BDD732 /* Debug */,

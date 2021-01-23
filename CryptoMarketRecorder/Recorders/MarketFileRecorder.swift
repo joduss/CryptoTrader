@@ -1,7 +1,7 @@
 import Foundation
 
 /// A MarketRecorder recording to a file.
-class FileMarketRecorder: MarketRecorder {
+class MarketFileRecorder: MarketRecorder {
     
     
     private let api : TradingPlatform
@@ -131,7 +131,7 @@ class FileMarketRecorder: MarketRecorder {
                 
         if tickersCache.count > 0 && tickersCache.count % savingFrequency == 0 {
             sourcePrint("Saving tickers to file... (Total: \(tickerCount))   ")
-            FileMarketRecorder.saveTo(fileHandle: tickersFileHandel, tickersCache)
+            MarketFileRecorder.saveTo(fileHandle: tickersFileHandel, tickersCache)
             tickersCache.removeAll(keepingCapacity: true)
         }
     }
@@ -148,7 +148,7 @@ class FileMarketRecorder: MarketRecorder {
         
         if tradesCache.count > 0 && tradesCache.count % savingFrequency == 0 {
             sourcePrint("Saving trades to file... (Total: \(tradeCount))    ")
-            FileMarketRecorder.saveTo(fileHandle: tradesFileHandel, tradesCache)
+            MarketFileRecorder.saveTo(fileHandle: tradesFileHandel, tradesCache)
             tradesCache.removeAll(keepingCapacity: true)
         }
         
@@ -171,7 +171,7 @@ class FileMarketRecorder: MarketRecorder {
         
         if depthsCache.count > 0 && depthsCache.count % 150 == 0 {
             sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.    ")
-            FileMarketRecorder.saveTo(fileHandle: depthsFileHandel, depthsCache)
+            MarketFileRecorder.saveTo(fileHandle: depthsFileHandel, depthsCache)
             depthsCache.removeAll(keepingCapacity: true)
         }
     }

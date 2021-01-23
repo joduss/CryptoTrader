@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Binance: WebSocketDelegate, TradingPlatform {
+public class Binance: WebSocketDelegate, CryptoExchangePlatform {
     
     private let baseUrl = URL(string: "wss://stream.binance.com:9443/ws/a")!
     
@@ -23,7 +23,7 @@ public class Binance: WebSocketDelegate, TradingPlatform {
     private(set) public var subscribedToMarketDepthStream: Bool = false
     
     public var webSocketHandler: WebSocketHandler
-    public var subscriber: TradingPlatformSubscriber?
+    public var subscriber: CryptoExchangePlatformSubscriber?
     
     
     public init(marketPair: MarketPair) {
