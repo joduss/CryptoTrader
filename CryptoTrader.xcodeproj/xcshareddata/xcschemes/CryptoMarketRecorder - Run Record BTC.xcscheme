@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-               BuildableName = "CryptoTrader"
-               BlueprintName = "CryptoTrader"
+               BlueprintIdentifier = "6BFC305625BCD5CA00BDD732"
+               BuildableName = "CryptoMarketRecorder"
+               BlueprintName = "CryptoMarketRecorder"
                ReferencedContainer = "container:CryptoTrader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -44,15 +44,15 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "CryptoTrader"
-            BlueprintName = "CryptoTrader"
+            BlueprintIdentifier = "6BFC305625BCD5CA00BDD732"
+            BuildableName = "CryptoMarketRecorder"
+            BlueprintName = "CryptoMarketRecorder"
             ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--record --btc_usd ~/Documents/ records"
+            argument = "--btc_usd ~/Documents/ test-records"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
@@ -63,16 +63,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
-            BuildableName = "CryptoTrader"
-            BlueprintName = "CryptoTrader"
+            BlueprintIdentifier = "6BFC305625BCD5CA00BDD732"
+            BuildableName = "CryptoMarketRecorder"
+            BlueprintName = "CryptoMarketRecorder"
             ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -4,7 +4,7 @@ import Foundation
 class MarketFileRecorder: MarketRecorder {
     
     
-    private let api : TradingPlatform
+    private let api : CryptoExchangePlatform
     private let savingFrequency: Int
     
     private let tickersFileSemaphore = DispatchSemaphore(value: 1)
@@ -27,7 +27,7 @@ class MarketFileRecorder: MarketRecorder {
 
     private var aggregatedTicker: MarketTicker?
 
-    init(api: TradingPlatform, savingFrequency: Int = 5000) {
+    init(api: CryptoExchangePlatform, savingFrequency: Int = 5000) {
         self.api = api
         self.savingFrequency = savingFrequency
         
@@ -169,7 +169,7 @@ class MarketFileRecorder: MarketRecorder {
             sourceReplacablePrint("Depth \(depthCount) => There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.")
         }
         
-        if depthsCache.count > 0 && depthsCache.count % 150 == 0 {
+        if depthsCache.count > 0 && depthsCache.count % (savingFrequency / 30) == 0 {
             sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.    ")
             MarketFileRecorder.saveTo(fileHandle: depthsFileHandel, depthsCache)
             depthsCache.removeAll(keepingCapacity: true)

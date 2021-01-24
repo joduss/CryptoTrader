@@ -28,28 +28,35 @@ public struct MarketDepth: Codable {
         return formatter
     }()
     
-    mutating func updateBids(at priceLevel: Double, with quantity: Double) {
+    mutating func updateBids(_ depthElements: [MarketDepthElement]) {
         date = Date()
-        if quantity == 0 {
-            bidsDouble.removeValue(forKey: NSNumber(value: priceLevel))
-            return
+        
+        for depthElement in depthElements {
+            if depthElement.quantity == 0 {
+                bidsDouble.removeValue(forKey: NSNumber(value: depthElement.priceLevel))
+                continue
+            }
+            
+            guard shouldAdd(at: depthElement.priceLevel) else { continue }
+            
+            bidsDouble[NSNumber(value: depthElement.priceLevel)] = depthElement.quantity
         }
         
-        guard shouldAdd(at: priceLevel) else { return }
-        
-        bidsDouble[NSNumber(value: priceLevel)] = quantity
         bids = computeBids()
     }
     
-    mutating func updateAsks(at priceLevel: Double, with quantity: Double) {
+    mutating func updateAsks(_ depthElements: [MarketDepthElement]) {
         date = Date()
-        if quantity == 0 {
-            asksDouble.removeValue(forKey: NSNumber(value: priceLevel))
-            return
-        }
-        guard shouldAdd(at: priceLevel) else { return }
         
-        asksDouble[NSNumber(value: priceLevel)] = quantity
+        for depthElement in depthElements {
+            if depthElement.quantity == 0 {
+                asksDouble.removeValue(forKey: NSNumber(value: depthElement.priceLevel))
+                continue
+            }
+            guard shouldAdd(at: depthElement.priceLevel) else { continue }
+            
+            asksDouble[NSNumber(value: depthElement.priceLevel)] = depthElement.quantity
+        }
         asks = computeAsks()
     }
     
@@ -77,7 +84,7 @@ public struct MarketDepth: Codable {
         var asks = [String:String]()
         
         for (priceLevel, qty) in asksDouble {
-            let roundedLevel: String = self.numberFormatter.string(for: priceLevel)!
+            let roundedLevel: String = self.numberFormatter.string(for: adaptivePriceRound(priceLevel))!
             
             if asks.keys.contains(roundedLevel) {
                 let currentQty = Double(asks[roundedLevel]!)!
@@ -92,7 +99,7 @@ public struct MarketDepth: Codable {
     }
     
     private func shouldAdd(at price: Double) -> Bool {
-        return price <= 1.5 * currentPrice && price >= 0.5 * currentPrice
+        return price <= 1.5 * currentPrice && price >= currentPrice / 1.5
     }
 
     private mutating func clean() {
@@ -107,5 +114,33 @@ public struct MarketDepth: Codable {
         for bidToRemove in bidsToRemove {
             bidsDouble.removeValue(forKey: bidToRemove)
         }
+    }
+    
+    // MARK: - Helpers
+    
+    /// Round a price adaptively. There is more resolution close to the current price than far away.
+    func adaptivePriceRound(_ number: NSNumber) -> Double {
+        
+        let priceValue = number.doubleValue
+        
+        guard currentPrice != 0 else { return priceValue}
+        
+        let rangeVeryPrecise = currentPrice / 200
+        let rangePrecise = currentPrice / 10
+        
+        if priceValue >= currentPrice - rangeVeryPrecise && priceValue <= currentPrice + rangeVeryPrecise {
+            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 1.0)
+        }
+        else if priceValue >= currentPrice - rangePrecise && priceValue <= currentPrice + rangePrecise {
+            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 5.0)
+        }
+        else {
+            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 25.0)
+        }
+    }
+
+    /// Round a price to a certain base. If base is 15, then it will ve rounded to a multiple of 15.
+    func roundPrice(_ number: Double, roundBase: Double) -> Double {
+        return round(number / roundBase) * roundBase
     }
 }

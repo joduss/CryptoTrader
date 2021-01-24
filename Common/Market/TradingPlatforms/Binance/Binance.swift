@@ -138,13 +138,12 @@ public class Binance: WebSocketDelegate, CryptoExchangePlatform {
         if response.starts(with: "{\"e\":\"depthUpdate\"") {
             
             let binanceDepth = try! JSONDecoder().decode(BinanceDepthUpdateResponse.self, from: response.data(using: .utf8)!)
-            for askUpdate in binanceDepth.askUpdates {
-                marketDepth.updateAsks(at: askUpdate.priceLevel, with: askUpdate.quantity)
-            }
             
-            for bidUpdate in binanceDepth.bidUpdates {
-                marketDepth.updateBids(at: bidUpdate.priceLevel, with: bidUpdate.quantity)
-            }
+            let askUpdates = binanceDepth.askUpdates.map({MarketDepthElement(priceLevel: $0.priceLevel, quantity: $0.quantity)})
+            marketDepth.updateAsks(askUpdates)
+
+            let bidUpdates = binanceDepth.bidUpdates.map({MarketDepthElement(priceLevel: $0.priceLevel, quantity: $0.quantity)})
+            marketDepth.updateBids(bidUpdates)
                         
             subscriber?.process(depthUpdate: marketDepth)
             return
