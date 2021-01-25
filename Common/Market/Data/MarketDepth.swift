@@ -3,12 +3,11 @@ import Foundation
 public struct MarketDepth: Codable {
     
     public private(set) var date = Date()
-    public private(set) var bids: [String : String] = [:]
-    public private(set) var asks: [String : String] = [:]
+    public private(set) var bids: [Double : Double] = [:]
+    public private(set) var asks: [Double : Double] = [:]
     
-    private var bidsDouble: [NSNumber : Double] = [:]
-    private var asksDouble: [NSNumber : Double] = [:]
-    
+    private var numberFormatter: NumberFormatter
+
     public var currentPrice: Double = 0 {
         didSet {
             clean()
@@ -16,33 +15,66 @@ public struct MarketDepth: Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case bids
-        case asks
+        case bids = "bids"
+        case asks = "asks"
         case date
     }
     
-    private lazy var numberFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.usesSignificantDigits = true
-        formatter.maximumSignificantDigits = 4
-        return formatter
-    }()
+    // MARK: - Initialization and serialization
+    
+    public init(from decoder: Decoder) throws {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        
+        date = try values.decode(Date.self, forKey: .date)
+        
+        let bidsString = try values.decode([String : String].self, forKey: .bids)
+        let asksString = try values.decode([String : String].self, forKey: .asks)
+        
+        bids.reserveCapacity(bidsString.count)
+        for bidString in bidsString {
+            bids[Double(bidString.key)!] = Double(bidString.value)!
+        }
+        
+        asks.reserveCapacity(asks.count)
+        for askString in asksString {
+            asks[Double(askString.key)!] = Double(askString.value)!
+        }
+    }
+    
+    public init() {
+        numberFormatter = NumberFormatter()
+        numberFormatter.usesSignificantDigits = true
+        numberFormatter.maximumSignificantDigits = 6
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        let bidsStrings = bidsAsStrings()
+        let asksStrings = asksAsStrings()
+        try container.encode(bidsStrings, forKey: .bids)
+        try container.encode(asksStrings, forKey: .asks)
+        try container.encode(date, forKey: .date)
+        sourcePrint("Serializing MarketDepth: It has \(asksStrings.count) asks aggregated levels and \(bidsStrings.count) bid aggregated levels")
+    }
+    
+    
+    // MARK: - Data update
     
     mutating func updateBids(_ depthElements: [MarketDepthElement]) {
         date = Date()
         
         for depthElement in depthElements {
             if depthElement.quantity == 0 {
-                bidsDouble.removeValue(forKey: NSNumber(value: depthElement.priceLevel))
+                bids.removeValue(forKey: depthElement.priceLevel)
                 continue
             }
             
             guard shouldAdd(at: depthElement.priceLevel) else { continue }
             
-            bidsDouble[NSNumber(value: depthElement.priceLevel)] = depthElement.quantity
+            bids[depthElement.priceLevel] = depthElement.quantity
         }
         
-        bids = computeBids()
     }
     
     mutating func updateAsks(_ depthElements: [MarketDepthElement]) {
@@ -50,92 +82,103 @@ public struct MarketDepth: Codable {
         
         for depthElement in depthElements {
             if depthElement.quantity == 0 {
-                asksDouble.removeValue(forKey: NSNumber(value: depthElement.priceLevel))
+                asks.removeValue(forKey: depthElement.priceLevel)
                 continue
             }
             guard shouldAdd(at: depthElement.priceLevel) else { continue }
             
-            asksDouble[NSNumber(value: depthElement.priceLevel)] = depthElement.quantity
+            asks[depthElement.priceLevel] = depthElement.quantity
         }
-        asks = computeAsks()
     }
     
-    private mutating func computeBids() -> [String : String] {
+    private mutating func clean() {
         
-        var bids = [String:String]()
-        
-        for (priceLevel, qty) in bidsDouble {
-            let roundedLevel: String = self.numberFormatter.string(for: priceLevel)!
-            
-            if bids.keys.contains(roundedLevel) {
-                let currentQty = Double(bids[roundedLevel]!)!
-                bids[roundedLevel] = String(currentQty + qty)
-            }
-            else {
-                bids[roundedLevel] = qty.description
-            }
+        let asksToRemove = asks.keys.filter({shouldAdd(at: $0) == false})
+        let bidsToRemove = bids.keys.filter({shouldAdd(at: $0) == false})
+
+        for askToRemove in asksToRemove {
+            asks.removeValue(forKey: askToRemove)
         }
         
-        return bids
+        for bidToRemove in bidsToRemove {
+            bids.removeValue(forKey: bidToRemove)
+        }
     }
     
-    private mutating func computeAsks() -> [String : String] {
+    // MARK: - Serialization helpers
+    
+    private func bidsAsStrings() -> [String : String] {
         
-        var asks = [String:String]()
+        var newBidsString = [String : String](minimumCapacity: bids.count / 5 + 1)
         
-        for (priceLevel, qty) in asksDouble {
+        for (priceLevel, qty) in bids {
             let roundedLevel: String = self.numberFormatter.string(for: adaptivePriceRound(priceLevel))!
             
-            if asks.keys.contains(roundedLevel) {
-                let currentQty = Double(asks[roundedLevel]!)!
-                asks[roundedLevel] = String(currentQty + qty)
+            if newBidsString.keys.contains(roundedLevel) {
+                let currentQty = Double(newBidsString[roundedLevel]!)!
+                newBidsString[roundedLevel] = numberFormatter.string(from: roundQuantity(currentQty + qty))!
             }
             else {
-                asks[roundedLevel] = qty.description
+                newBidsString[roundedLevel] = numberFormatter.string(from: roundQuantity(qty))!
             }
         }
         
-        return asks
+        return newBidsString
+    }
+    
+    private func asksAsStrings() -> [String : String] {
+        
+        var newAsksString = [String : String](minimumCapacity: asks.count / 5 + 1)
+
+        for (priceLevel, qty) in asks {
+            let roundedLevel: String = self.numberFormatter.string(for: adaptivePriceRound(priceLevel))!
+            
+            if newAsksString.keys.contains(roundedLevel) {
+                let currentQty = Double(newAsksString[roundedLevel]!)!
+                newAsksString[roundedLevel] = numberFormatter.string(from: roundQuantity(currentQty + qty))!
+            }
+            else {
+                newAsksString[roundedLevel] = numberFormatter.string(from: roundQuantity(qty))!
+            }
+        }
+        
+        return newAsksString
     }
     
     private func shouldAdd(at price: Double) -> Bool {
         return price <= 1.5 * currentPrice && price >= currentPrice / 1.5
     }
-
-    private mutating func clean() {
-        
-        let asksToRemove = asksDouble.keys.filter({shouldAdd(at: $0.doubleValue) == false})
-        let bidsToRemove = bidsDouble.keys.filter({shouldAdd(at: $0.doubleValue) == false})
-
-        for askToRemove in asksToRemove {
-            asksDouble.removeValue(forKey: askToRemove)
-        }
-        
-        for bidToRemove in bidsToRemove {
-            bidsDouble.removeValue(forKey: bidToRemove)
-        }
-    }
     
     // MARK: - Helpers
     
     /// Round a price adaptively. There is more resolution close to the current price than far away.
-    func adaptivePriceRound(_ number: NSNumber) -> Double {
+    func adaptivePriceRound(_ priceToRound: NSNumber) -> Double {
+        return adaptivePriceRound(priceToRound.doubleValue)
+    }
+    
+    func adaptivePriceRound(_ priceToRound: Double) -> Double {
+                
+        guard currentPrice != 0 else { return priceToRound}
         
-        let priceValue = number.doubleValue
+        let rangeVeryPrecise = currentPrice / 250 // 120
+        let rangePrecise = currentPrice / 100 // 300
+        let rangeLessPrecise = currentPrice / 20 // 1500
+        let rangeNotPrecise = currentPrice / 5 // 6000
         
-        guard currentPrice != 0 else { return priceValue}
-        
-        let rangeVeryPrecise = currentPrice / 200
-        let rangePrecise = currentPrice / 10
-        
-        if priceValue >= currentPrice - rangeVeryPrecise && priceValue <= currentPrice + rangeVeryPrecise {
-            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 1.0)
+        if priceToRound >= currentPrice - rangeVeryPrecise && priceToRound <= currentPrice + rangeVeryPrecise {
+            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 1.0)
         }
-        else if priceValue >= currentPrice - rangePrecise && priceValue <= currentPrice + rangePrecise {
-            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 5.0)
+        else if priceToRound >= currentPrice - rangePrecise && priceToRound <= currentPrice + rangePrecise {
+            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 5.0)
+        }
+        else if priceToRound >= currentPrice - rangeLessPrecise && priceToRound <= currentPrice + rangeLessPrecise {
+            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 25.0)
+        }
+        else if priceToRound >= currentPrice - rangeNotPrecise && priceToRound <= currentPrice + rangeNotPrecise {
+            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 50.0)
         }
         else {
-            return roundPrice(priceValue, roundBase: round(currentPrice / 10000.0) * 25.0)
+            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 150.0)
         }
     }
 
@@ -143,4 +186,12 @@ public struct MarketDepth: Codable {
     func roundPrice(_ number: Double, roundBase: Double) -> Double {
         return round(number / roundBase) * roundBase
     }
-}
+    
+    func roundQuantity(_ quantity: Double) -> Double {
+        if currentPrice == 0 {
+            return quantity
+        }
+        
+        return round(quantity, numberOfDecimals: Int(ceil(2 + log10(currentPrice))))
+    }
+ }

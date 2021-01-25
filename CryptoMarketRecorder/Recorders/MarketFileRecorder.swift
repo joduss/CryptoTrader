@@ -1,4 +1,5 @@
 import Foundation
+import JoLibrary
 
 /// A MarketRecorder recording to a file.
 class MarketFileRecorder: MarketRecorder {
@@ -30,10 +31,11 @@ class MarketFileRecorder: MarketRecorder {
     init(api: CryptoExchangePlatform, savingFrequency: Int = 5000) {
         self.api = api
         self.savingFrequency = savingFrequency
-        
+     
         tickersCache.reserveCapacity(savingFrequency)
         tradesCache.reserveCapacity(savingFrequency)
         depthsCache.reserveCapacity(savingFrequency)
+        
         self.api.subscriber = self
     }
     
@@ -131,8 +133,11 @@ class MarketFileRecorder: MarketRecorder {
                 
         if tickersCache.count > 0 && tickersCache.count % savingFrequency == 0 {
             sourcePrint("Saving tickers to file... (Total: \(tickerCount))   ")
-            MarketFileRecorder.saveTo(fileHandle: tickersFileHandel, tickersCache)
-            tickersCache.removeAll(keepingCapacity: true)
+            let tickersToSave = self.tickersCache
+            DispatchQueue.global().async {
+                MarketFileRecorder.saveTo(fileHandle: self.tickersFileHandel, tickersToSave)
+            }
+            self.tickersCache.removeAll(keepingCapacity: true)
         }
     }
     
@@ -148,7 +153,10 @@ class MarketFileRecorder: MarketRecorder {
         
         if tradesCache.count > 0 && tradesCache.count % savingFrequency == 0 {
             sourcePrint("Saving trades to file... (Total: \(tradeCount))    ")
-            MarketFileRecorder.saveTo(fileHandle: tradesFileHandel, tradesCache)
+            let tradesTosave = self.tradesCache
+            DispatchQueue.global().async {
+                MarketFileRecorder.saveTo(fileHandle: self.tradesFileHandel, tradesTosave)
+            }
             tradesCache.removeAll(keepingCapacity: true)
         }
         
@@ -170,8 +178,12 @@ class MarketFileRecorder: MarketRecorder {
         }
         
         if depthsCache.count > 0 && depthsCache.count % (savingFrequency / 30) == 0 {
-            sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.    ")
-            MarketFileRecorder.saveTo(fileHandle: depthsFileHandel, depthsCache)
+//             if depthsCache.count > 0 && depthsCache.count % 1 == 0 {
+            sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids (not aggregated).    ")
+            let depthToSave = depthsCache
+            DispatchQueue.global().async {
+                MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, depthToSave)
+            }
             depthsCache.removeAll(keepingCapacity: true)
         }
     }
