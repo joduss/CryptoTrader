@@ -38,6 +38,7 @@
 		6BEE162825BD8340002E2DC6 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE162725BD8340002E2DC6 /* ArgumentParser */; };
 		6BEE163025BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
 		6BEE163125BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
+		6BEE164D25BDFD2B002E2DC6 /* JoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE164C25BDFD2B002E2DC6 /* JoLibrary */; };
 		6BFC306925BCD6B100BDD732 /* MarketTicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7116D825BB1DE300D34447 /* MarketTicker.swift */; };
 		6BFC306A25BCD6B100BDD732 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E98D925AB9068004509E2 /* WebSocket.swift */; };
 		6BFC306B25BCD6B100BDD732 /* CryptoExchangePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */; };
@@ -137,6 +138,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6BEE162825BD8340002E2DC6 /* ArgumentParser in Frameworks */,
+				6BEE164D25BDFD2B002E2DC6 /* JoLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,6 +360,7 @@
 			name = CryptoMarketRecorder;
 			packageProductDependencies = (
 				6BEE162725BD8340002E2DC6 /* ArgumentParser */,
+				6BEE164C25BDFD2B002E2DC6 /* JoLibrary */,
 			);
 			productName = MarketRecorder;
 			productReference = 6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */;
@@ -632,6 +635,7 @@
 				INFOPLIST_FILE = CryptoMarketRecorder/info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.zajo.crypto-market-recorder";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -647,6 +651,7 @@
 				INFOPLIST_FILE = CryptoMarketRecorder/info.plist;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.zajo.crypto-market-recorder";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -718,6 +723,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6B8D17BC25B745360021B64E /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
+		};
+		6BEE164C25BDFD2B002E2DC6 /* JoLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B5600E025AE0D05002F8CE1 /* XCRemoteSwiftPackageReference "JoLibrary" */;
+			productName = JoLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
