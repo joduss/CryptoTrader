@@ -35,6 +35,9 @@
 		6BBF4F5425ACDC9B002D245C /* Binance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F5325ACDC9B002D245C /* Binance.swift */; };
 		6BBF4F5A25AD7BE8002D245C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F5925AD7BE8002D245C /* StringExtensions.swift */; };
 		6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F6225AD80C4002D245C /* CleanPrint.swift */; };
+		6BE656A025C08C59001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
+		6BE656AA25C09627001AAF59 /* CryptoTraderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE656A925C09627001AAF59 /* CryptoTraderTests.swift */; };
+		6BE656B225C0969D001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
 		6BEE162825BD8340002E2DC6 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE162725BD8340002E2DC6 /* ArgumentParser */; };
 		6BEE163025BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
 		6BEE163125BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
@@ -119,6 +122,10 @@
 		6BBF4F5C25AD7E8F002D245C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BBF4F6225AD80C4002D245C /* CleanPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPrint.swift; sourceTree = "<group>"; };
 		6BDE061625BB15EC00731878 /* MarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketRecorder.swift; sourceTree = "<group>"; };
+		6BE6569F25C08C59001AAF59 /* Percent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Percent.swift; sourceTree = "<group>"; };
+		6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CryptoTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BE656A925C09627001AAF59 /* CryptoTraderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTraderTests.swift; sourceTree = "<group>"; };
+		6BE656AB25C09627001AAF59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE161D25BD8293002E2DC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDepthElement.swift; sourceTree = "<group>"; };
 		6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMathFunctions.swift; sourceTree = "<group>"; };
@@ -164,6 +171,7 @@
 				6BFC305125BCD58800BDD732 /* Common */,
 				6B48DAD325A9F6BA00F2CD6D /* CryptoTrader */,
 				6BFC305825BCD5CA00BDD732 /* CryptoMarketRecorder */,
+				6BE656A825C09627001AAF59 /* CryptoTraderTests */,
 				6B48DAD225A9F6BA00F2CD6D /* Products */,
 				6BEE162625BD8340002E2DC6 /* Frameworks */,
 			);
@@ -174,6 +182,7 @@
 			children = (
 				6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */,
 				6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */,
+				6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -184,6 +193,7 @@
 				6B8D17CA25B757FD0021B64E /* Trading */,
 				6B48DAD425A9F6BA00F2CD6D /* main.swift */,
 				6BBF4F5C25AD7E8F002D245C /* Info.plist */,
+				6BE6569F25C08C59001AAF59 /* Percent.swift */,
 			);
 			path = CryptoTrader;
 			sourceTree = "<group>";
@@ -287,6 +297,15 @@
 			path = CodableTypes;
 			sourceTree = "<group>";
 		};
+		6BE656A825C09627001AAF59 /* CryptoTraderTests */ = {
+			isa = PBXGroup;
+			children = (
+				6BE656A925C09627001AAF59 /* CryptoTraderTests.swift */,
+				6BE656AB25C09627001AAF59 /* Info.plist */,
+			);
+			path = CryptoTraderTests;
+			sourceTree = "<group>";
+		};
 		6BEE162625BD8340002E2DC6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -349,6 +368,23 @@
 			productReference = 6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */;
 			productType = "com.apple.product-type.tool";
 		};
+		6BE656A625C09627001AAF59 /* CryptoTraderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BE656AC25C09627001AAF59 /* Build configuration list for PBXNativeTarget "CryptoTraderTests" */;
+			buildPhases = (
+				6BE656A325C09627001AAF59 /* Sources */,
+				6BE656A425C09627001AAF59 /* Frameworks */,
+				6BE656A525C09627001AAF59 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CryptoTraderTests;
+			productName = CryptoTraderTests;
+			productReference = 6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6BFC305625BCD5CA00BDD732 /* CryptoMarketRecorder */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6BFC305B25BCD5CA00BDD732 /* Build configuration list for PBXNativeTarget "CryptoMarketRecorder" */;
@@ -406,9 +442,20 @@
 			targets = (
 				6B48DAD025A9F6BA00F2CD6D /* CryptoTrader */,
 				6BFC305625BCD5CA00BDD732 /* CryptoMarketRecorder */,
+				6BE656A625C09627001AAF59 /* CryptoTraderTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6BE656A525C09627001AAF59 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6B48DACD25A9F6BA00F2CD6D /* Sources */ = {
@@ -427,6 +474,7 @@
 				6B48DAE525A9FE3800F2CD6D /* SimpleTrader.swift in Sources */,
 				6B48DADE25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift in Sources */,
 				6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */,
+				6BE656A025C08C59001AAF59 /* Percent.swift in Sources */,
 				6B9D04A625B7885100EC53E1 /* BinanceAggregatedTradeResponse.swift in Sources */,
 				6BEE163025BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */,
 				6B3E98D725AB259F004509E2 /* DateExtensions.swift in Sources */,
@@ -443,6 +491,15 @@
 				6BBD82AF25AF753500734704 /* MarketHistorySlice.swift in Sources */,
 				6B8D17C125B756AB0021B64E /* IgnoreAsNil.swift in Sources */,
 				6B7116F525BB78B000D34447 /* BinanceTickerResponse.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BE656A325C09627001AAF59 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6BE656AA25C09627001AAF59 /* CryptoTraderTests.swift in Sources */,
+				6BE656B225C0969D001AAF59 /* Percent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -626,6 +683,44 @@
 				INFOPLIST_FILE = CryptoTrader/info.plist;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ch.zajo.trader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6BE656AD25C09627001AAF59 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SB56D8K42E;
+				INFOPLIST_FILE = CryptoTraderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.zajo.market-recorder.CryptoTraderTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6BE656AE25C09627001AAF59 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = SB56D8K42E;
+				INFOPLIST_FILE = CryptoTraderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.zajo.market-recorder.CryptoTraderTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
