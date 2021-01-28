@@ -9,47 +9,116 @@ import Foundation
 
 class MarketHistorySlice {
     
-    let prices: ArraySlice<MarketAggregatedTrade>
+    public internal(set) var prices: ArraySlice<MarketAggregatedTrade>
     
     private var averagePrice: Double!
     private var min: Double!
     private var max: Double!
     
-    init(prices: ArraySlice<MarketAggregatedTrade>) {
+    public init(prices: ArraySlice<MarketAggregatedTrade>) {
         self.prices = prices
     }
     
-    // The interval must be given positive.
-    func average() -> Double {
+    /// Returns true if there is history in the past in a time interval from now.
+    func hasRecordFromAtLeastPastInterval(_ interval: TimeInterval) -> Bool {
+        guard let firstRecord = prices.first else { return false }
+        
+        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
+    }
+    
+    public func average() -> Double {
         computeBasic()
         return self.averagePrice
     }
+    
+    public func maxPrice() -> Double {
+        computeBasic()
+        return self.max
+    }
+    
+    public func minPrice() -> Double {
+        computeBasic()
+        return self.min
+    }
 
-    /// Slope is in price unit per second
+    /// Computes the slope between the beginning of the market history slice and the end, by averaging the first, respectively last
+    /// samples withing a range of size 'averageInterval' at the beginning, respectivelly end of the market history slice.
     func slope() -> Double {
-        var priceDic: [TimeInterval:Double] = [:]
-        priceDic.reserveCapacity(prices.count)
         
-        for price in prices {
-            priceDic[round(price.date.timeIntervalSinceReferenceDate)] = price.price
+        guard let firstTrade = prices.first, let lastTrade = prices.last else {
+            return 0
         }
         
-        let firstItemRoundedTimestamp = round(self.prices.first!.date.timeIntervalSinceReferenceDate)
+        let averageInterval = 4.0
         
-        var slope = 0.0
-        var last: (TimeInterval, Double) = (TimeInterval(firstItemRoundedTimestamp), priceDic[firstItemRoundedTimestamp]!)
+        let totalTimeInterval = lastTrade.date - firstTrade.date
         
-        priceDic.removeValue(forKey: firstItemRoundedTimestamp)
+        let firstPartInterval = self.pricesInInterval(beginDate: firstTrade.date, endDate: firstTrade.date + totalTimeInterval / averageInterval)
+        let lastPartInterval = self.pricesInInterval(beginDate: lastTrade.date - totalTimeInterval / averageInterval, endDate: lastTrade.date)
+
+//        for price in prices {
+//            priceDic[round(price.date.timeIntervalSinceReferenceDate)] = price.price
+//        }
+//
+//        let firstItemRoundedTimestamp = round(self.prices.first!.date.timeIntervalSinceReferenceDate)
+//
+//        var slope = 0.0
+//        var last: (TimeInterval, Double) = (TimeInterval(firstItemRoundedTimestamp), priceDic[firstItemRoundedTimestamp]!)
+//
+//        priceDic.removeValue(forKey: firstItemRoundedTimestamp)
+//
+//        for priceTimestamp in priceDic.keys.sorted() {
+//            let price = priceDic[priceTimestamp]!
+//            let localSlope = (price - last.1) / (priceTimestamp - last.0)
+//            slope += localSlope / Double(priceDic.count)
+//
+//            last = (priceTimestamp, price)
+//        }
+//
+//        return slope
         
-        for priceTimestamp in priceDic.keys {
-            let price = priceDic[priceTimestamp]!
-            let localSlope = (price - last.1) - (priceTimestamp - last.0)
-            slope += localSlope / Double(priceDic.count)
-            
-            last = (priceTimestamp, price)
+        return (lastPartInterval.average() - firstPartInterval.average()) / totalTimeInterval
+    }
+    
+//    func isTrendUpwards() -> Bool {
+//
+//    }
+    
+    /// Threshold: Percent of change in price to consider a difference of price as a negative trend.
+    func isTrendDownwards(threshold: Double = 0) -> Bool {
+        guard let firstTrade = prices.first, let lastTrade = prices.last else {
+            return false
         }
         
-        return slope
+        let intervalSlots = 4.0
+        
+        let totalTimeInterval = lastTrade.date - firstTrade.date
+        let intervalSlotDuration = totalTimeInterval / intervalSlots
+        
+        let firstPartInterval = self.pricesInInterval(beginDate: firstTrade.date, endDate: firstTrade.date + intervalSlotDuration)
+        let beforeLastPartInterval = self.pricesInInterval(beginDate: lastTrade.date - 2 * intervalSlotDuration,
+                                                           endDate: lastTrade.date - intervalSlotDuration)
+        let lastPartInterval = self.pricesInInterval(beginDate: lastTrade.date - intervalSlotDuration, endDate: lastTrade.date)
+        
+        let lastPartIntervalAvg = lastPartInterval.average()
+        let beforeLastPartIntervalAvg = beforeLastPartInterval.average()
+        let firstPartIntervalAvg = firstPartInterval.average()
+        
+//        let durationAToB = totalTimeInterval - 1.5 * intervalSlotDuration
+        
+//        let slopeAtoB = Percent(Percent(differenceOf: beforeLastPartIntervalAvg, from: firstPartIntervalAvg).percentage / durationAToB)
+        let slopeBtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: beforeLastPartIntervalAvg).percentage / intervalSlotDuration)
+        let slopeAtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: firstPartIntervalAvg).percentage / 3 * intervalSlots)
+        
+        if slopeAtoC.percentage > threshold {
+            return false
+        }
+        
+        if slopeBtoC.percentage > threshold {
+            return false
+        }
+        
+        return true
     }
     
     func variability() -> Variability {
@@ -62,11 +131,11 @@ class MarketHistorySlice {
                            spikes1Percent:searchingSpikes(spikeRatioToPrice: 1.0 / 100, priceMin: min, priceMax: max, priceAvg: averagePrice))
     }
     
+    /// Computes the min, max and average prices.
     private func computeBasic() {
         if self.min != nil {
             return
         }
-        
         
         var min = Double.greatestFiniteMagnitude
         var max = 0.0
@@ -147,5 +216,118 @@ class MarketHistorySlice {
             
         }
         return spikeCount
+    }
+}
+
+
+// MARK: - History slicing
+
+extension MarketHistorySlice {
+    
+    /// Returns a market history up to a given point back in the past.
+    func prices(last interval: TimeInterval) -> MarketHistorySlice {
+        return pricesInInterval(beginDate: DateFactory.now.advanced(by: -interval))
+    }
+    
+    /// Returns a market history from a given date to the end or to a specific date.
+    func pricesInInterval(beginDate: Date, endDate: Date? = nil) -> MarketHistorySlice {
+        
+        guard self.prices.count > 0 else { return MarketHistorySlice(prices: ArraySlice()) }
+        let startIdx = findSortedIdx(dateAtLeast: beginDate)!
+
+        if let endDate = endDate {
+            let endIdx = findSortedIdx(dateAtMax: endDate)!
+            return MarketHistorySlice(prices: self.prices[startIdx..<endIdx])
+        }
+        else {
+            return MarketHistorySlice(prices: self.prices[startIdx..<self.prices.endIndex])
+        }
+    }
+    
+    /// Find the index of the largest date smaller or equal than a given date in a sorted array.
+    /// Uses the binary search algorithm.
+    func findSortedIdx(dateAtMax date: Date) -> Int? {
+        guard prices.count > 0 else { return nil }
+        
+        if prices.first!.date > date {
+            return nil
+        }
+        
+        if prices.last!.date <= date {
+            return prices.endIndex-1
+        }
+        
+        var rangeToSearch = (self.prices.startIndex)...(self.prices.endIndex - 1)
+        
+        while(rangeToSearch.upperBound != rangeToSearch.lowerBound) {
+
+            // In case there are only 2 elements in the range.
+            // If the larger element is too large, the smaller might be ok. It still might be larger, so we need to take the one below.
+            if rangeToSearch.upperBound - 1 == rangeToSearch.lowerBound {
+                if prices[rangeToSearch.upperBound].date > date {
+                    return prices[rangeToSearch.lowerBound].date > date ? rangeToSearch.lowerBound - 1 : rangeToSearch.lowerBound
+                }
+                return rangeToSearch.upperBound
+            }
+            
+            let centerRange = Int(round(Double((rangeToSearch.upperBound + rangeToSearch.lowerBound)) / 2.0))
+            
+            if prices[centerRange].date > date {
+                // If the value is larger or equal, we should search smaller values.
+                rangeToSearch =  (rangeToSearch.lowerBound)...(centerRange-1)
+            }
+            else {
+                // if the value is smaller, Then we need to search on the right, where larger values are to find the largest value
+                // not too big.
+                rangeToSearch = (centerRange)...rangeToSearch.upperBound
+
+            }
+        }
+        
+        return rangeToSearch.lowerBound
+    }
+
+    /// Find the index of the largest date smaller or equal than a given date in a sorted array.
+    /// Uses the binary search algorithm.
+    func findSortedIdx(dateAtLeast date: Date) -> Int? {
+        guard prices.count > 0 else { return nil }
+        
+        if prices.first!.date >= date {
+            return prices.startIndex
+        }
+        
+        if prices.last!.date < date {
+            return nil
+        }
+        
+        var rangeToSearch = (self.prices.startIndex)...(self.prices.endIndex - 1)
+        
+        while(rangeToSearch.upperBound != rangeToSearch.lowerBound) {
+
+            // In case there are only 2 elements in the range
+            // If the smaller element is too small, we take the larger. It might still be too small. In such case,
+            // we take the one above.
+            if rangeToSearch.upperBound - 1 == rangeToSearch.lowerBound {
+                if prices[rangeToSearch.lowerBound].date < date {
+                    return prices[rangeToSearch.upperBound].date >= date ? rangeToSearch.upperBound : rangeToSearch.upperBound + 1
+                }
+                return rangeToSearch.lowerBound
+            }
+            
+            let centerRange = Int(round(Double((rangeToSearch.upperBound + rangeToSearch.lowerBound)) / 2.0))
+            
+            if prices[centerRange].date >= date {
+                // If the value is larger or equal, we should search smaller values right large enough on the left.
+                rangeToSearch =  (rangeToSearch.lowerBound)...centerRange
+            }
+            else {
+
+                // if the value is smaller, Then we need to search on the right, where larger values are.
+                rangeToSearch = (centerRange + 1)...rangeToSearch.upperBound
+
+            }
+        }
+        
+        return rangeToSearch.lowerBound
     }
 }
