@@ -41,6 +41,7 @@
 		6BEE162825BD8340002E2DC6 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE162725BD8340002E2DC6 /* ArgumentParser */; };
 		6BEE163025BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
 		6BEE163125BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
+		6BEE163E25BDB624002E2DC6 /* MarketPerSecondHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE163D25BDB624002E2DC6 /* MarketPerSecondHistory.swift */; };
 		6BEE164D25BDFD2B002E2DC6 /* JoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE164C25BDFD2B002E2DC6 /* JoLibrary */; };
 		6BEE165125BDFFB3002E2DC6 /* GlobalMathFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */; };
 		6BEE165225BDFFB3002E2DC6 /* GlobalMathFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */; };
@@ -128,6 +129,7 @@
 		6BE656AB25C09627001AAF59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE161D25BD8293002E2DC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDepthElement.swift; sourceTree = "<group>"; };
+		6BEE163D25BDB624002E2DC6 /* MarketPerSecondHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketPerSecondHistory.swift; sourceTree = "<group>"; };
 		6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMathFunctions.swift; sourceTree = "<group>"; };
 		6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoMarketRecorder; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BFC305925BCD5CA00BDD732 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 		6B8D17CA25B757FD0021B64E /* Trading */ = {
 			isa = PBXGroup;
 			children = (
+				6BEE163C25BDB5F6002E2DC6 /* Market */,
 				6B9D04A825B8C13300EC53E1 /* Traders */,
 				6B3E98D325AB23D4004509E2 /* MarketHistory.swift */,
 				6BBD82AE25AF753500734704 /* MarketHistorySlice.swift */,
@@ -311,6 +314,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6BEE163C25BDB5F6002E2DC6 /* Market */ = {
+			isa = PBXGroup;
+			children = (
+				6BEE163D25BDB624002E2DC6 /* MarketPerSecondHistory.swift */,
+			);
+			path = Market;
 			sourceTree = "<group>";
 		};
 		6BFC305125BCD58800BDD732 /* Common */ = {
@@ -418,6 +429,9 @@
 					6B48DAD025A9F6BA00F2CD6D = {
 						CreatedOnToolsVersion = 12.3;
 					};
+					6BE656A625C09627001AAF59 = {
+						CreatedOnToolsVersion = 12.3;
+					};
 					6BFC305625BCD5CA00BDD732 = {
 						CreatedOnToolsVersion = 12.3;
 					};
@@ -480,6 +494,7 @@
 				6B3E98D725AB259F004509E2 /* DateExtensions.swift in Sources */,
 				6B9D04A325B787ED00EC53E1 /* BinanceDepthUpdateResponse.swift in Sources */,
 				6B3E98DA25AB9068004509E2 /* WebSocket.swift in Sources */,
+				6BEE163E25BDB624002E2DC6 /* MarketPerSecondHistory.swift in Sources */,
 				6B8D17C525B756E30021B64E /* KrakenTicker.swift in Sources */,
 				6B48DAD525A9F6BA00F2CD6D /* main.swift in Sources */,
 				6BBF4F5A25AD7BE8002D245C /* StringExtensions.swift in Sources */,
