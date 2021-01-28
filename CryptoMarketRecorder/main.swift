@@ -14,6 +14,9 @@ struct CryptoMarketRecorder: ParsableCommand {
     @Argument(help: "Base file name.")
     var fileName: String?
     
+    @Option(name: .long)
+    var loadDepthFile: String?
+    
     mutating func run() throws {
         guard let directoryPath = (recordFileDirectory as NSString?)?.expandingTildeInPath else {
             CryptoMarketRecorder.exit(withError: .some(ValidationError("Giving a directory path is mandatory for action 'record'")))
@@ -24,17 +27,23 @@ struct CryptoMarketRecorder: ParsableCommand {
         }
         
         let directoryUrl = URL(fileURLWithPath: directoryPath, isDirectory: true)
-        let tickerFile = directoryUrl.appendingPathComponent("\(fileName)-tickers.json")
-        let tradeFile = directoryUrl.appendingPathComponent("\(fileName)-trades.json")
-        let depthFile = directoryUrl.appendingPathComponent("\(fileName)-depth.json")
-        
+        let tickerFile = directoryUrl.appendingPathComponent("\(fileName)-tickers")
+        let tradeFile = directoryUrl.appendingPathComponent("\(fileName)-trades")
+        let depthFile = directoryUrl.appendingPathComponent("\(fileName)-depth")
+        let depthBackupFile = directoryUrl.appendingPathComponent("\(fileName)-depth-backup.json")
+
         let api = Binance(marketPair: self.marketPair)
-        let recorder = MarketFileRecorder(api: api, savingFrequency: 5000)
-        
+        let recorder = MarketFileRecorder(api: api, savingFrequency: 120)
         
         recorder.saveTicker(in: tickerFile)
         recorder.saveAggregatedTrades(in: tradeFile)
+        
+        if let loadDepthFilePath = (self.loadDepthFile as NSString?)?.expandingTildeInPath {
+            recorder.loadDepthBackup(from: URL(fileURLWithPath: loadDepthFilePath))
+        }
+        
         recorder.saveDepths(in: depthFile)
+        recorder.saveDepthBackup(in: depthBackupFile)
     }
 }
 

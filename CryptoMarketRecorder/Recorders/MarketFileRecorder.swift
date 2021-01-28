@@ -4,17 +4,19 @@ import JoLibrary
 /// A MarketRecorder recording to a file.
 class MarketFileRecorder: MarketRecorder {
     
-    
     private let api : CryptoExchangePlatform
     private let savingFrequency: Int
     
     private let tickersFileSemaphore = DispatchSemaphore(value: 1)
     private let tradesFileSemaphore = DispatchSemaphore(value: 1)
     private let depthsFileSemaphore = DispatchSemaphore(value: 1)
+    private let depthsBackupFileSemaphore = DispatchSemaphore(value: 1)
 
     private var tickersFileHandel : FileHandle!
     private var tradesFileHandel : FileHandle!
     private var depthsFileHandel : FileHandle!
+    private var depthsBackupFileHandel : FileHandle!
+
 
     private var tickersCache: [MarketTicker] = []
     private var tradesCache: [MarketAggregatedTrade] = []
@@ -55,6 +57,11 @@ class MarketFileRecorder: MarketRecorder {
         sourcePrint("The price recorder will save depths to \(fileUrl.path)")
         depthsFileHandel = createFileHandle(fromUrl: fileUrl)
         self.api.subscribeToMarketDepthStream()
+    }
+    
+    func saveDepthBackup(in fileUrl: URL) {
+        sourcePrint("The price recorder will save the depths backup to \(fileUrl.path)")
+        depthsBackupFileHandel = createFileHandle(fromUrl: fileUrl)
     }
     
     // MARK: Helpers
@@ -183,6 +190,9 @@ class MarketFileRecorder: MarketRecorder {
             let depthToSave = depthsCache
             DispatchQueue.global().async {
                 MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, depthToSave)
+                try! self.depthsBackupFileHandel.seek(toOffset: 0)
+                try! self.depthsBackupFileHandel.truncate(atOffset: 0)
+                self.depthsBackupFileHandel.write(try! JSONEncoder().encode(depthToSave.last!.backup()))
             }
             depthsCache.removeAll(keepingCapacity: true)
         }
