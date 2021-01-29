@@ -41,6 +41,8 @@
 		6BEE162825BD8340002E2DC6 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE162725BD8340002E2DC6 /* ArgumentParser */; };
 		6BEE163025BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
 		6BEE163125BD9CE8002E2DC6 /* MarketDepthElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */; };
+		6BEE163625BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE163525BDA949002E2DC6 /* SimulatedExchangePlatform.swift */; };
+		6BEE163725BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE163525BDA949002E2DC6 /* SimulatedExchangePlatform.swift */; };
 		6BEE163E25BDB624002E2DC6 /* MarketPerSecondHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE163D25BDB624002E2DC6 /* MarketPerSecondHistory.swift */; };
 		6BEE164D25BDFD2B002E2DC6 /* JoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6BEE164C25BDFD2B002E2DC6 /* JoLibrary */; };
 		6BEE165125BDFFB3002E2DC6 /* GlobalMathFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */; };
@@ -129,6 +131,7 @@
 		6BE656AB25C09627001AAF59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE161D25BD8293002E2DC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BEE162F25BD9CE8002E2DC6 /* MarketDepthElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDepthElement.swift; sourceTree = "<group>"; };
+		6BEE163525BDA949002E2DC6 /* SimulatedExchangePlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedExchangePlatform.swift; sourceTree = "<group>"; };
 		6BEE163D25BDB624002E2DC6 /* MarketPerSecondHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketPerSecondHistory.swift; sourceTree = "<group>"; };
 		6BEE165025BDFFB3002E2DC6 /* GlobalMathFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMathFunctions.swift; sourceTree = "<group>"; };
 		6BFC305725BCD5CA00BDD732 /* CryptoMarketRecorder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoMarketRecorder; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,6 +145,13 @@
 			files = (
 				6B8D17BE25B745360021B64E /* ArgumentParser in Frameworks */,
 				6B5600E225AE0D05002F8CE1 /* JoLibrary in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BE656A425C09627001AAF59 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +213,7 @@
 		6B48DADC25A9FD4300F2CD6D /* TradingPlatforms */ = {
 			isa = PBXGroup;
 			children = (
+				6BEE163425BDA890002E2DC6 /* Simulated */,
 				6B8D17BA25B7443A0021B64E /* Binance */,
 				6B3E98DD25AB92BE004509E2 /* Kraken */,
 				6B48DADD25A9FD8E00F2CD6D /* CryptoExchangePlatform.swift */,
@@ -314,6 +325,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6BEE163425BDA890002E2DC6 /* Simulated */ = {
+			isa = PBXGroup;
+			children = (
+				6BEE163525BDA949002E2DC6 /* SimulatedExchangePlatform.swift */,
+			);
+			path = Simulated;
 			sourceTree = "<group>";
 		};
 		6BEE163C25BDB5F6002E2DC6 /* Market */ = {
@@ -483,6 +502,7 @@
 				6B7116F225BB38E500D34447 /* MarketAggregatedTrade.swift in Sources */,
 				6B9D04A025B7837F00EC53E1 /* DateFactory.swift in Sources */,
 				6B3E98D425AB23D4004509E2 /* MarketHistory.swift in Sources */,
+				6BEE163625BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */,
 				6BA1C53925B4D6FA00ECEB5F /* KrakenTickerResponse.swift in Sources */,
 				6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */,
 				6B48DAE525A9FE3800F2CD6D /* SimpleTrader.swift in Sources */,
@@ -535,6 +555,7 @@
 				6BFC307225BCD6B100BDD732 /* KrakenTickerResponse.swift in Sources */,
 				6BFC307C25BCD6B100BDD732 /* BinanceDepthUpdateResponse.swift in Sources */,
 				6BFC309E25BCD8BE00BDD732 /* MarketPair.swift in Sources */,
+				6BEE163725BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */,
 				6BFC306B25BCD6B100BDD732 /* CryptoExchangePlatform.swift in Sources */,
 				6BFC306D25BCD6B100BDD732 /* CleanPrint.swift in Sources */,
 				6BFC307A25BCD6B100BDD732 /* DateExtensions.swift in Sources */,
@@ -790,6 +811,15 @@
 			buildConfigurations = (
 				6B48DAD925A9F6BA00F2CD6D /* Debug */,
 				6B48DADA25A9F6BA00F2CD6D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6BE656AC25C09627001AAF59 /* Build configuration list for PBXNativeTarget "CryptoTraderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BE656AD25C09627001AAF59 /* Debug */,
+				6BE656AE25C09627001AAF59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
