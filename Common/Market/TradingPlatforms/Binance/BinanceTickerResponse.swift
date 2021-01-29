@@ -12,6 +12,7 @@ class BinanceTickerResponse: Decodable {
     //  "A":"40.66000000"  // best ask qty
     //}
     
+    let updateId: Int
     let symbol: String
     let bidPrice: Double
     let bidQuantity: Double
@@ -19,6 +20,7 @@ class BinanceTickerResponse: Decodable {
     let askQuantity: Double
 
     enum CodingKeys: String, CodingKey {
+        case updateId = "u"
         case symbol = "s"
         case bestBidPrice = "b"
         case bestBidQuantity = "B"
@@ -28,6 +30,7 @@ class BinanceTickerResponse: Decodable {
     
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
+        updateId = try values.decode(Int.self, forKey: .updateId)
         symbol = try values.decode(String.self, forKey: .symbol)
         bidPrice = Double(try values.decode(String.self, forKey: .bestBidPrice))!
         bidQuantity = Double(try values.decode(String.self, forKey: .bestBidQuantity))!

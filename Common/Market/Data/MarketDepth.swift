@@ -1,8 +1,51 @@
 import Foundation
 
+public struct MarketDepthBackup: Codable {
+    
+    public let date: Date
+    public let id: Int
+    public private(set) var bids: [String : Double] = [:]
+    public private(set) var asks: [String : Double] = [:]
+    
+    public var bidsDoubles: [Double : Double] {
+        var transformedBids = [Double : Double]()
+        transformedBids.reserveCapacity(bids.count)
+        for (key, value) in self.bids {
+            transformedBids[Double(key)!] = value
+        }
+        return transformedBids
+    }
+    
+    public var asksDoubles: [Double : Double] {
+        var transformedAsks = [Double : Double]()
+        transformedAsks.reserveCapacity(asks.count)
+        for (key, value) in self.asks {
+            transformedAsks[Double(key)!] = value
+        }
+        return transformedAsks
+    }
+    
+    init(bids: [Double : Double], asks: [Double : Double], date: Date, id: Int) {
+        self.bids.reserveCapacity(bids.count)
+        self.asks.reserveCapacity(asks.capacity)
+        self.date = date
+        self.id = id
+        
+        for (bidKey, bidValue) in bids {
+            self.bids[bidKey.description] = bidValue
+        }
+        
+        for (askKey, askValue) in asks {
+            self.asks[askKey.description] = askValue
+        }
+    }
+}
+
+
 public struct MarketDepth: Codable {
     
-    public private(set) var date = Date()
+    public private(set) var id: Int
+    public private(set) var date = DateFactory.now
     public private(set) var bids: [Double : Double] = [:]
     public private(set) var asks: [Double : Double] = [:]
     
@@ -15,9 +58,10 @@ public struct MarketDepth: Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case bids = "bids"
-        case asks = "asks"
+        case bids
+        case asks
         case date
+        case id
     }
     
     // MARK: - Initialization and serialization
@@ -27,6 +71,7 @@ public struct MarketDepth: Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
         date = try values.decode(Date.self, forKey: .date)
+        id = try values.decode(Int.self, forKey: .id)
         
         let bidsString = try values.decode([String : String].self, forKey: .bids)
         let asksString = try values.decode([String : String].self, forKey: .asks)
@@ -43,23 +88,36 @@ public struct MarketDepth: Codable {
     }
     
     public init() {
+        id = 0
         numberFormatter = NumberFormatter()
         numberFormatter.usesSignificantDigits = true
         numberFormatter.maximumSignificantDigits = 6
     }
     
+    public init(marketDepthBackup: MarketDepthBackup) {
+        self.init()
+        self.bids = marketDepthBackup.bidsDoubles
+        self.asks = marketDepthBackup.asksDoubles
+        self.date = marketDepthBackup.date
+    }
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        let bidsStrings = bidsAsStrings()
-        let asksStrings = asksAsStrings()
-        try container.encode(bidsStrings, forKey: .bids)
-        try container.encode(asksStrings, forKey: .asks)
+        try container.encode(bidsAsStrings(), forKey: .bids)
+        try container.encode(asksAsStrings(), forKey: .asks)
         try container.encode(date, forKey: .date)
-        sourcePrint("Serializing MarketDepth: It has \(asksStrings.count) asks aggregated levels and \(bidsStrings.count) bid aggregated levels")
+        try container.encode(id, forKey: .id)
+    }
+    
+    public func backup() -> MarketDepthBackup {
+        return MarketDepthBackup(bids: self.bids, asks: self.asks, date: self.date, id: self.id)
     }
     
     
     // MARK: - Data update
+    mutating func updateId(_ id: Int) {
+        self.id = id
+    }
     
     mutating func updateBids(_ depthElements: [MarketDepthElement]) {
         date = Date()

@@ -65,7 +65,7 @@ public class Kraken: CryptoExchangePlatform, WebSocketDelegate {
     public func process(response: String) {
         if response.starts(with: "[") {
             let serverResponse = KrakenTickerResponse(response: response)
-            subscriber?.process(trade: MarketAggregatedTrade(date: Date(), symbol: marketPair.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
+            subscriber?.process(trade: MarketAggregatedTrade(id: Int.random(in: 0...Int.max),date: Date(), symbol: marketPair.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
         }
     }
 }

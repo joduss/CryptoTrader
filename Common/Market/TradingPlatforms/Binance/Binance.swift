@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import JoLibrary
 
-public class Binance: WebSocketDelegate, CryptoExchangePlatform {
+final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
     
     private let baseUrl = URL(string: "wss://stream.binance.com:9443/ws/a")!
     
@@ -33,6 +34,14 @@ public class Binance: WebSocketDelegate, CryptoExchangePlatform {
         webSocketHandler = WebSocketHandler(url: baseUrl)
         webSocketHandler.websocketDelegate = self
         webSocketHandler.createSocket()
+    }
+    
+    public convenience init(marketPair: MarketPair, marketDepthBackup: MarketDepthBackup) {
+        self.init(marketPair: marketPair)
+        self.marketDepth = MarketDepth(marketDepthBackup: marketDepthBackup)
+        
+        sourcePrint("Initialized Binance with depth backup...")
+        sourcePrint("Loaded \(marketDepth.bids.count) bids and \(marketDepth.asks.count) asks")
     }
 
     
@@ -104,28 +113,31 @@ public class Binance: WebSocketDelegate, CryptoExchangePlatform {
     public func process(response: String) {
         
         if response.starts(with: "{\"e\":\"aggTrade\",") {
-            let binanceTrader = try! JSONDecoder().decode(BinanceAggregatedTradeResponse.self, from: response.data(using: .utf8)!)
+            let binanceTrade = try! JSONDecoder().decode(BinanceAggregatedTradeResponse.self, from: response.data(using: .utf8)!)
             
-            if abs(marketDepth.currentPrice - binanceTrader.price) > marketDepth.currentPrice / 100 {
-                marketDepth.currentPrice = binanceTrader.price
+            // Update the market depth.
+            if abs(marketDepth.currentPrice - binanceTrade.price) > marketDepth.currentPrice / 100 {
+                marketDepth.currentPrice = binanceTrade.price
             }
             
-            marketDepth.currentPrice = binanceTrader.price
+            marketDepth.currentPrice = binanceTrade.price
             
             guard self.subscribedToAggregatedTradeStream else { return }
             
-            let trade = MarketAggregatedTrade(date: Date(),
-                                              symbol: binanceTrader.symbol,
-                                              price: binanceTrader.price,
-                                              quantity: binanceTrader.quantity,
-                                              buyerIsMaker: binanceTrader.buyerIsMarker)
+            let trade = MarketAggregatedTrade(id: binanceTrade.tradeId,
+                                              date: Date(),
+                                              symbol: binanceTrade.symbol,
+                                              price: binanceTrade.price,
+                                              quantity: binanceTrade.quantity,
+                                              buyerIsMaker: binanceTrade.buyerIsMarker)
             subscriber?.process(trade: trade)
             return
         }
         
         if response.starts(with: "{\"u\":") {
             let binanceTicker = try! JSONDecoder().decode(BinanceTickerResponse.self, from: response.data(using: .utf8)!)
-            let ticker = MarketTicker(date: Date(),
+            let ticker = MarketTicker(id: binanceTicker.updateId,
+                                      date: Date(),
                                       symbol: binanceTicker.symbol,
                                       bidPrice: binanceTicker.bidPrice,
                                       bidQuantity: binanceTicker.bidQuantity,

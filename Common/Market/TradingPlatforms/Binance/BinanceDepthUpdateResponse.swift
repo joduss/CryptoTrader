@@ -30,10 +30,12 @@ class BinanceDepthUpdateResponse: Decodable {
     //}
     
     let symbol: String
+    private(set) var eventTime: Int
     private(set) var bidUpdates: [BinanceDepthUpdateElementResponse] = []
     private(set) var askUpdates: [BinanceDepthUpdateElementResponse] = []
     
     enum CodingKeys: String, CodingKey {
+        case eventTime = "E"
         case symbol = "s"
         case askUpdates = "a"
         case bidUpdates = "b"
@@ -43,6 +45,7 @@ class BinanceDepthUpdateResponse: Decodable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         symbol = try values.decode(String.self, forKey: .symbol)
         let bidUpdateArrays = try values.decode([[String]].self, forKey: .bidUpdates)
+        eventTime = try values.decode(Int.self, forKey: .eventTime)
         
         for bidUpdateArray in bidUpdateArrays {
             bidUpdates.append(BinanceDepthUpdateElementResponse(array: bidUpdateArray))
