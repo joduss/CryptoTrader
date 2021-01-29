@@ -19,29 +19,29 @@ struct Trader: ParsableCommand {
     var action: Action = .simulate
     
     @Argument(help: "Where to save the files for recording.")
-    var recordFileDirectory: String?
-    
-    @Argument(help: "Base file name.")
-    var fileName: String?
+    var aggregatedTradeRecordsPath: String?
     
     mutating func run() throws {
+        
         switch action {
         case .trade:
-            sourcePrint("Trading is not yet supported.")
+            Trader.exit(withError: ValidationError("Trading is not yet supported"))
             break
         case .simulate:
-            //print("Running trader with simulation api.")
-            //let api = SimulatedTradingPlatform(prices: prices)
-            //let trader = Trader(api: api)
-            //api.startSimulation(completed: {
-            //    print("Total profits: \(trader.profits)")
-            //})
+            
+            guard let aggregatedTradeRecordsPath = aggregatedTradeRecordsPath else {
+                Trader.exit(withError: ValidationError("A path to the file containing data for simulation is required!"))
+            }
+            
+            print("Running trader with simulation api.")
+            let api = SimulatedExchangePlatform(marketPair: self.marketPair, aggregatedTradesFilePath: aggregatedTradeRecordsPath)
+            let trader = SimpleTrader(api: api)
+            print("Total profits: \(trader.profits)")
             break
         }
-        
     }
 }
 
 Trader.main()
-RunLoop.main.run()
+
 
