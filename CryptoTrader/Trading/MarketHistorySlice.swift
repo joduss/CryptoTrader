@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MarketHistorySlice {
+open class MarketHistorySlice {
     
     public internal(set) var prices: ArraySlice<MarketAggregatedTrade>
     

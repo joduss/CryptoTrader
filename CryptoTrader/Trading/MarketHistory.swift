@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MarketHistory: MarketHistorySlice {
+final class MarketHistory: MarketHistorySlice {
     
     private let intervalToKeep: TimeInterval
     private var lastCleanup = 0

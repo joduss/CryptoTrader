@@ -39,6 +39,7 @@ class MarketPerSecondHistory {
         else {
             let secondAggregatedTrade =
                 MarketAggregatedTrade(
+                    id: 0,
                     date: currentTrade.date,
                     symbol: currentTrade.symbol,
                     price: (currentTrade.price * currentTradeAggregationCount + newTrade.price) / (currentTradeAggregationCount + 1),
@@ -61,7 +62,7 @@ class MarketPerSecondHistory {
         for index in 0..<trades.endIndex {
             let price = trades[index]
             
-            if (DateFactory.now - price.date > TimeInterval.fromHours(1.01)) {
+            if (DateFactory.now - price.date > intervalToKeep) {
                 continue
             }
             
