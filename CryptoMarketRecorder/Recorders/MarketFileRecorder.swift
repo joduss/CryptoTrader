@@ -2,14 +2,18 @@ import Foundation
 import JoLibrary
 
 /// A MarketRecorder recording to a file.
-class MarketFileRecorder: MarketRecorder {
+final class MarketFileRecorder: MarketRecorder {
     
     private let api : CryptoExchangePlatform
     private let savingFrequency: Int
     
-    private let tickersFileSemaphore = DispatchSemaphore(value: 1)
-    private let tradesFileSemaphore = DispatchSemaphore(value: 1)
-    private let depthsFileSemaphore = DispatchSemaphore(value: 1)
+    let tradesQueue = DispatchQueue(label: "Trade")
+    let tickersQueue = DispatchQueue(label: "Tickers")
+    let depthsQueue = DispatchQueue(label: "Depths")
+
+    private let tickersSemaphore = DispatchSemaphore(value: 1)
+    private let tradeFileSemaphore = DispatchSemaphore(value: 1)
+    private let depthsSemaphore = DispatchSemaphore(value: 1)
     private let depthsBackupFileSemaphore = DispatchSemaphore(value: 1)
 
     private var tickersFileHandel : FileHandle!
@@ -90,8 +94,10 @@ class MarketFileRecorder: MarketRecorder {
         //            try! fileHandle.seek(toOffset: end - 1)
         //        }
 
+        let encoder = JSONEncoder()
+        
         for record in dataArray {
-            let data = try! JSONEncoder().encode(record)
+            let data = try! encoder.encode(record)
             fileHandle.write(data)
             fileHandle.write("\n".data(using: .utf8)!)
         }
@@ -104,21 +110,27 @@ class MarketFileRecorder: MarketRecorder {
     
     // MARK: - TradingPlatformSubscriber
     
+    // MARK: Tickers
     func process(ticker: MarketTicker) {
-        
-        tickersFileSemaphore.wait()
-        
-        defer {
-            tickersFileSemaphore.signal()
+        tickersQueue.async {
+            self.tickersSemaphore.wait()
+            self.processThreadSafe(ticker: ticker)
+            self.tickersSemaphore.signal()
         }
-        
+    }
+    
+    func processThreadSafe(ticker: MarketTicker) {
+                
         guard let aggregatedTicker = self.aggregatedTicker else {
             self.aggregatedTicker = ticker
             return
         }
-        
+
+        // If the bid and ask price are the same, we just update the quantity.
+        // We use the largest ticker id.
         if ticker.askPrice == aggregatedTicker.askPrice && ticker.bidPrice == aggregatedTicker.bidPrice {
-            self.aggregatedTicker = MarketTicker(date: ticker.date,
+            self.aggregatedTicker = MarketTicker(id: max(ticker.id, aggregatedTicker.id),
+                                                 date: ticker.date,
                                                  symbol: ticker.symbol,
                                                  bidPrice: ticker.bidPrice,
                                                  bidQuantity: ticker.bidQuantity + aggregatedTicker.bidQuantity,
@@ -126,10 +138,10 @@ class MarketFileRecorder: MarketRecorder {
                                                  askQuantity: ticker.askQuantity + aggregatedTicker.askQuantity)
             return
         }
-        
+
         tickerCount += 1
         tickersCache.append(aggregatedTicker)
-        
+
         if tickerCount % 10 == 0 {
             sourceReplacablePrint("Ticker \(tickerCount) => Bid: \(aggregatedTicker.bidQuantity) at \(aggregatedTicker.bidPrice) / Ask: \(aggregatedTicker.askQuantity) at \(aggregatedTicker.askPrice)")
         }
@@ -137,46 +149,62 @@ class MarketFileRecorder: MarketRecorder {
         // Use the new ticker which is different from previous.
         self.aggregatedTicker = ticker
 
-                
+
         if tickersCache.count > 0 && tickersCache.count % savingFrequency == 0 {
             sourcePrint("Saving tickers to file... (Total: \(tickerCount))   ")
             let tickersToSave = self.tickersCache
-            DispatchQueue.global().async {
+            tickersQueue.async {
+                self.tickersSemaphore.wait()
                 MarketFileRecorder.saveTo(fileHandle: self.tickersFileHandel, tickersToSave)
+                self.tickersSemaphore.signal()
             }
             self.tickersCache.removeAll(keepingCapacity: true)
         }
     }
     
+    // MARK: Trades
+    
     func process(trade: MarketAggregatedTrade) {
-        tradesFileSemaphore.wait()
-        
+        tradesQueue.async {
+            self.tradeFileSemaphore.wait()
+            self.processThreadSafe(trade: trade)
+            self.tradeFileSemaphore.signal()
+        }
+    }
+
+    
+    func processThreadSafe(trade: MarketAggregatedTrade) {
         tradeCount += 1
         tradesCache.append(trade)
-        
+
         if tradeCount % 10 == 0 {
             sourceReplacablePrint("Trade \(tradeCount) at price: \(trade.price)")
         }
-        
+
         if tradesCache.count > 0 && tradesCache.count % savingFrequency == 0 {
             sourcePrint("Saving trades to file... (Total: \(tradeCount))    ")
             let tradesTosave = self.tradesCache
             DispatchQueue.global().async {
+                self.tradeFileSemaphore.wait()
                 MarketFileRecorder.saveTo(fileHandle: self.tradesFileHandel, tradesTosave)
+                self.tradeFileSemaphore.signal()
             }
             tradesCache.removeAll(keepingCapacity: true)
         }
-        
-        tradesFileSemaphore.signal()
     }
     
+    
+    // MARK: Depths
+
     func process(depthUpdate: MarketDepth) {
-        depthsFileSemaphore.wait()
-        
-        defer {
-            depthsFileSemaphore.signal()
+        depthsQueue.async {
+            self.depthsSemaphore.wait()
+            self.threadSafeProcess(depthUpdate: depthUpdate)
+            self.depthsSemaphore.signal()
         }
-        
+    }
+    
+    private func threadSafeProcess(depthUpdate: MarketDepth) {
         depthsCache.append(depthUpdate)
         depthCount += 1
         
@@ -185,15 +213,17 @@ class MarketFileRecorder: MarketRecorder {
         }
         
         if depthsCache.count > 0 && depthsCache.count % (savingFrequency / 30) == 0 {
-//             if depthsCache.count > 0 && depthsCache.count % 1 == 0 {
+            //             if depthsCache.count > 0 && depthsCache.count % 1 == 0 {
             sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids (not aggregated).    ")
             let depthToSave = depthsCache
-            DispatchQueue.global().async {
-                MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, depthToSave)
-                try! self.depthsBackupFileHandel.seek(toOffset: 0)
-                try! self.depthsBackupFileHandel.truncate(atOffset: 0)
-                self.depthsBackupFileHandel.write(try! JSONEncoder().encode(depthToSave.last!.backup()))
-            }
+            self.depthsSemaphore.wait()
+            
+            MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, depthToSave)
+            try! self.depthsBackupFileHandel.seek(toOffset: 0)
+            try! self.depthsBackupFileHandel.truncate(atOffset: 0)
+            self.depthsBackupFileHandel.write(try! JSONEncoder().encode(depthToSave.last!.backup()))
+            
+            self.depthsSemaphore.signal()
             depthsCache.removeAll(keepingCapacity: true)
         }
     }

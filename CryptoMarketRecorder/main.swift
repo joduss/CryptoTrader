@@ -31,19 +31,26 @@ struct CryptoMarketRecorder: ParsableCommand {
         let tradeFile = directoryUrl.appendingPathComponent("\(fileName)-trades")
         let depthFile = directoryUrl.appendingPathComponent("\(fileName)-depth")
         let depthBackupFile = directoryUrl.appendingPathComponent("\(fileName)-depth-backup.json")
-
-        let api = Binance(marketPair: self.marketPair)
-        let recorder = MarketFileRecorder(api: api, savingFrequency: 120)
         
-        recorder.saveTicker(in: tickerFile)
-        recorder.saveAggregatedTrades(in: tradeFile)
+        var api: Binance!
         
         if let loadDepthFilePath = (self.loadDepthFile as NSString?)?.expandingTildeInPath {
-            recorder.loadDepthBackup(from: URL(fileURLWithPath: loadDepthFilePath))
+            
+            sourcePrint("Loading depths backup from \(loadDepthFilePath)...")
+            let data = try! Data(contentsOf: URL(fileURLWithPath: loadDepthFilePath))
+            let backup = try! JSONDecoder().decode(MarketDepthBackup.self, from: data)
+            api = Binance(marketPair: marketPair, marketDepthBackup: backup)
         }
+        else {
+            api = Binance(marketPair: self.marketPair)
+        }
+
+        let recorder = MarketFileRecorder(api: api, savingFrequency: 5000)
         
-        recorder.saveDepths(in: depthFile)
         recorder.saveDepthBackup(in: depthBackupFile)
+        recorder.saveTicker(in: tickerFile)
+        recorder.saveAggregatedTrades(in: tradeFile)
+        recorder.saveDepths(in: depthFile)
     }
 }
 
