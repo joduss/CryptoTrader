@@ -21,16 +21,28 @@ struct Variability {
 }
 
 
-class SimpleTrader: CryptoExchangePlatformSubscriber {
+
+
+
+// IDEE
+
+// Vendre quand plus bas, puis racheter si threshold 0.99 atteint ou 102.
+// Pareil achat
+
+
+final class SimpleTrader: CryptoExchangePlatformSubscriber {
     
-    let marketAnalyzer = MarketHistory(intervalToKeep: TimeInterval.fromHours(1.05))
+    let marketAnalyzer = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(2.01))
     var api : CryptoExchangePlatform
     
-    var orderSize: Double = 69
+    var orderSize: Double = 200
     var balance: Double = 210.0
-    var orders: [Order] = []
     
-    var fees = 0.1 / 100
+    var orders: [TradingOrder] = []
+    
+    var closedOrder: TradingOrder?
+    
+    var fees = Percent(0.1)
     
     var profits: Double = 0
     
@@ -44,10 +56,50 @@ class SimpleTrader: CryptoExchangePlatformSubscriber {
         return fileUrl.absoluteURL.path
     }
     
+    private var market5MinCache: MarketHistorySlice?
+    private var market10Cache: MarketHistorySlice?
+    private var market2HourCache: MarketHistorySlice?
+    private var market30Cache: MarketHistorySlice?
+    
+    private var market10Min:  MarketHistorySlice {
+        if market10Cache == nil {
+            market10Cache = marketAnalyzer.prices(last: TimeInterval.fromMinutes(10))!
+        }
+        return market10Cache!
+    }
+    
+    private var market5Min: MarketHistorySlice {
+        if market5MinCache == nil {
+            market5MinCache = market10Min.prices(last: TimeInterval.fromMinutes(5))
+        }
+        return market5MinCache!
+    }
+    
+    private var market2Hour: MarketHistorySlice {
+        if market2HourCache == nil {
+            market2HourCache = marketAnalyzer.prices(last: TimeInterval.fromHours(2))
+        }
+        return market2HourCache!
+    }
+    
+    private var market30Min:  MarketHistorySlice {
+        if market30Cache == nil {
+            market30Cache = marketAnalyzer.prices(last: TimeInterval.fromMinutes(30))!
+        }
+        return market30Cache!
+    }
+    
+    
     init(api: CryptoExchangePlatform) {
         self.api = api
-        api.subscribeToTickerStream()
         self.api.subscriber = self
+        api.subscribeToAggregatedTradeStream()
+    }
+    
+    private func resetCurrentMarketStats() {
+        market10Cache = nil
+        market2HourCache = nil
+        market30Cache = nil
     }
     
     func process(ticker: MarketTicker) {
@@ -56,6 +108,9 @@ class SimpleTrader: CryptoExchangePlatformSubscriber {
     
     func process(trade: MarketAggregatedTrade) {
         marketAnalyzer.record(trade)
+        
+        resetCurrentMarketStats()
+        
         decide(price: trade.price)
     }
     
@@ -63,144 +118,278 @@ class SimpleTrader: CryptoExchangePlatformSubscriber {
         
     }
     
+    private var decisionCount = 0
+    
     func decide(price: Double) {
-        print("[\(DateFactory.now)] Must decide with price \(price)")
-        guard marketAnalyzer.hasRecordFromAtLeastPastInterval(TimeInterval.fromMinutes(60)) else { return }
         
-        //        let s = marketAnalyzer.prices(last: 3600)
+        decisionCount += 1
+        
+        if decisionCount % 10 == 0 {
+            sourcePrint("Decision for price \(price)")
+        }
+        
+//        let dispatchGroup = DispatchGroup()
+//        
+//        DispatchQueue(label: "1").async {
+//            dispatchGroup.enter()
+//            self.market2Hour.slope()
+//            dispatchGroup.leave()
+//        }
+//        
+//        DispatchQueue(label: "2").async {
+//            dispatchGroup.enter()
+//            self.market30Min.slope()
+//            dispatchGroup.leave()
+//        }
+//        
+//        DispatchQueue(label: "3").async {
+//            dispatchGroup.enter()
+//            self.market5Min.slope()
+//            dispatchGroup.leave()
+//        }
+//        
+//        
+//        dispatchGroup.wait()
         
         
-        // Should buy?
+        if canBuy && marketAnalyzer.hasRecordFromAtLeastPastInterval(TimeInterval.fromHours(2)) {
+            decideNewBuy(price: price)
+        }
         
-        decideIfBuy(price: price)
-        
-        let marketLast30 = marketAnalyzer.prices(last: 30)
-        
-        // should sell
         for order in orders {
-            if (price / order.price) > 1.01 && marketLast30.slope() < -3 {
-                // let slope = marketAnalyzer.slope(last: 60)
-                self.sell(order: order, at: price)
+            
+            if order.canBuy {
+                decideRebuy(order: order, price: price)
+            }
+            else if (order.canSell) {
+                decideSell(order: order, price: price)
             }
         }
     }
     
-    func decideIfBuy(price: Double) {
-        
-        //        Performance.measure(title: "All decision") {
-        
-        //        Performance.measure(title: "Market", code: { () in
-        //            let tt = marketAnalyzer.prices(last: TimeInterval.fromMinutes(5))
-        //            let ff = marketAnalyzer.prices(last: TimeInterval.fromMinutes(10))
-        //            let dd = marketAnalyzer.prices(last: TimeInterval.fromMinutes(30))
-        //            let ss = marketAnalyzer.prices(last: TimeInterval.fromMinutes(60))
-        //        })
-        
-        
-        
-        let market5Last = marketAnalyzer.prices(last: TimeInterval.fromMinutes(5))
-        let market10Last = marketAnalyzer.prices(last: TimeInterval.fromMinutes(10))
-        let market30Last = marketAnalyzer.prices(last: TimeInterval.fromMinutes(30))
-        let market60Last = marketAnalyzer.prices(last: TimeInterval.fromMinutes(60))
-        
-        let slope5Minutes = market5Last.slope()
-        let variability5Minutes = market5Last.variability()
-        
-        let slope30Minutes = market30Last.slope()
-        let variability30Minutes = market30Last.variability()
-        //
-        //let slope60Minutes = marketAnalyzer.slope(last: TimeInterval.fromMinutes(60))
-        let variability60Minutes = market60Last.variability()
-        
-        //        Performance.measure(title: "Slope", code: { () in
-        //            let fd = market5Last.slope()
-        //            let ass = market30Last.slope()
-        //        })
-        //
-        //        Performance.measure(title: "Variability", code: { () in
-        //            let a = market30Last.variability()
-        //            let b = market5Last.variability()
-        //            let c = market60Last.variability()
-        //        })
-        
-        if canBuy && price < variability60Minutes.max * 0.99 {
-            
-            if slope5Minutes > price / 1000 {
-                // Slight increase
-                // Must be very variable!
-                if (variability5Minutes.variabilityRatioToPrice >= 0.5 / 100 && variability60Minutes.spikes07Percent >= 1) {
-                    self.buy(price: price)
-                    return
-                }
-            }
-            
-            if slope30Minutes < -1 {
-                // Going down
-                // Must be very variable!!
-                if variability30Minutes.spikes1Percent > 1 && variability5Minutes.spikes07Percent > 1 {
-                    self.buy(price: price)
-                    return
-                }
-            }
-            
-            if (variability60Minutes.variabilityRatioToPrice > 1 / 100 && variability60Minutes.spikes1Percent > 2) {
-                self.buy(price: price)
-                return
-            }
-            
-//            let var10 = market10Last.variability()
-            let avg10 = market10Last.average()
-            if (avg10 - price) / avg10 > (0.5 / 100.0) {
-                self.buy(price: price)
-                return
-            }
-            
-            if (!orders.contains(where: {DateFactory.now - $0.date < TimeInterval.fromHours(1)})) {
-                self.buy(price: price)
-                return
-            }
-            
-            let avg30 = variability30Minutes.average
-            if (price - avg30) / avg30 > (0.3 / 100.0) && (variability30Minutes.max - price) / price > 0.3 * 100 {
-                self.buy(price: price)
-                return
-            }
-            
-            //            if price < variability5Minutes.min {
-            //                self.buy(price: price)
-            //                return
-            //            }
-            
-            if (variability5Minutes.average - price <= -100 && variability30Minutes.spikes1Percent > 0) {
-                self.buy(price: price)
-                return
-            }
-            
-            //            let avg1 = mark
-            //            if (avg10 > price)
-        }
-        //        }
+//    func decideNewBuy(price: Double) {
+//
+//        if price > market2Hour.maxPrice() { return }
+//
+//        if price > market2Hour.average() && market2Hour.maxPrice() / price > fromPercent(2) {
+//            // buy
+//            buy(price: price)
+//            return
+//        }
+//
+//        if price < market2Hour.average() && market30Min.slope() > 1 {
+//            // buy
+//            buy(price: price)
+//            return
+//        }
+//    }
+    
+    func fromPercent(_ value: Double) -> Double {
+        return value / 100.0
     }
     
-    func buy(price: Double) {
-        
-        balance -= orderSize
-        
-        let qty = (orderSize / price) * (1 - fees)
-        let order = Order(date: DateFactory.now, price: price, qty: qty)
-        self.orders.append(order)
-        
-        print("At \(DateFactory.now) Bought \(qty) for \(price)")
+    func toPercent(_ value: Double) -> Double {
+        return value * 100
     }
     
-    func sell(order: Order, at price: Double) {
-        
-        let sellCost = (order.qty * price) * (1 - fees)
-        let sellProfits = sellCost - orderSize
+//    func decideSell(order: TradingOrder, price: Double) {
+//
+//        // Selling can occur in 2 cases:
+//        // - Price is high, and we do profits
+//        // - Price is low and we want to sell it, let it go lower to buy it later to maximize profit when the high price is back
+//
+//        // Case 1: Price is high
+//        if order.initialPrice < price {
+//
+//            // We set a limit sell earlier and now the price got lower again. Time to sell
+//
+//            if let closePrice = order.lowLimit, closePrice > price {
+//                sourcePrint("Selling now: high price was not holding up.")
+//                let cost = price * order.quantity -% Percent(0.1)
+//                order.closeOrderSelling(at: price, forCost: cost)
+//                return
+//            }
+//
+//            // The price is high. Let's set a stop loss.
+//            if order.lowLimit == nil && price >= order.initialPrice * fromPercent(101.2) {
+//                sourcePrint("Price is high. Let's put a stop loss order.")
+//                order.lowLimit = order.initialPrice * fromPercent(100.8)
+//                return
+//            }
+//
+//            // The price went even higher. Let's update the stop loss!
+//            let newStopLoss = price * fromPercent(99)
+//            if let currentSellStopLoss = order.lowLimit, newStopLoss > currentSellStopLoss {
+//                order.lowLimit = newStopLoss
+//            }
+//
+//            return
+//        }
+//
+//        // Ho no, the price go lower...
+//
+//        // Let's still try to take advantage from the price going down!
+//        let slope = Percent(-0.1 / 30 / 60) // -0.1 over 30 min
+//
+//        if toPercent(price / order.initialPrice) < 99
+//            && Percent(ratioOf: market30Min.slope(), to: market30Min.average()) < slope
+//            && Percent(ratioOf: market10Min.slope(), to: market10Min.average()) < slope
+//            && Percent(ratioOf: market5Min.slope(), to: market5Min.average()) < slope {
+//            sourcePrint("Price is lower, but let sell and buy it at a even lower price.")
+//            intermediateSell(order: order, at: price)
+//            return
+//        }
+//    }
+//
+//
+//    func decideRebuy(order: TradingOrder, price: Double) {
+//
+//        // Rebuying can occur in cases:
+//        // - The price reached the bottom and starts to raise again
+//        // - Bad luck, we sold and to avoid too much losses we need to buy it back at a high price...
+//
+//        let priceToIntermediatePrice = (price / order.price).asPercent
+//
+//        // In this case, we couldn't rebuy at a lower price...
+//        if priceToIntermediatePrice > Percent(103) && market30Min.slope() > 0.05 || priceToIntermediatePrice > Percent(104) {
+//            // rebuy at a loss
+//            rebuy(order: order, at: price)
+//        }
+//
+//        // Price is low!
+//        if priceToIntermediatePrice < Percent(98.8) {
+//
+//            // We set a limit at which we'll sell
+//
+//            let limitBuy = price * Percent(100.3)
+//
+//            // The price started to climb again. Let's buy.
+//            if let currentLimitBuy = order.upperLimit, currentLimitBuy < price {
+//                // Test if would resell at the point. If yes => don't sell, but update the order
+//                rebuy(order: order, at: price)
+//                return
+//            }
+//
+//            // The price got even lower, let's update the limit at which we'll rebuy
+//            if let currentLimitBuy = order.upperLimit, currentLimitBuy > limitBuy {
+//                order.upperLimit = limitBuy
+//                return
+//            }
+//
+//            // The price decreased and we can now have profits for sure (almost)
+//            // Let's define the limit at which we'll buy back if the price start to raise again.
+//            if order.upperLimit == nil {
+//                order.upperLimit = limitBuy
+//                return
+//            }
+//        }
+//    }
+//
+//
+//    func buy(price: Double) {
+//
+//        balance -= orderSize
+//
+//        let qty = (orderSize / price) -% fees
+//        let order = TradingOrder(price: price, amount: qty, cost: qty * price)
+//        self.orders.append(order)
+//
+//        sourcePrint("At \(DateFactory.now) Bought \(qty) for \(price)")
+//    }
+
+    func closeSell(order: TradingOrder, at price: Double) {
+
+        let sellCost = (order.quantity * price) -% fees
+        let sellProfits = sellCost - order.initialValue
+        order.closeOrderSelling(at: price, forCost: sellCost)
         profits += sellProfits
         balance += sellCost
-        self.orders.removeAll(where: {$0.date == order.date})
+        self.orders.removeAll(where: {$0 === order})
         
-        print("Selling order made at \(order.date) for price \(order.price) at price \(price) for a total cost of \(sellCost) with profits of \(sellProfits). Total profits: \(profits).")
+        closedOrder = order
+
+        sourcePrint("[Trade] Selling order made the \(order.date) for price \(order.initialPrice) at price \(price) for a total cost of \(sellCost) with profits of \(sellProfits). Total profits: \(profits).")
     }
+
+    func rebuy(order: TradingOrder, at price: Double) {
+        order.intermediateBuy(quantityBought: (order.value / price) -% fees, at: price)
+    }
+
+    func intermediateSell(order: TradingOrder, at price: Double) {
+        order.intermediateSell(at: price, for: (price * order.quantity) -% fees)
+    }
+    
+    
+    
+    // Technic 2
+    
+    func decideNewBuy(price: Double) {
+        let market1Hour = market2Hour.prices(last: TimeInterval.fromHours(1))
+        
+        if price > market1Hour.maxPrice() { return }
+        
+        
+        if let lastOrder = closedOrder {
+            
+            if abs(Percent(differenceOf: price, from: lastOrder.price).percentage) > 1 {
+                // continue
+            }
+            else if lastOrder.closeDate! - DateFactory.now < 300 {
+                return
+            }
+        }
+        
+        
+        if price > market1Hour.average() && market2Hour.maxPrice() / price > fromPercent(2) {
+            // buy
+            buy(price: price)
+            return
+        }
+        
+        if price < market1Hour.average() && market10Min.slope() > 0 {
+            buy(price: price)
+            return
+        }
+    }
+    
+    func decideRebuy(order: TradingOrder, price: Double) {
+        if price > order.upperLimit! || price < order.lowLimit! {
+            rebuy(order: order, at: price)
+            
+            order.upperLimit = price +% Percent(5)
+            order.lowLimit = price -% Percent(1)
+            return
+        }
+    }
+
+    func decideSell(order: TradingOrder, price: Double) {
+        
+        if price > order.initialPrice +% Percent(1) {
+            closeSell(order: order, at: price)
+            return
+        }
+        
+        if price > order.upperLimit! || price < order.lowLimit! {
+            intermediateSell(order: order, at: price)
+            
+            order.upperLimit = price +% Percent(5)
+            order.lowLimit = price -% Percent(1)
+            return
+        }
+    }
+
+    func buy(price: Double) {
+
+        balance -= orderSize
+
+        let qty = (orderSize / price) -% fees
+        let order = TradingOrder(price: price, amount: qty, cost: qty * price)
+        self.orders.append(order)
+        
+        order.upperLimit = price +% Percent(1)
+        order.lowLimit = price -% Percent(2)
+
+        sourcePrint("[Trade] At \(DateFactory.now) Bought \(qty) for \(price). Cost: \(order.initialValue)")
+    }
+
 }
