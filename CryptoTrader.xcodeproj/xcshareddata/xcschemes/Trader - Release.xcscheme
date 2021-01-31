@@ -50,6 +50,12 @@
             ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/market-10-trades-read-migrated.json&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

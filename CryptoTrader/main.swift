@@ -23,6 +23,8 @@ struct Trader: ParsableCommand {
     
     mutating func run() throws {
         
+        sourcePrint("CryptoTrader started")
+        
         switch action {
         case .trade:
             Trader.exit(withError: ValidationError("Trading is not yet supported"))

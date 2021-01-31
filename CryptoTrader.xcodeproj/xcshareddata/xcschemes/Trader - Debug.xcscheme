@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/prices-conv-5.json&quot;"
+            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/market-10-trades read.json&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

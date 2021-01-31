@@ -52,8 +52,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "record --btc_usd ~/Documents test-market"
+            argument = "merge --depth-files-directory /Users/jonathanduss/Library/Developer/Xcode/DerivedData/CryptoTrader-comppumrkontvwbrwwwxanmpsvyt/Build/Products/Debug/a/ /Users/jonathanduss/Library/Developer/Xcode/DerivedData/CryptoTrader-comppumrkontvwbrwwwxanmpsvyt/Build/Products/Debug"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "merge --depth-files-directory /Users/jonathanduss/Desktop/untitled\ folder\ 2/depthfiles /Users/jonathanduss/Desktop/untitled\ folder\ 2"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
