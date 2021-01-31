@@ -156,6 +156,8 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
 
             let bidUpdates = binanceDepth.bidUpdates.map({MarketDepthElement(priceLevel: $0.priceLevel, quantity: $0.quantity)})
             marketDepth.updateBids(bidUpdates)
+            
+            marketDepth.updateId(binanceDepth.eventTime)
                         
             subscriber?.process(depthUpdate: marketDepth)
             return
