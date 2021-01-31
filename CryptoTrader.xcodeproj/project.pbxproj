@@ -25,6 +25,7 @@
 		6B8D17BE25B745360021B64E /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6B8D17BD25B745360021B64E /* ArgumentParser */; };
 		6B8D17C125B756AB0021B64E /* IgnoreAsNil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8D17C025B756AB0021B64E /* IgnoreAsNil.swift */; };
 		6B8D17C525B756E30021B64E /* KrakenTicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B8D17C425B756E30021B64E /* KrakenTicker.swift */; };
+		6B960F7725C7579600B22BF3 /* TradeFilesMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B960F7625C7579600B22BF3 /* TradeFilesMerger.swift */; };
 		6B9D049D25B7830200EC53E1 /* TradingOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9D049C25B7830200EC53E1 /* TradingOrder.swift */; };
 		6B9D04A025B7837F00EC53E1 /* DateFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9D049F25B7837F00EC53E1 /* DateFactory.swift */; };
 		6B9D04A325B787ED00EC53E1 /* BinanceDepthUpdateResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9D04A225B787ED00EC53E1 /* BinanceDepthUpdateResponse.swift */; };
@@ -36,6 +37,8 @@
 		6BBF4F5A25AD7BE8002D245C /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F5925AD7BE8002D245C /* StringExtensions.swift */; };
 		6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F6225AD80C4002D245C /* CleanPrint.swift */; };
 		6BCA376D25C49A1A00B58E3C /* DepthFilesMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA376C25C49A1A00B58E3C /* DepthFilesMerger.swift */; };
+		6BCA377525C5D2D100B58E3C /* TickerFilesMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA377425C5D2D100B58E3C /* TickerFilesMerger.swift */; };
+		6BCA377A25C5D30400B58E3C /* FileMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA377925C5D30400B58E3C /* FileMerger.swift */; };
 		6BE656A025C08C59001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
 		6BE656AA25C09627001AAF59 /* CryptoTraderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE656A925C09627001AAF59 /* CryptoTraderTests.swift */; };
 		6BE656B225C0969D001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
@@ -114,6 +117,7 @@
 		6B7116FA25BC462500D34447 /* MarketDepth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDepth.swift; sourceTree = "<group>"; };
 		6B8D17C025B756AB0021B64E /* IgnoreAsNil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreAsNil.swift; sourceTree = "<group>"; };
 		6B8D17C425B756E30021B64E /* KrakenTicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KrakenTicker.swift; sourceTree = "<group>"; };
+		6B960F7625C7579600B22BF3 /* TradeFilesMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeFilesMerger.swift; sourceTree = "<group>"; };
 		6B9D049C25B7830200EC53E1 /* TradingOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingOrder.swift; sourceTree = "<group>"; };
 		6B9D049F25B7837F00EC53E1 /* DateFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFactory.swift; sourceTree = "<group>"; };
 		6B9D04A225B787ED00EC53E1 /* BinanceDepthUpdateResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceDepthUpdateResponse.swift; sourceTree = "<group>"; };
@@ -126,6 +130,8 @@
 		6BBF4F5C25AD7E8F002D245C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6BBF4F6225AD80C4002D245C /* CleanPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanPrint.swift; sourceTree = "<group>"; };
 		6BCA376C25C49A1A00B58E3C /* DepthFilesMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthFilesMerger.swift; sourceTree = "<group>"; };
+		6BCA377425C5D2D100B58E3C /* TickerFilesMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerFilesMerger.swift; sourceTree = "<group>"; };
+		6BCA377925C5D30400B58E3C /* FileMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMerger.swift; sourceTree = "<group>"; };
 		6BDE061625BB15EC00731878 /* MarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketRecorder.swift; sourceTree = "<group>"; };
 		6BE6569F25C08C59001AAF59 /* Percent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Percent.swift; sourceTree = "<group>"; };
 		6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CryptoTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -316,7 +322,10 @@
 		6BCA376A25C499FD00B58E3C /* Merge */ = {
 			isa = PBXGroup;
 			children = (
+				6BCA377425C5D2D100B58E3C /* TickerFilesMerger.swift */,
+				6B960F7625C7579600B22BF3 /* TradeFilesMerger.swift */,
 				6BCA376C25C49A1A00B58E3C /* DepthFilesMerger.swift */,
+				6BCA377925C5D30400B58E3C /* FileMerger.swift */,
 			);
 			path = Merge;
 			sourceTree = "<group>";
@@ -556,6 +565,7 @@
 				6BFC307425BCD6B100BDD732 /* BinanceAggregatedTradeResponse.swift in Sources */,
 				6BFC306E25BCD6B100BDD732 /* DateFactory.swift in Sources */,
 				6BFC307625BCD6B100BDD732 /* WebSocketHandler.swift in Sources */,
+				6BCA377A25C5D30400B58E3C /* FileMerger.swift in Sources */,
 				6BFC306F25BCD6B100BDD732 /* StringExtensions.swift in Sources */,
 				6BFC307925BCD6B100BDD732 /* MarketDepth.swift in Sources */,
 				6BEE165225BDFFB3002E2DC6 /* GlobalMathFunctions.swift in Sources */,
@@ -567,7 +577,9 @@
 				6BFC307C25BCD6B100BDD732 /* BinanceDepthUpdateResponse.swift in Sources */,
 				6BFC309E25BCD8BE00BDD732 /* MarketPair.swift in Sources */,
 				6BEE163725BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */,
+				6B960F7725C7579600B22BF3 /* TradeFilesMerger.swift in Sources */,
 				6BFC306B25BCD6B100BDD732 /* CryptoExchangePlatform.swift in Sources */,
+				6BCA377525C5D2D100B58E3C /* TickerFilesMerger.swift in Sources */,
 				6BFC306D25BCD6B100BDD732 /* CleanPrint.swift in Sources */,
 				6BFC307A25BCD6B100BDD732 /* DateExtensions.swift in Sources */,
 				6BFC306925BCD6B100BDD732 /* MarketTicker.swift in Sources */,
