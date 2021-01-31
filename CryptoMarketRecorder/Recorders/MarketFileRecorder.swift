@@ -7,6 +7,8 @@ final class MarketFileRecorder: MarketRecorder {
     private let api : CryptoExchangePlatform
     private let savingFrequency: Int
     
+    private let printFrequency = 20
+    
     let tradesQueue = DispatchQueue(label: "Trade")
     let tickersQueue = DispatchQueue(label: "Tickers")
     let depthsQueue = DispatchQueue(label: "Depths")
@@ -44,6 +46,8 @@ final class MarketFileRecorder: MarketRecorder {
         
         self.api.subscriber = self
     }
+    
+    // MARK: Configuration of the recorder
     
     func saveTicker(in fileUrl: URL) {
         sourcePrint("The price recorder will save tickers to \(fileUrl.path)")
@@ -120,7 +124,6 @@ final class MarketFileRecorder: MarketRecorder {
     }
     
     func processThreadSafe(ticker: MarketTicker) {
-                
         guard let aggregatedTicker = self.aggregatedTicker else {
             self.aggregatedTicker = ticker
             return
@@ -142,22 +145,16 @@ final class MarketFileRecorder: MarketRecorder {
         tickerCount += 1
         tickersCache.append(aggregatedTicker)
 
-        if tickerCount % 10 == 0 {
+        if tickerCount % printFrequency == 0 {
             sourceReplacablePrint("Ticker \(tickerCount) => Bid: \(aggregatedTicker.bidQuantity) at \(aggregatedTicker.bidPrice) / Ask: \(aggregatedTicker.askQuantity) at \(aggregatedTicker.askPrice)")
         }
 
         // Use the new ticker which is different from previous.
         self.aggregatedTicker = ticker
-
-
+        
         if tickersCache.count > 0 && tickersCache.count % savingFrequency == 0 {
             sourcePrint("Saving tickers to file... (Total: \(tickerCount))   ")
-            let tickersToSave = self.tickersCache
-            tickersQueue.async {
-                self.tickersSemaphore.wait()
-                MarketFileRecorder.saveTo(fileHandle: self.tickersFileHandel, tickersToSave)
-                self.tickersSemaphore.signal()
-            }
+            MarketFileRecorder.saveTo(fileHandle: self.tickersFileHandel, self.tickersCache)
             self.tickersCache.removeAll(keepingCapacity: true)
         }
     }
@@ -171,24 +168,18 @@ final class MarketFileRecorder: MarketRecorder {
             self.tradeFileSemaphore.signal()
         }
     }
-
     
     func processThreadSafe(trade: MarketAggregatedTrade) {
         tradeCount += 1
         tradesCache.append(trade)
 
-        if tradeCount % 10 == 0 {
+        if tradeCount % printFrequency == 0 {
             sourceReplacablePrint("Trade \(tradeCount) at price: \(trade.price)")
         }
-
+        
         if tradesCache.count > 0 && tradesCache.count % savingFrequency == 0 {
             sourcePrint("Saving trades to file... (Total: \(tradeCount))    ")
-            let tradesTosave = self.tradesCache
-            DispatchQueue.global().async {
-                self.tradeFileSemaphore.wait()
-                MarketFileRecorder.saveTo(fileHandle: self.tradesFileHandel, tradesTosave)
-                self.tradeFileSemaphore.signal()
-            }
+            MarketFileRecorder.saveTo(fileHandle: self.tradesFileHandel, self.tradesCache)
             tradesCache.removeAll(keepingCapacity: true)
         }
     }
@@ -208,23 +199,21 @@ final class MarketFileRecorder: MarketRecorder {
         depthsCache.append(depthUpdate)
         depthCount += 1
         
-        if depthCount % 1 == 0 {
-            sourceReplacablePrint("Depth \(depthCount) => There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.")
-        }
+        // This method is called every second
+        sourceReplacablePrint("Depth \(depthCount) => There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids.")
         
         if depthsCache.count > 0 && depthsCache.count % (savingFrequency / 30) == 0 {
-            //             if depthsCache.count > 0 && depthsCache.count % 1 == 0 {
             sourcePrint("Saving depths to file... (Total: \(depthCount)). There are \(depthUpdate.asks.count) asks and \(depthUpdate.bids.count) bids (not aggregated).    ")
-            let depthToSave = depthsCache
-            self.depthsSemaphore.wait()
             
-            MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, depthToSave)
+            MarketFileRecorder.saveTo(fileHandle: self.depthsFileHandel, self.depthsCache)
+            
+            // Saving the backup which can be used to continue the process with current depths.
+            // (Only approximate, which should be enough)
             try! self.depthsBackupFileHandel.seek(toOffset: 0)
             try! self.depthsBackupFileHandel.truncate(atOffset: 0)
-            self.depthsBackupFileHandel.write(try! JSONEncoder().encode(depthToSave.last!.backup()))
+            self.depthsBackupFileHandel.write(try! JSONEncoder().encode(self.depthsCache.last!.backup()))
             
-            self.depthsSemaphore.signal()
-            depthsCache.removeAll(keepingCapacity: true)
+            self.depthsCache.removeAll(keepingCapacity: true)
         }
     }
 }
