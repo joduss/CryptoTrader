@@ -33,8 +33,8 @@ class TradingOrder {
     private var qtyHistory: [Double] = []
     
     
-    public var lowLimit: Double?
-    public var upperLimit: Double?
+    public var lowLimit: Double
+    public var upperLimit: Double
     
     public private(set) var canSell: Bool = false
     public private(set) var canBuy: Bool = false
@@ -62,6 +62,8 @@ class TradingOrder {
         qtyHistory.append(amount)
         canSell = true
         canBuy = false
+        lowLimit = price
+        upperLimit = price
     }
     
     // MARK: - Computations on current values.
@@ -85,9 +87,6 @@ class TradingOrder {
         sourcePrint("[Trade] Closed at price \(price) with profits \(value - initialValue) (%)")
         
         orderState = .closed
-        
-        lowLimit = nil
-        upperLimit = nil
     }
     
     func intermediateSell(at price: Double, for cost: Double) {
@@ -100,9 +99,6 @@ class TradingOrder {
         
         canSell = false
         canBuy = true
-        
-        lowLimit = nil
-        upperLimit = nil
     }
     
     func intermediateBuy(quantityBought: Double, at price: Double) {
@@ -119,10 +115,6 @@ class TradingOrder {
         qtyHistory.append(quantityBought)
         canSell = true
         canBuy = false
-        
-        lowLimit = nil
-        upperLimit = nil
-        
 
         
         sourcePrint("\n[Trade] Rebuy \(quantityBought) at \(price), after selling \(soldQty) at \(soldAt). Original was \(initialQty) at \(price). Qty gained: \(quantityBought - soldQty). From initial \(quantityBought - initialQty)")
