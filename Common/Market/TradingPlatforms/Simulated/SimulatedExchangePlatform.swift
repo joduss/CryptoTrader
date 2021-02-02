@@ -40,19 +40,22 @@ public class SimulatedExchangePlatform: CryptoExchangePlatform {
                 break
             }
             
-            let splitLines = line.split(separator: ",")
+            //            let splitLines = line.split(separator: ",")
+            //
+            //            let id = extractInt(startIndex: 6, in: splitLines[0])
+            //            let qty = extractDouble(startIndex: 11, in: splitLines[1])
+            //            let symbol = marketPair.rawValue
+            //            let price = extractDouble(startIndex: 8, in: splitLines[3])
+            //            let buyerIsMarker = true // don't care
+            //            var dateLine = splitLines[5]
+            //            dateLine.removeLast()
+            //            dateLine.removeLast()
+            //            let date = Date(timeIntervalSinceReferenceDate: extractDouble(startIndex: 7, in: dateLine))
             
-            let id = extractInt(startIndex: 6, in: splitLines[0])
-            let qty = extractDouble(startIndex: 11, in: splitLines[1])
-            let symbol = marketPair.rawValue
-            let price = extractDouble(startIndex: 8, in: splitLines[3])
-            let buyerIsMarker = true // don't care
-            var dateLine = splitLines[5]
-            dateLine.removeLast()
-            dateLine.removeLast()
-            let date = Date(timeIntervalSinceReferenceDate: extractDouble(startIndex: 7, in: dateLine))
+            //            let trade = MarketAggregatedTrade(id: id, date: date, symbol: symbol, price: price, quantity: qty, buyerIsMaker: buyerIsMarker)
             
-            let trade = MarketAggregatedTrade(id: id, date: date, symbol: symbol, price: price, quantity: qty, buyerIsMaker: buyerIsMarker)
+            let trade = try! decoder.decode(MarketAggregatedTrade.self, from: line.data(using: .utf8)!)
+            
             self.semaphore.wait()
             
             DispatchQueue.global(qos: .userInitiated).async {
