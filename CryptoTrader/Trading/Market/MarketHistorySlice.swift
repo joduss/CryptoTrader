@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import JoLibrary
 
 open class MarketHistorySlice {
     
@@ -121,15 +122,15 @@ open class MarketHistorySlice {
         return true
     }
     
-    func variability() -> Variability {
-        computeBasic()
-                
-        return Variability(min: min,
-                           max: max,
-                           average: averagePrice,
-                           spikes07Percent: searchingSpikes(spikeRatioToPrice: 0.7 / 100, priceMin: min, priceMax: max, priceAvg: averagePrice),
-                           spikes1Percent:searchingSpikes(spikeRatioToPrice: 1.0 / 100, priceMin: min, priceMax: max, priceAvg: averagePrice))
-    }
+//    func variability() -> Variability {
+//        computeBasic()
+//
+//        return Variability(min: min,
+//                           max: max,
+//                           average: averagePrice,
+//                           spikes07Percent: searchingSpikes(spikeRatioToPrice: 0.7 / 100, priceMin: min, priceMax: max, priceAvg: averagePrice),
+//                           spikes1Percent:searchingSpikes(spikeRatioToPrice: 1.0 / 100, priceMin: min, priceMax: max, priceAvg: averagePrice))
+//    }
     
     /// Computes the min, max and average prices.
     private func computeBasic() {
@@ -141,82 +142,86 @@ open class MarketHistorySlice {
         var max = 0.0
         var total = 0.0
         
-        for price in self.prices {
-            if (price.price < min) {
-                min = price.price
+        self.prices.withUnsafeBufferPointer({ array in
+            for price in array {
+                if (price.price < min) {
+                    min = price.price
+                }
+                if (price.price > max) {
+                    max = price.price
+                }
+                total += price.price
             }
-            if (price.price > max) {
-                max = price.price
-            }
-            total += price.price
-        }
-        
+        })
+                    
         self.min = min
         self.max = max
         self.averagePrice = total / Double(self.prices.count)
     }
     
-    func searchingSpikes(spikeRatioToPrice: Double, priceMin: Double, priceMax: Double, priceAvg: Double) -> UInt {
-                
-        guard prices.count > 1 else { return 0 }
-        
-        guard (priceMax - priceMin) / priceAvg > spikeRatioToPrice else {
-            return 0
-        }
-        
-        var lastMinBeforeSpike = prices.first!.price
-        var lastMaxBeforeSpike = prices.first!.price
-        
-        var lastSpikePrice: Double?
-        var spikeCount: UInt = 0
-        
-        for priceObject in prices {
-            
-            let price = priceObject.price
-            
-            if let lastSpike = lastSpikePrice {
-                
-                if price > lastMaxBeforeSpike {
-                    lastMaxBeforeSpike = price
-                } else if (price < lastMinBeforeSpike) {
-                    lastMinBeforeSpike = price
-                }
-                
-                let diffPositive = lastMaxBeforeSpike - lastSpike
-                let diffNegative = lastMinBeforeSpike - lastSpike
-
-                let diffPositiveToPrice = abs(diffPositive / price)
-                let diffNegativeToPrice = abs(diffNegative / price)
-
-                if diffPositiveToPrice >= spikeRatioToPrice || diffNegativeToPrice >= spikeRatioToPrice {
-                    lastSpikePrice = price
-                    lastMinBeforeSpike = price
-                    lastMaxBeforeSpike = price
-                    spikeCount += 1
-                }
-                
-            }
-            else {
-                if price > lastMaxBeforeSpike {
-                    lastMaxBeforeSpike = price
-                } else if (price < lastMinBeforeSpike) {
-                    lastMinBeforeSpike = price
-                }
-                
-                let diff = lastMaxBeforeSpike - lastMinBeforeSpike
-                let diffRatioToPrice = diff / price
-                
-                if diffRatioToPrice >= spikeRatioToPrice {
-                    lastSpikePrice = price
-                    lastMinBeforeSpike = price
-                    lastMaxBeforeSpike = price
-                    spikeCount += 1
-                }
-            }
-            
-        }
-        return spikeCount
-    }
+//    func searchingSpikes(spikeRatioToPrice: Double, priceMin: Double, priceMax: Double, priceAvg: Double) -> UInt {
+//                
+//        guard prices.count > 1 else { return 0 }
+//        
+//        guard (priceMax - priceMin) / priceAvg > spikeRatioToPrice else {
+//            return 0
+//        }
+//        
+//        var lastMinBeforeSpike = prices.first!.price
+//        var lastMaxBeforeSpike = prices.first!.price
+//        
+//        var lastSpikePrice: Double?
+//        var spikeCount: UInt = 0
+//        
+//        
+//                
+//        for priceObject in prices {
+//            
+//            let price = priceObject.price
+//            
+//            if let lastSpike = lastSpikePrice {
+//                
+//                if price > lastMaxBeforeSpike {
+//                    lastMaxBeforeSpike = price
+//                } else if (price < lastMinBeforeSpike) {
+//                    lastMinBeforeSpike = price
+//                }
+//                
+//                let diffPositive = lastMaxBeforeSpike - lastSpike
+//                let diffNegative = lastMinBeforeSpike - lastSpike
+//
+//                let diffPositiveToPrice = abs(diffPositive / price)
+//                let diffNegativeToPrice = abs(diffNegative / price)
+//
+//                if diffPositiveToPrice >= spikeRatioToPrice || diffNegativeToPrice >= spikeRatioToPrice {
+//                    lastSpikePrice = price
+//                    lastMinBeforeSpike = price
+//                    lastMaxBeforeSpike = price
+//                    spikeCount += 1
+//                }
+//                
+//            }
+//            else {
+//                if price > lastMaxBeforeSpike {
+//                    lastMaxBeforeSpike = price
+//                } else if (price < lastMinBeforeSpike) {
+//                    lastMinBeforeSpike = price
+//                }
+//                
+//                let diff = lastMaxBeforeSpike - lastMinBeforeSpike
+//                let diffRatioToPrice = diff / price
+//                
+//                if diffRatioToPrice >= spikeRatioToPrice {
+//                    lastSpikePrice = price
+//                    lastMinBeforeSpike = price
+//                    lastMaxBeforeSpike = price
+//                    spikeCount += 1
+//                }
+//            }
+//            
+//        }
+//        return spikeCount
+//    }
 }
 
 

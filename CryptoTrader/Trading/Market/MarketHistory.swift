@@ -42,7 +42,7 @@ final class MarketHistory: MarketHistorySlice {
             
             if index == 0 { return }
             
-            self.prices.removeSubrange(index..<self.prices.endIndex)
+            self.prices.removeSubrange(0..<index)
             return
         }
     }
