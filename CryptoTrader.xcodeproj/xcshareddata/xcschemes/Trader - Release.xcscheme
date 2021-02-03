@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1230"
+   LastUpgradeVersion = "1240"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -52,7 +52,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/market-10-trades-read-migrated.json&quot;"
+            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/market-10-trades-migrated.trades&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/merged 02-02-2021.trades&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

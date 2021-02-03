@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1230"
+   LastUpgradeVersion = "1240"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -52,12 +52,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "merge --depth-files-directory /Users/jonathanduss/Library/Developer/Xcode/DerivedData/CryptoTrader-comppumrkontvwbrwwwxanmpsvyt/Build/Products/Debug/a/ /Users/jonathanduss/Library/Developer/Xcode/DerivedData/CryptoTrader-comppumrkontvwbrwwwxanmpsvyt/Build/Products/Debug"
+            argument = "merge -f &quot;/Users/jonathanduss/Documents/Data Mining/toMerge&quot; &quot;/Users/jonathanduss/Documents/Data Mining/merged&quot;"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "merge --depth-files-directory /Users/jonathanduss/Desktop/untitled\ folder\ 2/depthfiles /Users/jonathanduss/Desktop/untitled\ folder\ 2"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
