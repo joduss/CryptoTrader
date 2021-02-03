@@ -82,14 +82,8 @@ extension CryptoMarketRecorder {
         
         static var configuration = CommandConfiguration(abstract: "Merge files containing market data.")
         
-        @Option(name: .long)
-        var depthFilesDirectory: String?
-        
-        @Option(name: .long)
-        var tradeFilesDirectory: String?
-        
-        @Option(name: .long)
-        var tickerFilesDirectory: String?
+        @Option(name: .shortAndLong)
+        var fileToMergeDirectory: String?
         
         @Argument(help: "Directory where to save the resulting files.")
         var resultsDirectory: String
@@ -98,19 +92,19 @@ extension CryptoMarketRecorder {
             
             let resultDirectoryPath = resultsDirectory.expandedPath() as NSString
                         
-            if let depthFilesDirectory = self.depthFilesDirectory?.expandedPath() {
+            if let depthFilesDirectory = self.fileToMergeDirectory?.expandedPath() {
                 let resultingFile = resultDirectoryPath.appendingPathComponent("merged.depths")
                 let merger = DepthFilesMerger(directoryPath: depthFilesDirectory, mergedFilePath: resultingFile)
                 try merger.merge()
             }
             
-            if let tradeFilesDirectory = self.tradeFilesDirectory?.expandedPath() {
+            if let tradeFilesDirectory = self.fileToMergeDirectory?.expandedPath() {
                 let resultingFile = resultDirectoryPath.appendingPathComponent("merged.trades")
                 let merger = TradeFilesMerger(directoryPath: tradeFilesDirectory, mergedFilePath: resultingFile)
                 try merger.merge()
             }
             
-            if let tickerFilesDirectory = self.tradeFilesDirectory?.expandedPath() {
+            if let tickerFilesDirectory = self.fileToMergeDirectory?.expandedPath() {
                 let resultingFile = resultDirectoryPath.appendingPathComponent("merged.tickers")
                 let merger = TickerFilesMerger(directoryPath: tickerFilesDirectory, mergedFilePath: resultingFile)
                 try merger.merge()
