@@ -96,9 +96,17 @@ public class FileMerger {
     private func mergeFile(at path: String) throws {
         let reader = TextFileReader.openFile(at: path)
         
+        var lineCount = 0
+        
         while let line = reader.readLine() {
-            let lineData = line.data(using: .utf8)!
-            let lineId = try objectId(inLine: line)
+            var lineId: Int = -1
+            var lineData: Data!
+            // The deserialization has a memory leak during deserialization.
+            try autoreleasepool {
+                lineData = line.data(using: .utf8)!
+                lineId = try objectId(inLine: line)
+            }
+            
             if lineId <= lastId {
                 sourcePrint("\(self) is skipping id \(lineId) because it is already present")
                 continue
@@ -106,7 +114,16 @@ public class FileMerger {
             
             lastId = lineId
             mergedFileHandle.write(lineData)
+            
+            lineCount += 1
+            
+            if lineCount % 350000 == 0 {
+                try! mergedFileHandle.synchronize()
+            }
+            
         }
+        
+        mergedFileHandle.synchronizeFile()
         
         reader.close()
     }

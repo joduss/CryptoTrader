@@ -1,5 +1,5 @@
 import Foundation
-import JoLibrary
+import ArgumentParser
 
 final class TickerFilesMerger: FileMerger {
     
@@ -10,7 +10,12 @@ final class TickerFilesMerger: FileMerger {
         super.init(directoryPath: directoryPath, mergedFilePath: mergedFilePath)
     }
     
-    override public func objectId(inLine: String) -> Int {
-        return (try! jsonDecoder.decode(MarketTicker.self, from: inLine.data(using: .utf8)!)).id
-    }  
+    override public func objectId(inLine line: String) throws -> Int {
+        guard let id = (try? jsonDecoder.decode(MarketTicker.self, from: line.data(using: .utf8)!))?.id else {
+            sourcePrint("Cannot decode json of type 'MarketTicker' from line \(line)")
+            throw ExitCode.failure
+        }
+        
+        return id
+    }
 }
