@@ -33,32 +33,41 @@ public class SimulatedExchangePlatform: CryptoExchangePlatform {
         
         let reader = TextFileReader.openFile(at: self.aggregatedTradesFilePath)
         
+        var idx = 0
+        
         while true {
             
-            guard let line = reader.readLine() else {
+            guard var line = reader.readLine() else {
                 (subscriber as? SimpleTrader)?.summary()
                 break
             }
             
-            //            let splitLines = line.split(separator: ",")
-            //
-            //            let id = extractInt(startIndex: 6, in: splitLines[0])
-            //            let qty = extractDouble(startIndex: 11, in: splitLines[1])
-            //            let symbol = marketPair.rawValue
-            //            let price = extractDouble(startIndex: 8, in: splitLines[3])
-            //            let buyerIsMarker = true // don't care
-            //            var dateLine = splitLines[5]
-            //            dateLine.removeLast()
-            //            dateLine.removeLast()
-            //            let date = Date(timeIntervalSinceReferenceDate: extractDouble(startIndex: 7, in: dateLine))
+            idx += 1
             
-            //            let trade = MarketAggregatedTrade(id: id, date: date, symbol: symbol, price: price, quantity: qty, buyerIsMaker: buyerIsMarker)
+            if idx % 5 == 0 {
+                continue
+            }
             
-            let trade = try! decoder.decode(MarketAggregatedTrade.self, from: line.data(using: .utf8)!)
+            let splitLines = line[line.index(line.startIndex, offsetBy: 2)..<line.index(line.endIndex, offsetBy: -0)].split(separator: ",")
+            
+            let id = extractInt(startIndex: 5, in: splitLines[1])
+            let qty = extractDouble(startIndex: 10, in: splitLines[0])
+            let symbol = marketPair.rawValue
+            let price = extractDouble(startIndex: 8, in: splitLines[3])
+            let buyerIsMarker = true // don't care
+            var dateLine = splitLines[5]
+            dateLine.removeLast()
+            dateLine.removeLast()
+            let date = Date(timeIntervalSinceReferenceDate: extractDouble(startIndex: 7, in: dateLine))
+            
+            let trade = MarketAggregatedTrade(id: id, date: date, symbol: symbol, price: price, quantity: qty, buyerIsMaker: buyerIsMarker)
+            
+            //            let trade = try! decoder.decode(MarketAggregatedTrade.self, from: line.data(using: .utf8)!)
             
             self.semaphore.wait()
             
             DispatchQueue.global(qos: .userInitiated).async {
+                
                 DateFactory.simulated = true
                 DateFactory.now = trade.date
                 self.subscriber?.process(trade: trade)
