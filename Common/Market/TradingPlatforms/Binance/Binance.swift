@@ -91,6 +91,8 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
             return "btcusdt"
         case .eth_usd:
             return "ethusdt"
+        case .icx_usd:
+            return "icxusdt"
         }
     }
     

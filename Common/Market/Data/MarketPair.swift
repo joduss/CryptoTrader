@@ -8,4 +8,7 @@ public enum MarketPair: String, EnumerableFlag {
     
     /// USD or USDT depending on the exchange
     case btc_usd
+    
+    /// USD or USDT depending on the exchange
+    case icx_usd
 }
