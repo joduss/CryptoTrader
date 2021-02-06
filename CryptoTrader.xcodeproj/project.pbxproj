@@ -41,7 +41,6 @@
 		6BCA377A25C5D30400B58E3C /* FileMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA377925C5D30400B58E3C /* FileMerger.swift */; };
 		6BD322F825CA075100FDDFD4 /* JoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6BD322F725CA075100FDDFD4 /* JoLibrary */; };
 		6BD322FA25CA075100FDDFD4 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6BD322F925CA075100FDDFD4 /* ArgumentParser */; };
-		6BD3230025CA078F00FDDFD4 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD322FF25CA078F00FDDFD4 /* main.swift */; };
 		6BE656A025C08C59001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
 		6BE656AA25C09627001AAF59 /* CryptoTraderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE656A925C09627001AAF59 /* CryptoTraderTests.swift */; };
 		6BE656B225C0969D001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
@@ -144,7 +143,6 @@
 		6BCA377425C5D2D100B58E3C /* TickerFilesMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TickerFilesMerger.swift; sourceTree = "<group>"; };
 		6BCA377925C5D30400B58E3C /* FileMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMerger.swift; sourceTree = "<group>"; };
 		6BD322E725CA071600FDDFD4 /* CryptoPreprocessor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoPreprocessor; sourceTree = BUILT_PRODUCTS_DIR; };
-		6BD322FF25CA078F00FDDFD4 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		6BDE061625BB15EC00731878 /* MarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketRecorder.swift; sourceTree = "<group>"; };
 		6BE6569F25C08C59001AAF59 /* Percent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Percent.swift; sourceTree = "<group>"; };
 		6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CryptoTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -210,7 +208,6 @@
 		6B48DAC825A9F6BA00F2CD6D = {
 			isa = PBXGroup;
 			children = (
-				6BD322E125CA06D000FDDFD4 /* CryptoPreprocessor */,
 				6BFC305125BCD58800BDD732 /* Common */,
 				6B48DAD325A9F6BA00F2CD6D /* CryptoTrader */,
 				6BFC305825BCD5CA00BDD732 /* CryptoMarketRecorder */,
@@ -350,14 +347,6 @@
 				6BCA377925C5D30400B58E3C /* FileMerger.swift */,
 			);
 			path = Merge;
-			sourceTree = "<group>";
-		};
-		6BD322E125CA06D000FDDFD4 /* CryptoPreprocessor */ = {
-			isa = PBXGroup;
-			children = (
-				6BD322FF25CA078F00FDDFD4 /* main.swift */,
-			);
-			path = CryptoPreprocessor;
 			sourceTree = "<group>";
 		};
 		6BD3230925CA081000FDDFD4 /* DataParser */ = {
@@ -618,7 +607,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6BD3230025CA078F00FDDFD4 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
