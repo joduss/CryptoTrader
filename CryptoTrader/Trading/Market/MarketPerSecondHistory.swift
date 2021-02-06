@@ -20,6 +20,7 @@ final class MarketPerSecondHistory: MarketHistorySlice {
         
         guard let currentTrade = self.currentTrade else {
             self.currentTrade = newTrade
+            prices.append(newTrade)
             currentTradeAggregationCount = 1
             return
         }
@@ -47,6 +48,8 @@ final class MarketPerSecondHistory: MarketHistorySlice {
                     buyerIsMaker: true)
             currentTradeAggregationCount += 1
             self.currentTrade = secondAggregatedTrade
+            self.prices.removeLast()
+            self.prices.append(secondAggregatedTrade)
         }
     }
     
