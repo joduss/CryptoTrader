@@ -9,46 +9,34 @@ import Foundation
 final class SimpleTrader: CryptoExchangePlatformSubscriber {
     
     private struct Parameters {
-        static let buyUpperLimitPercent = 1.0
+        ///The initial limit set at which the limits will be updated
+        static let initialUpperLimitPercent = 1.0
         
-        static let sellLowerLimitDivisor = 3.5
+        static let sellLowerLimitDivisor = 4.0
         
         /// How much does it need to grow so that we update the lower limit at which we should sell due to decrease of price
-        static let sellUpperLimitPercent: Percent = 0.2
+        static let updateSellUpperLimitPercent: Percent = 0.35
         
         /// How much lower can be the price at which we sell to take the profits in case the price goes down again.
-        static let maxSellLowerLimitPercent: Percent = 0.6
+        static let maxSellLowerLimitPercent: Percent = 0.7
         
         /// Minimum lower limit compared to initial price at which we sell.
         static let minLowerLimitPercent: Percent = 0.25
+        
+        static let minDistancePercentNegative: Percent = -1.0
+        static let minDistancePercentPositive: Percent = 0.7
+
+        
+        static let prepareBuyOverPricePercent: Percent = 0.5
+        static let updatePrepareBuyOverPricePercent: Percent = 0.5
     }
     
-    // Profits = 13.599324848781983
-    //    static let buyUpperLimitPercent = 0.5
-    //    static let sellLowerLimitDivisor = 2.5
-    //    static let sellLowerLimitPercent = 0.4
-    //    static let sellUpperLimitPercent = 0.2
-    
-    // Profits = 14.640733885920692
-    //    private struct Parameters {
-    //        static let buyUpperLimitPercent = 0.6
-    //        static let sellLowerLimitDivisor = 4
-    //        static let sellLowerLimitPercent = 0.5
-    //        static let sellUpperLimitPercent = 0.2
-    //    }
-    
-    // Profits = 15.461218620192053
-    //    private struct Parameters {
-    //        static let buyUpperLimitPercent = 0.6
-    //        static let sellLowerLimitDivisor = 5
-    //        static let sellLowerLimitPercent = 0.6
-    //        static let sellUpperLimitPercent = 0.2
-    //    }
+
     
     let marketAnalyzer = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(2.01))
     var api : CryptoExchangePlatform
     
-    var orderSize: Double = 20
+    var orderSize: Double = 25
     
     let initialBalance = 250.0
     var balance: Double
@@ -72,22 +60,7 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
         self.api.subscriber = self
         api.subscribeToAggregatedTradeStream()
     }
-    
-//    private func canBuyAt(price: Double) -> Bool {
-//        if hasSufficientBalance == false {
-//            return false
-//        }
-//
-//        if Percent(differenceOf: price, from: lowerInitialPrice()) < Percent(1) {
-//            return true
-//        }
-//
-//        if Percent(differenceOf: price, from: maxInitialPrice()) > Percent(1) {
-//            return true
-//        }
-//
-//        return false
-//    }
+
     
     func process(ticker: MarketTicker) {
 
@@ -127,7 +100,8 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
     }
     
     // MARK: - Action of sellin / buying
-    
+    // ================================================================
+
     var lastSell: Double = 0
     var lastSellDate: Date = DateFactory.now
 
@@ -148,6 +122,21 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
         
         sourcePrint("Total Profits: \(profits)")
     }
+    
+    func buy(price: Double) {
+
+        balance -= orderSize
+
+        let qty = (orderSize / price) -% fees
+        let order = TradingOrder(price: price, amount: qty, cost: orderSize)
+        self.orders.append(order)
+        self.lastBuyOrder = order
+        
+        order.upperLimit = price +% Percent(Parameters.initialUpperLimitPercent)
+        order.lowLimit = price -% Percent(100)
+
+        sourcePrint("[Trade] At \(DateFactory.now) Bought \(qty) for \(price). Cost: \(orderSize)")
+    }
 
     func rebuy(order: TradingOrder, at price: Double) {
         order.intermediateBuy(quantityBought: (order.value / price) -% fees, at: price)
@@ -160,14 +149,56 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
     
     
     // MARK: - Decision making
+    // ================================================================
     
+    private var prepareBuyOverPrice: Double?
+    private var locked = false
+
     func decideNewBuy(price: Double) {
         /// There are always sufficient found here!
         /// There are 2h of statistic availables
-                
+        
+        
+        // Locking
+        if locked {
+            
+            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(1)).isTrendDownwards(threshold: 0.2) {
+                return
+            }
+            
+            locked = false
+        }
+        
+        // Buy prepared
+        if let prepareBuyOverPrice = self.prepareBuyOverPrice {
+            
+            if price >= prepareBuyOverPrice {
+                buy(price: price)
+                self.prepareBuyOverPrice = nil
+                return
+            }
+            
+            if price < prepareBuyOverPrice -% Parameters.updatePrepareBuyOverPricePercent {
+                prepareBuy(currentPrice: price)
+                return
+            }
+            return
+        }
+             
+        // Device for a buy prep
         if let closestOrder = self.closestOrder(to: price) {
             
-            if abs(Percent(differenceOf: price, from: closestOrder.initialPrice).percentage) < 0.25 {
+            if price == closestOrder.price {
+                return
+            }
+            
+            // If case of a decrease, it must be large enough to consider bying again
+            if price < closestOrder.price && Percent(differenceOf: price, from: closestOrder.initialPrice) > Parameters.minDistancePercentNegative {
+                return
+            }
+            
+            // Same when increasing, but less
+            if price > closestOrder.price && Percent(differenceOf: price, from: closestOrder.initialPrice) < Parameters.minDistancePercentPositive {
                 return
             }
             
@@ -177,37 +208,54 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
             if lastBuyOrderPrice < price {
                 // Compared to last buy, the price went up.
                 
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) > Percent(Parameters.buyUpperLimitPercent) {
+                if Percent(differenceOf: price, from: lastBuyOrderPrice) > Percent(Parameters.initialUpperLimitPercent) {
                     buy(price: price)
                     return
                 }
             }
             else {
+                                
                 // Compared to last buy, the price went down.
+                if orders.filter({$0.price > price && DateFactory.now - $0.date < TimeInterval.fromHours(2) }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2)).isTrendDownwards(threshold: 0.2) {
+                    // We pause for 3h or 3%
+                    self.locked = true
+                }
                 
-                // Going down... we are carefull, if we buy, we plan small profits
-                // TODO
-                
-                if let lastClosedOrder = closedOrders.last, Percent(differenceOf: price, from: lastClosedOrder.price) > Percent(-0.4) {
-                    return
+                if let lastOpenPrice = orders.last?.price {
+                    if Percent(differenceOf: price, from: lastOpenPrice) < 2.0 {
+                        prepareBuy(currentPrice: price)
+                        return
+                    }
                 }
                 
                 // Big drop in short time => we jump on it!
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) < Percent(-3) && DateFactory.now - lastBuyOrder!.date < TimeInterval.fromMinutes(5) {
-                    buy(price: price)
+                if Percent(differenceOf: price, from: lastBuyOrderPrice) < Percent(-2) && DateFactory.now - lastBuyOrder!.date < TimeInterval.fromMinutes(5) {
+                    prepareBuy(currentPrice: price)
                     return
                 }
                 // Small slow decrease
                 if Percent(differenceOf: price, from: lastBuyOrderPrice) < Percent(-1) && DateFactory.now - lastBuyOrder!.date > TimeInterval.fromMinutes(60) {
-                    buy(price: price)
+                    prepareBuy(currentPrice: price)
                     return
+                }
+                
+                // We sold and the price went down. So we buy again
+                guard let lastClosedOrder = closedOrders.last else { return }
+                guard let lastOpenedOrderPrice = orders.last?.price else { return }
+                
+                if price < lastClosedOrder.price && lastOpenedOrderPrice > lastClosedOrder.price {
+                    prepareBuy(currentPrice: price)
                 }
             }
             
             return
         }
         
-        buy(price: price)
+        prepareBuy(currentPrice: price)
+    }
+    
+    private func prepareBuy(currentPrice: Double) {
+        prepareBuyOverPrice = currentPrice +% Parameters.prepareBuyOverPricePercent
     }
     
     func decideRebuy(order: TradingOrder, price: Double) { }
@@ -228,37 +276,22 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
                 if lowLimitPercentDrop >  Parameters.maxSellLowerLimitPercent {
                     lowLimitPercentDrop = Parameters.maxSellLowerLimitPercent
                 }
-                if lowLimitPercentDrop < Parameters.minLowerLimitPercent {
-                    lowLimitPercentDrop = Parameters.minLowerLimitPercent
+                if lowLimitPercentDrop < Parameters.minLowerLimitPercent + 0.1 {
+                    return
                 }
                 
-                order.upperLimit = price +% Parameters.sellUpperLimitPercent
+                order.upperLimit = price +% Parameters.updateSellUpperLimitPercent
                 order.lowLimit = price -% lowLimitPercentDrop
                 return
             }
             
             // If the price goes below the lower limit, but is higher than the original price, we close
-            if price < order.lowLimit {
+            if price < order.lowLimit && Percent(differenceOf: price, from: order.initialPrice) > Parameters.minLowerLimitPercent {
                 closeSell(order: order, at: price)
             }
             
             return
         }
-    }
-
-    func buy(price: Double) {
-
-        balance -= orderSize
-
-        let qty = (orderSize / price) -% fees
-        let order = TradingOrder(price: price, amount: qty, cost: orderSize)
-        self.orders.append(order)
-        self.lastBuyOrder = order
-        
-        order.upperLimit = price +% Percent(Parameters.buyUpperLimitPercent)
-        order.lowLimit = price -% Percent(100)
-
-        sourcePrint("[Trade] At \(DateFactory.now) Bought \(qty) for \(price). Cost: \(orderSize)")
     }
     
     private func lowerInitialPrice() -> Double {
@@ -321,7 +354,7 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
         sourcePrint("Duration: \(timeInterval / 3600 / 24) days \n\n")
         sourcePrint("Current balance: \(balance)")
         sourcePrint("Coins: \(coins) @ \(currentPrice)")
-        sourcePrint("Profits: \(profits) (\(Percent(ratioOf: profits, to: initialBalance)) %) / Per day: \(profits / (timeInterval / 3600 / 24))")
+        sourcePrint("Profits: \(profits) (\(Percent(ratioOf: profits, to: initialBalance).percentage) %) / Per day: \(profits / (timeInterval / 3600 / 24))")
         
         
         sourcePrint("Total assets value: \(currentValue + balance)")
@@ -333,5 +366,4 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
         }
     }
 }
-
 
