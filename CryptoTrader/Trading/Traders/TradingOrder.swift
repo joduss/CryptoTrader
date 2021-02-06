@@ -75,6 +75,17 @@ class TradingOrder {
     // MARK: - Buy / Sell actions
     
     func closeOrderSelling(at price: Double, forCost value: Double) {
+        let profits = value - initialValue
+        let profitPercent = Percent(differenceOf: value, from: initialValue)
+        
+        sourcePrint(
+            """
+            [Trade] Selling order from the \(date)
+                    Bought \(initialQty) @ \(initialPrice).
+                    Selling \(quantity) @ \(price). Cost: \(value).
+                    Profits of \(profits) (\(profitPercent.percentage) %).
+            """)
+                
         currentPrice = price
         currentValue = value
         currentQty = 0
@@ -82,9 +93,6 @@ class TradingOrder {
         
         canSell = false
         canBuy = false
-        
-        let sellCost = price * quantity
-        sourcePrint("[Trade] Closed at price \(price) with profits \(value - initialValue) (%)")
         
         orderState = .closed
     }
@@ -122,5 +130,61 @@ class TradingOrder {
         let provisionalProfitsCurrentPrice = (quantityBought * price - initialValue)
         sourcePrint("[Trade] Provisional profits with original price: \(provisionalProfitsSellOriginalPrice)")
         sourcePrint("[Trade] Provisional profits with current price \(price): \(provisionalProfitsCurrentPrice)\n")
+    }
+    
+    func description(for price: Double) -> String {
+        
+        if let closeDate = self.closeDate {
+            
+            let profit = value - initialValue
+            let profitPercent = Percent(differenceOf: value, from: initialValue)
+            
+            return
+                """
+                Order open the (\(OutputDateFormatter.instance.format(date: date)), closed the \(OutputDateFormatter.instance.format(date: closeDate))
+                Initial price: \(initialPrice) / Close price: \(price)
+                Initial Quantity: \(initialQty)
+                Initial value: \(initialValue) / Close value: \(value)
+                Profit: \(profit) (\(profitPercent.percentage)%)
+                """
+        }
+        else {
+            return
+                """
+                Order (\(OutputDateFormatter.instance.format(date: date))
+                Initial price: \(initialPrice) / Current price: \(price)
+                Initial Quantity: \(initialQty)
+                Initial value: \(initialValue) / Current: \(price * quantity)
+                Lower / Upper limits: \(lowLimit / upperLimit)
+                """
+        }
+    }
+    
+    func description() -> String {
+        
+        if let closeDate = self.closeDate {
+            
+            let profit = value - initialValue
+            let profitPercent = Percent(differenceOf: value, from: initialValue)
+            
+            return
+                """
+                Order open the (\(OutputDateFormatter.instance.format(date: date)), closed the \(OutputDateFormatter.instance.format(date: closeDate))
+                Initial price: \(initialPrice) / Close price: \(price)
+                Initial Quantity: \(initialQty)
+                Initial value: \(initialValue) / Close value: \(value)
+                Profit: \(profit) (\(profitPercent.percentage)%)
+                """
+        }
+        else {
+            return
+                """
+                Order (\(OutputDateFormatter.instance.format(date: date))
+                Initial price: \(initialPrice)
+                Initial Quantity: \(initialQty)
+                Initial value: \(initialValue)
+                Lower / Upper limits: \(lowLimit / upperLimit)
+                """
+        }
     }
 }
