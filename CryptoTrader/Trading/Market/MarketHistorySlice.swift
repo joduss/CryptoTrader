@@ -86,7 +86,7 @@ open class MarketHistorySlice {
 //    }
     
     /// Threshold: Percent of change in price to consider a difference of price as a negative trend.
-    func isTrendDownwards(threshold: Double = 0) -> Bool {
+    func isTrendDownwards(threshold: Percent = 0) -> Bool {
         guard let firstTrade = prices.first, let lastTrade = prices.last else {
             return false
         }
@@ -111,11 +111,11 @@ open class MarketHistorySlice {
         let slopeBtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: beforeLastPartIntervalAvg).percentage / intervalSlotDuration)
         let slopeAtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: firstPartIntervalAvg).percentage / 3 * intervalSlots)
         
-        if slopeAtoC.percentage > threshold {
+        if slopeAtoC > threshold {
             return false
         }
         
-        if slopeBtoC.percentage > threshold {
+        if slopeBtoC > threshold {
             return false
         }
         
