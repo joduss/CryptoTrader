@@ -44,7 +44,7 @@ public class SimulatedExchangePlatform: CryptoExchangePlatform {
             
             idx += 1
             
-            if idx % 5 == 0 {
+            if idx % 3 == 0 {
                 continue
             }
             
