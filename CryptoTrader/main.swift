@@ -38,7 +38,6 @@ struct Trader: ParsableCommand {
             print("Running trader with simulation api.")
             let api = SimulatedExchangePlatform(marketPair: self.marketPair, aggregatedTradesFilePath: aggregatedTradeRecordsPath)
             let trader = SimpleTrader(api: api)
-            print("Total profits: \(trader.profits)")
             break
         }
     }
