@@ -21,7 +21,7 @@ struct Percent: Comparable {
     }
     
     init(ratioOf: Double, to: Double) {
-        self.percentage = ratioOf / to * 100
+        self.percentage = ratioOf / to * 100.0
     }
     
     /// The  difference between a number compared to another original one.
@@ -67,22 +67,20 @@ struct Percent: Comparable {
     static func *(lhs: Percent, rhs: Double) -> Double {
         return lhs.value * rhs
     }
-}
-
-extension Double {
-    var asPercent: Percent {
-        return Percent(self * 100)
+    
+    static func /(lhs: Percent, rhs: Double) -> Percent {
+        Percent(lhs.percentage / rhs)
     }
 }
-//
-//extension Percent: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
-//    init(integerLiteral value: IntegerLiteralType) {
-//        self.init(Double(value))
-//    }
-//
-//    init(floatLiteral value: FloatLiteralType) {
-//        self.init(Double(value))
-//    }
-//}
+
+extension Percent: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
+    init(integerLiteral value: IntegerLiteralType) {
+        self.init(Double(value))
+    }
+
+    init(floatLiteral value: FloatLiteralType) {
+        self.init(Double(value))
+    }
+}
 
 

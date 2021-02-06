@@ -13,10 +13,9 @@ class CryptoTraderTests: XCTestCase {
     }
 
     func testPercent() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
         let percent = Percent(25)
-        
+
+
         XCTAssertEqual(25, percent.percentage)
         XCTAssertEqual(0.25, percent.value)
                 
@@ -35,8 +34,14 @@ class CryptoTraderTests: XCTestCase {
 
         XCTAssertEqual(Percent(50), Percent(ratioOf: 100, to: 200))
         XCTAssertEqual(Percent(200), Percent(ratioOf: 200, to: 100))
-
-//        XCTAssertEqual(<#T##expression1: FloatingPoint##FloatingPoint#>, <#T##expression2: FloatingPoint##FloatingPoint#>, accuracy: <#T##FloatingPoint#>)
+    }
+    
+    func testExpressibleByFloatLiteral() throws {
+        let percent = Percent(100)
+        let doubleValue: Double = 150
         
+        let doubleResult = doubleValue * percent
+                
+        XCTAssertEqual(doubleValue, doubleResult)
     }
 }
