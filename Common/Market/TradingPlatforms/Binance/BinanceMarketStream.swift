@@ -109,8 +109,16 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, C
     
     public func process(response: String) {
         
+        do {
+            try parse(response)
+        } catch {
+            sourcePrint("ERROR: Parsing the response resulted in an error: \(error)")
+        }
+    }
+    
+    private func parse(_ response: String) throws {
         if response.starts(with: "{\"e\":\"aggTrade\",") {
-            let binanceTrade = try! JSONDecoder().decode(BinanceAggregatedTradeResponse.self, from: response.data(using: .utf8)!)
+            let binanceTrade = try JSONDecoder().decode(BinanceAggregatedTradeResponse.self, from: response.data(using: .utf8)!)
             
             // Update the market depth.
             if abs(marketDepth.currentPrice - binanceTrade.price) > marketDepth.currentPrice / 100 {
@@ -132,7 +140,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, C
         }
         
         if response.starts(with: "{\"u\":") {
-            let binanceTicker = try! JSONDecoder().decode(BinanceTickerResponse.self, from: response.data(using: .utf8)!)
+            let binanceTicker = try JSONDecoder().decode(BinanceTickerResponse.self, from: response.data(using: .utf8)!)
             let ticker = MarketTicker(id: binanceTicker.updateId,
                                       date: Date(),
                                       symbol: binanceTicker.symbol,
@@ -146,7 +154,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, C
         
         if response.starts(with: "{\"e\":\"depthUpdate\"") {
             
-            let binanceDepth = try! JSONDecoder().decode(BinanceDepthUpdateResponse.self, from: response.data(using: .utf8)!)
+            let binanceDepth = try JSONDecoder().decode(BinanceDepthUpdateResponse.self, from: response.data(using: .utf8)!)
             
             let askUpdates = binanceDepth.askUpdates.map({MarketDepthElement(priceLevel: $0.priceLevel, quantity: $0.quantity)})
             marketDepth.updateAsks(askUpdates)

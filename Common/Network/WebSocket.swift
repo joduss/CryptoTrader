@@ -36,6 +36,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     // MARK: Connection setup
     
     public func connect() {
+        sourcePrint("Creating a websocket connection.")
         session?.invalidateAndCancel()
         
         session = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
@@ -44,6 +45,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     }
     
     public func disconnect() {
+        sourcePrint("Disconnect the websocket.")
         session?.invalidateAndCancel()
         webSocketTask = nil
         session = nil
