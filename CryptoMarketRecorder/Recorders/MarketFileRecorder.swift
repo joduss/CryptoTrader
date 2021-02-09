@@ -9,9 +9,9 @@ final class MarketFileRecorder: MarketRecorder {
     
     private let printFrequency = 20
     
-    let tradesQueue = DispatchQueue(label: "Trade")
-    let tickersQueue = DispatchQueue(label: "Tickers")
-    let depthsQueue = DispatchQueue(label: "Depths")
+    private let tradesQueue = DispatchQueue(label: "Trade")
+    private let tickersQueue = DispatchQueue(label: "Tickers")
+    private let depthsQueue = DispatchQueue(label: "Depths")
 
     private let tickersSemaphore = DispatchSemaphore(value: 1)
     private let tradeFileSemaphore = DispatchSemaphore(value: 1)
@@ -33,8 +33,7 @@ final class MarketFileRecorder: MarketRecorder {
     private var depthCount = 0
     
     private var lastTrade: Double = 0
-
-    private var aggregatedTicker: MarketTicker?
+    private var lastTicker: MarketTicker?
 
     init(api: MarketDataStream, savingFrequency: Int = 5000) {
         self.marketStream = api
@@ -124,33 +123,26 @@ final class MarketFileRecorder: MarketRecorder {
     }
     
     func processThreadSafe(ticker: MarketTicker) {
-        guard let aggregatedTicker = self.aggregatedTicker else {
-            self.aggregatedTicker = ticker
+        guard let lastTicker = self.lastTicker else {
+            self.lastTicker = ticker
             return
         }
 
-        // If the bid and ask price are the same, we just update the quantity.
-        // We use the largest ticker id.
-        if ticker.askPrice == aggregatedTicker.askPrice && ticker.bidPrice == aggregatedTicker.bidPrice {
-            self.aggregatedTicker = MarketTicker(id: max(ticker.id, aggregatedTicker.id),
-                                                 date: ticker.date,
-                                                 symbol: ticker.symbol,
-                                                 bidPrice: ticker.bidPrice,
-                                                 bidQuantity: ticker.bidQuantity + aggregatedTicker.bidQuantity,
-                                                 askPrice: ticker.askPrice,
-                                                 askQuantity: ticker.askQuantity + aggregatedTicker.askQuantity)
+        // If the bid and ask price are the same, we just update it.
+        if ticker.askPrice == lastTicker.askPrice && ticker.bidPrice == lastTicker.bidPrice {
+            self.lastTicker = ticker
             return
         }
 
         tickerCount += 1
-        tickersCache.append(aggregatedTicker)
+        tickersCache.append(lastTicker)
 
         if tickerCount % printFrequency == 0 {
-            sourceReplacablePrint("Ticker \(tickerCount) => Bid: \(aggregatedTicker.bidQuantity) at \(aggregatedTicker.bidPrice) / Ask: \(aggregatedTicker.askQuantity) at \(aggregatedTicker.askPrice)")
+            sourceReplacablePrint("Ticker \(tickerCount) => Bid: \(lastTicker.bidQuantity) at \(lastTicker.bidPrice) / Ask: \(lastTicker.askQuantity) at \(lastTicker.askPrice)")
         }
 
         // Use the new ticker which is different from previous.
-        self.aggregatedTicker = ticker
+        self.lastTicker = ticker
         
         if tickersCache.count > 0 && tickersCache.count % savingFrequency == 0 {
             sourcePrint("Saving tickers to file... (Total: \(tickerCount))   ")
