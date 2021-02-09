@@ -1,45 +1,40 @@
-//
-//  Binance.swift
-//  Trader2
-//
-//  Created by Jonathan Duss on 11.01.21.
-//
-
 import Foundation
 import JoLibrary
 
-final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
-    
+final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, CryptoExchangePlatform {
+
     private let baseUrl = URL(string: "wss://stream.binance.com:9443/ws/a")!
-    
+
+    private var marketDepth = MarketDepth()
+
     private var socket: WebSocket {
         return webSocketHandler.socket!
     }
 
-    public let marketPair: MarketPair
-    private var marketDepth = MarketDepth()
-    
-    private(set) public var subscribedToTickerStream: Bool = false
-    private(set) public var subscribedToAggregatedTradeStream: Bool = false
-    private(set) public var subscribedToMarketDepthStream: Bool = false
+    public private(set) var subscribedToTickerStream: Bool = false
+    public private(set) var subscribedToAggregatedTradeStream: Bool = false
+    public private(set) var subscribedToMarketDepthStream: Bool = false
+    public private(set) var subscribedtoUserOrderUpdateStream = false
     
     public var webSocketHandler: WebSocketHandler
+    
     public var subscriber: CryptoExchangePlatformSubscriber?
     
     
-    public init(marketPair: MarketPair) {
+    public override init(symbol: MarketPair, config: BinanceApiConfiguration) {
         sourcePrint("Using Binance API")
-        self.marketPair = marketPair
-        
+                
         webSocketHandler = WebSocketHandler(url: baseUrl)
+        super.init(symbol: symbol, config: config)
+
         webSocketHandler.websocketDelegate = self
         webSocketHandler.createSocket()
     }
     
-    public convenience init(marketPair: MarketPair, marketDepthBackup: MarketDepthBackup) {
-        self.init(marketPair: marketPair)
+    public convenience init(symbol: MarketPair, config: BinanceApiConfiguration, marketDepthBackup: MarketDepthBackup) {
+        self.init(symbol: symbol, config: config)
         self.marketDepth = MarketDepth(marketDepthBackup: marketDepthBackup)
-        
+
         sourcePrint("Initialized Binance with depth backup...")
         sourcePrint("Loaded \(marketDepth.bids.count) bids and \(marketDepth.asks.count) asks")
     }
@@ -54,7 +49,7 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
                 "method": "SUBSCRIBE",
                 "params":
                     [
-                    "\(marketPairSymbol)@bookTicker"
+                    "\(binanceSymbol)@bookTicker"
                 ],
                 "id": 1
             }
@@ -75,7 +70,7 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
                 "method": "SUBSCRIBE",
                 "params":
                     [
-                    "\(marketPairSymbol)@depth@1000ms"
+                    "\(binanceSymbol)@depth@1000ms"
                 ],
                 "id": 1
             }
@@ -85,8 +80,8 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
     
     // MARK: - Helpers
     
-    private var marketPairSymbol: String {
-        switch marketPair {
+    private func marketPairSymbol(_ symbol: MarketPair) -> String {
+        switch symbol {
         case .btc_usd:
             return "btcusdt"
         case .eth_usd:
@@ -102,7 +97,7 @@ final public class Binance: WebSocketDelegate, CryptoExchangePlatform {
                 "method": "SUBSCRIBE",
                 "params":
                     [
-                    "\(marketPairSymbol)@aggTrade"
+                    "\(binanceSymbol)@aggTrade"
                 ],
                 "id": 1
             }

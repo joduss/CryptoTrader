@@ -1,7 +1,7 @@
 import Foundation
 
 
-class BinanceAggregatedTradeResponse: Decodable {
+struct BinanceAggregatedTradeResponse: Decodable {
     
     /*{
     "e": "aggTrade",  // Event type
@@ -35,7 +35,7 @@ class BinanceAggregatedTradeResponse: Decodable {
         case ignore = "M"
     }
     
-    required init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         date = try values.decode(Int.self, forKey: .date)
         symbol = try values.decode(String.self, forKey: .symbol)

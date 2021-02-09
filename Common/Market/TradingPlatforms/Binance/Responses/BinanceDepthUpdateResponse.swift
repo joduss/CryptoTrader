@@ -7,7 +7,7 @@
 
 import Foundation
 
-class BinanceDepthUpdateResponse: Decodable {
+struct BinanceDepthUpdateResponse: Decodable {
     
     //{
     //  "e": "depthUpdate", // Event type
@@ -41,7 +41,7 @@ class BinanceDepthUpdateResponse: Decodable {
         case bidUpdates = "b"
     }
     
-    required init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         symbol = try values.decode(String.self, forKey: .symbol)
         let bidUpdateArrays = try values.decode([[String]].self, forKey: .bidUpdates)

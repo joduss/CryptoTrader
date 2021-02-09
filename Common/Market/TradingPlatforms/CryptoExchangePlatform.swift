@@ -13,13 +13,12 @@ public protocol CryptoExchangePlatform: class, WebSocketDelegate {
     var subscribedToMarketDepthStream: Bool { get }
 
     var webSocketHandler: WebSocketHandler { get }
-    var marketPair: MarketPair { get }
+    var symbol: MarketPair { get }
     var subscriber: CryptoExchangePlatformSubscriber? { get set }
     
     func subscribeToTickerStream()
     func subscribeToAggregatedTradeStream()
     func subscribeToMarketDepthStream()
-
 }
 
 extension CryptoExchangePlatform {

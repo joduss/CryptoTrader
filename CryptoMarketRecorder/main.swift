@@ -49,17 +49,17 @@ extension CryptoMarketRecorder {
             let depthFile = directoryUrl.appendingPathComponent("\(fileName).depths")
             let depthBackupFile = directoryUrl.appendingPathComponent("\(fileName)-depth-backup.json")
             
-            var api: Binance!
+            var api: BinanceMarketStream!
+            let apiConfig = BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey)
             
             if let loadDepthFilePath = (self.loadDepthFile as NSString?)?.expandingTildeInPath {
-                
                 sourcePrint("Loading depths backup from \(loadDepthFilePath)...")
                 let data = try! Data(contentsOf: URL(fileURLWithPath: loadDepthFilePath))
                 let backup = try! JSONDecoder().decode(MarketDepthBackup.self, from: data)
-                api = Binance(marketPair: marketPair, marketDepthBackup: backup)
+                api = BinanceMarketStream(symbol: marketPair, config: apiConfig, marketDepthBackup: backup)
             }
             else {
-                api = Binance(marketPair: self.marketPair)
+                api = BinanceMarketStream(symbol: self.marketPair, config: apiConfig)
             }
 
             let recorder = MarketFileRecorder(api: api, savingFrequency: 5000)

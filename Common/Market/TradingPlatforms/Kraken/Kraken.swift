@@ -10,10 +10,13 @@ import Foundation
 
 public class Kraken: CryptoExchangePlatform, WebSocketDelegate {
     
-    private(set) public var subscribedToTickerStream: Bool = false
-    private(set) public var subscribedToAggregatedTradeStream: Bool = false
-    private(set) public var subscribedToMarketDepthStream: Bool = false
-    
+    public let symbol: MarketPair
+
+    public private(set) var subscribedToTickerStream: Bool = false
+    public private(set) var subscribedToAggregatedTradeStream: Bool = false
+    public private(set) var subscribedToMarketDepthStream: Bool = false
+    public private(set) var subscribedtoUserOrderUpdateStream: Bool = false
+
     private let baseUrl = URL(string: "wss://ws.kraken.com")!
     public let webSocketHandler: WebSocketHandler
     
@@ -27,11 +30,9 @@ public class Kraken: CryptoExchangePlatform, WebSocketDelegate {
     }
     
     public var subscriber: CryptoExchangePlatformSubscriber?
-    public let marketPair: MarketPair
     
-    public init(marketPair: MarketPair) {
-        self.marketPair = marketPair
-        
+    public init(symbol: MarketPair) {
+        self.symbol = symbol
         webSocketHandler = WebSocketHandler(url: baseUrl)
         webSocketHandler.websocketDelegate = self
         webSocketHandler.createSocket()
@@ -55,17 +56,18 @@ public class Kraken: CryptoExchangePlatform, WebSocketDelegate {
             """)
     }
     
-    public func subscribeToAggregatedTradeStream() { }
+    public func subscribeToAggregatedTradeStream() {}
     
     public func subscribeToMarketDepthStream() {}
 
+    public func subscribeToUserDataStream() {}
     
     // MARK: - WebSocketDelegate
     
     public func process(response: String) {
         if response.starts(with: "[") {
             let serverResponse = KrakenTickerResponse(response: response)
-            subscriber?.process(trade: MarketAggregatedTrade(id: Int.random(in: 0...Int.max),date: Date(), symbol: marketPair.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
+            subscriber?.process(trade: MarketAggregatedTrade(id: Int.random(in: 0...Int.max),date: Date(), symbol: symbol.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
         }
     }
 }
