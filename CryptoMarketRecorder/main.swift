@@ -26,12 +26,12 @@ extension CryptoMarketRecorder {
         var marketPair: MarketPair = .btc_usd
         
         @Argument(help: "Where to save the files for recording.")
-        var recordFileDirectory: String?
+        var recordFileDirectory: String
         
         @Argument(help: "Base file name.")
-        var fileName: String?
+        var fileName: String
         
-        @Option(name: .long)
+        @Option(name: [.customShort("d"), .long])
         var loadDepthFile: String?
         
         mutating func run() throws {
@@ -39,8 +39,9 @@ extension CryptoMarketRecorder {
                 CryptoMarketRecorder.exit(withError: .some(ValidationError("Giving a directory path is mandatory for action 'record'")))
             }
             
-            guard let fileName = fileName else {
-                CryptoMarketRecorder.exit(withError: .some(ValidationError("Giving a base file name is mandatory for action 'record'")))
+            // Create directory if it does not exists
+            if !FileManager.default.fileExists(atPath: directoryPath) {
+                try FileManager.default.createDirectory(at: URL(fileURLWithPath: directoryPath), withIntermediateDirectories: true, attributes: nil)
             }
             
             let directoryUrl = URL(fileURLWithPath: directoryPath, isDirectory: true)
