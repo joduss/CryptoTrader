@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B0B413A25D1D06300ADE7D2 /* OrderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0B413925D1D06300ADE7D2 /* OrderState.swift */; };
+		6B0B413B25D1D06300ADE7D2 /* OrderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0B413925D1D06300ADE7D2 /* OrderState.swift */; };
 		6B20104625D30D11000124D8 /* BinanceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B20104525D30D11000124D8 /* BinanceClient.swift */; };
 		6B20104725D30D11000124D8 /* BinanceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B20104525D30D11000124D8 /* BinanceClient.swift */; };
 		6B20105825D30F3C000124D8 /* BinanceApiFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B20105725D30F3C000124D8 /* BinanceApiFragment.swift */; };
@@ -119,6 +121,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6B0B413925D1D06300ADE7D2 /* OrderState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderState.swift; sourceTree = "<group>"; };
 		6B20104525D30D11000124D8 /* BinanceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceClient.swift; sourceTree = "<group>"; };
 		6B20105725D30F3C000124D8 /* BinanceApiFragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceApiFragment.swift; sourceTree = "<group>"; };
 		6B3E98D025AB0C6E004509E2 /* TimeIntervalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntervalExtension.swift; sourceTree = "<group>"; };
@@ -349,6 +352,7 @@
 			children = (
 				6B9D049C25B7830200EC53E1 /* TradingOrder.swift */,
 				6B48DAE425A9FE3800F2CD6D /* SimpleTrader.swift */,
+				6B0B413925D1D06300ADE7D2 /* OrderState.swift */,
 			);
 			path = Traders;
 			sourceTree = "<group>";
@@ -609,6 +613,7 @@
 				6B90DD4B25D1CAA500BF751A /* BinanceApiConfiguration.swift in Sources */,
 				6B7116F225BB38E500D34447 /* MarketAggregatedTrade.swift in Sources */,
 				6B9D04A025B7837F00EC53E1 /* DateFactory.swift in Sources */,
+				6B0B413A25D1D06300ADE7D2 /* OrderState.swift in Sources */,
 				6B3E98D425AB23D4004509E2 /* MarketHistory.swift in Sources */,
 				6BA6B49925D081D900D53521 /* BinanceApiUrls.swift in Sources */,
 				6BEE163625BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */,
@@ -661,6 +666,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B0B413B25D1D06300ADE7D2 /* OrderState.swift in Sources */,
 				6BFC307425BCD6B100BDD732 /* BinanceAggregatedTradeResponse.swift in Sources */,
 				6BFC306E25BCD6B100BDD732 /* DateFactory.swift in Sources */,
 				6BFC307625BCD6B100BDD732 /* WebSocketHandler.swift in Sources */,
