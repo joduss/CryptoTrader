@@ -4,7 +4,7 @@ import JoLibrary
 /// A MarketRecorder recording to a file.
 final class MarketFileRecorder: MarketRecorder {
     
-    private let api : CryptoExchangePlatform
+    private let marketStream : MarketDataStream
     private let savingFrequency: Int
     
     private let printFrequency = 20
@@ -36,15 +36,15 @@ final class MarketFileRecorder: MarketRecorder {
 
     private var aggregatedTicker: MarketTicker?
 
-    init(api: CryptoExchangePlatform, savingFrequency: Int = 5000) {
-        self.api = api
+    init(api: MarketDataStream, savingFrequency: Int = 5000) {
+        self.marketStream = api
         self.savingFrequency = savingFrequency
      
         tickersCache.reserveCapacity(savingFrequency)
         tradesCache.reserveCapacity(savingFrequency)
         depthsCache.reserveCapacity(savingFrequency)
         
-        self.api.subscriber = self
+        self.marketStream.subscriber = self
     }
     
     // MARK: Configuration of the recorder
@@ -52,19 +52,19 @@ final class MarketFileRecorder: MarketRecorder {
     func saveTicker(in fileUrl: URL) {
         sourcePrint("The price recorder will save tickers to \(fileUrl.path)")
         tickersFileHandel = createFileHandle(fromUrl: fileUrl)
-        self.api.subscribeToTickerStream()
+        self.marketStream.subscribeToTickerStream()
     }
     
     func saveAggregatedTrades(in fileUrl: URL) {
         sourcePrint("The price recorder will save trades to \(fileUrl.path)")
         tradesFileHandel = createFileHandle(fromUrl: fileUrl)
-        self.api.subscribeToAggregatedTradeStream()
+        self.marketStream.subscribeToAggregatedTradeStream()
     }
     
     func saveDepths(in fileUrl: URL) {
         sourcePrint("The price recorder will save depths to \(fileUrl.path)")
         depthsFileHandel = createFileHandle(fromUrl: fileUrl)
-        self.api.subscribeToMarketDepthStream()
+        self.marketStream.subscribeToMarketDepthStream()
     }
     
     func saveDepthBackup(in fileUrl: URL) {

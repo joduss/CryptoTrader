@@ -2,10 +2,10 @@ import Foundation
 import JoLibrary
 
 
-public class SimulatedExchangePlatform: CryptoExchangePlatform {
+public class SimulatedExchangePlatform: MarketDataStream {
     
     public let symbol: MarketPair
-    public var subscriber: CryptoExchangePlatformSubscriber?
+    public var subscriber: MarketDataStreamSubscriber?
 
     public private(set) var subscribedToTickerStream: Bool = false
     public private(set) var subscribedToAggregatedTradeStream: Bool = false

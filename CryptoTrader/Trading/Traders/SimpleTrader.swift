@@ -6,7 +6,7 @@ import Foundation
 // Pareil achat
 
 
-final class SimpleTrader: CryptoExchangePlatformSubscriber {
+final class SimpleTrader: MarketDataStreamSubscriber {
     
     private struct Parameters {
         ///The initial limit set at which the limits will be updated
@@ -34,7 +34,7 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
 
     
     let marketAnalyzer = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(2.01))
-    var api : CryptoExchangePlatform
+    var api : MarketDataStream
     
     var orderSize: Double = 25
     
@@ -54,7 +54,7 @@ final class SimpleTrader: CryptoExchangePlatformSubscriber {
         return balance > orderSize
     }
     
-    init(api: CryptoExchangePlatform) {
+    init(api: MarketDataStream) {
         balance = initialBalance
         self.api = api
         self.api.subscriber = self
