@@ -4,7 +4,7 @@ import Foundation
 /// close and reconnect the connection to the server.
 public class WebSocketHandler {
     
-    private let url: URL
+    private var url: URL?
     
     var socket: WebSocket?
 
@@ -21,10 +21,16 @@ public class WebSocketHandler {
         self.url = url
     }
     
+    init() { }
+    
+    func update(url: URL) {
+        self.url = url
+    }
+    
     /// Creates a new WebSocket and calls 'OnCompleted' once the connection
     func createSocket(onCompleted: ((Bool) -> ())? = nil) {
         closeSocket()
-        socket = WebSocket(url: url)
+        socket = WebSocket(url: url!)
         socket?.delegate = websocketDelegate
         socket?.connect()
         socket?.ping() { success in

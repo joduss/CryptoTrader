@@ -13,4 +13,8 @@ class BinanceClient {
     lazy private(set) var marketStream : BinanceMarketStream = {
         return BinanceMarketStream(symbol: symbol, config: config)
     }()
+    
+    lazy private(set) var userDataStream : BinanceUserDataStream = {
+        return BinanceUserDataStream(symbol: symbol, config: config)
+    }()
 }
