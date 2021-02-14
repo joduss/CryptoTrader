@@ -1,10 +1,10 @@
 import Foundation
 
-class TradingOrder {
+class SimulationTraderOrder {
     
     let date: Date
     
-    private(set) var orderState = OrderState.open
+    private(set) var orderState = SimulationOrderState.open
     
     var closeDate: Date?
     

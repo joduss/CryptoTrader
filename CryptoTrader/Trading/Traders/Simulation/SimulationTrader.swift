@@ -6,7 +6,7 @@ import Foundation
 // Pareil achat
 
 
-final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
+final class SimulationTrader: ExchangeMarketDataStreamSubscriber {
     
     private struct Parameters {
         ///The initial limit set at which the limits will be updated
@@ -41,10 +41,10 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
     let initialBalance = 250.0
     var balance: Double
     
-    var orders: [TradingOrder] = []
+    var orders: [SimulationTraderOrder] = []
     
-    var lastBuyOrder: TradingOrder?
-    var closedOrders: [TradingOrder] = []
+    var lastBuyOrder: SimulationTraderOrder?
+    var closedOrders: [SimulationTraderOrder] = []
     
     var fees = Percent(0.1)
     
@@ -105,7 +105,7 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
     var lastSell: Double = 0
     var lastSellDate: Date = DateFactory.now
 
-    func closeSell(order: TradingOrder, at price: Double) {
+    func closeSell(order: SimulationTraderOrder, at price: Double) {
         
         lastSell = price
         lastSellDate = DateFactory.now
@@ -129,7 +129,7 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
         balance -= orderSize
 
         let qty = (orderSize / price) -% fees
-        let order = TradingOrder(price: price, amount: qty, cost: orderSize)
+        let order = SimulationTraderOrder(price: price, amount: qty, cost: orderSize)
         self.orders.append(order)
         self.lastBuyOrder = order
         
@@ -139,11 +139,11 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
         sourcePrint("[Trade] At \(DateFactory.now) Bought \(qty) for \(price). Cost: \(orderSize)")
     }
 
-    func rebuy(order: TradingOrder, at price: Double) {
+    func rebuy(order: SimulationTraderOrder, at price: Double) {
         order.intermediateBuy(quantityBought: (order.value / price) -% fees, at: price)
     }
 
-    func intermediateSell(order: TradingOrder, at price: Double) {
+    func intermediateSell(order: SimulationTraderOrder, at price: Double) {
         order.intermediateSell(at: price, for: (price * order.quantity) -% fees)
     }
     
@@ -259,9 +259,9 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
         prepareBuyOverPrice = currentPrice +% Parameters.prepareBuyOverPricePercent
     }
     
-    func decideRebuy(order: TradingOrder, price: Double) { }
+    func decideRebuy(order: SimulationTraderOrder, price: Double) { }
 
-    func decideSell(order: TradingOrder, price: Double) {
+    func decideSell(order: SimulationTraderOrder, price: Double) {
         
         if price > 3000000 {
             printCurrentOrders()
@@ -303,9 +303,9 @@ final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
         return orders.max(by: {$0.price < $1.price})?.price ?? Double.greatestFiniteMagnitude
     }
     
-    private func closestOrder(to price: Double) -> TradingOrder? {
+    private func closestOrder(to price: Double) -> SimulationTraderOrder? {
         var diff = Double.greatestFiniteMagnitude
-        var closest: TradingOrder?
+        var closest: SimulationTraderOrder?
         
         for otherOrder in self.orders {
             let currentDiff = abs(otherOrder.initialPrice - price)
