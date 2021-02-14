@@ -20,6 +20,34 @@
                ReferencedContainer = "container:CryptoTrader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
+               BuildableName = "CryptoTrader"
+               BlueprintName = "CryptoTrader"
+               ReferencedContainer = "container:CryptoTrader.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6BE656A625C09627001AAF59"
+               BuildableName = "CryptoTraderTests.xctest"
+               BlueprintName = "CryptoTraderTests"
+               ReferencedContainer = "container:CryptoTrader.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -40,22 +68,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6BFC305625BCD5CA00BDD732"
-            BuildableName = "CryptoMarketRecorder"
-            BlueprintName = "CryptoMarketRecorder"
-            ReferencedContainer = "container:CryptoTrader.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "record --btc_usd ~/Desktop/record-test test-market"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

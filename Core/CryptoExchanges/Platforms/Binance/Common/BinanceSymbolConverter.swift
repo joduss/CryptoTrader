@@ -2,7 +2,7 @@ import Foundation
 
 struct BinanceSymbolConverter {
     
-    static func convert(symbol: String) throws -> MarketPair {
+    static func convert(symbol: String) throws -> CryptoSymbol {
         switch(symbol) {
         case "BTCUSDT":
             return .btc_usd
@@ -15,7 +15,7 @@ struct BinanceSymbolConverter {
         }
     }
     
-    static func convert(symbol: MarketPair) -> String {
+    static func convert(symbol: CryptoSymbol) -> String {
         switch symbol {
         case .btc_usd:
             return "BTCUSDT"

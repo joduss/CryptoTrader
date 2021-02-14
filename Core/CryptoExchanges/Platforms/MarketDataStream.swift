@@ -12,7 +12,7 @@ public protocol MarketDataStream: class, WebSocketDelegate {
     var subscribedToMarketDepthStream: Bool { get }
 
     var webSocketHandler: WebSocketHandler { get }
-    var symbol: MarketPair { get }
+    var symbol: CryptoSymbol { get }
     var subscriber: MarketDataStreamSubscriber? { get set }
     
     func subscribeToTickerStream()

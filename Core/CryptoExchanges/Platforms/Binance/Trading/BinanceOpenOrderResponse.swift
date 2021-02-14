@@ -2,7 +2,7 @@ import Foundation
 
 // Can make this as a protocol!
 struct BinanceOpenOrderResponse: Decodable {
-    let symbol: MarketPair
+    let symbol: CryptoSymbol
     let platformOrderId: Int
     let clientOrderId: String
 

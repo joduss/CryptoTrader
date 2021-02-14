@@ -10,7 +10,7 @@ struct BinanceListOpenOrderRequest: BinanceApiRequest {
     private(set) var queryItems: [URLQueryItem]?
     
     
-    init(symbol: MarketPair) {
+    init(symbol: CryptoSymbol) {
         self.queryItems = [
             URLQueryItem(name: "symbol", value: BinanceSymbolConverter.convert(symbol: symbol))
         ]

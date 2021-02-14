@@ -1,16 +1,9 @@
 //
 
 import XCTest
+@testable import CryptoTraderLib
 
-class CryptoTraderTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+class PercentTests: XCTestCase {
 
     func testPercent() throws {
         let percent = Percent(25)

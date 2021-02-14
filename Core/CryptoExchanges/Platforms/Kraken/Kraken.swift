@@ -10,7 +10,7 @@ import Foundation
 
 public class Kraken: MarketDataStream, WebSocketDelegate {
     
-    public let symbol: MarketPair
+    public let symbol: CryptoSymbol
 
     public private(set) var subscribedToTickerStream: Bool = false
     public private(set) var subscribedToAggregatedTradeStream: Bool = false
@@ -31,7 +31,7 @@ public class Kraken: MarketDataStream, WebSocketDelegate {
     
     public var subscriber: MarketDataStreamSubscriber?
     
-    public init(symbol: MarketPair) {
+    public init(symbol: CryptoSymbol) {
         self.symbol = symbol
         webSocketHandler = WebSocketHandler(url: baseUrl)
         webSocketHandler.websocketDelegate = self

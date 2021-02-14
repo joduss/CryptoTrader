@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 
 
-public enum MarketPair: String, EnumerableFlag {
+public enum CryptoSymbol: String, EnumerableFlag {
     /// USD or USDT depending on the exchange
     case eth_usd
     

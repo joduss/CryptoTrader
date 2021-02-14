@@ -21,7 +21,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, M
     public var subscriber: MarketDataStreamSubscriber?
     
     
-    public override init(symbol: MarketPair, config: BinanceApiConfiguration) {
+    public override init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {
         sourcePrint("Using Binance API")
                 
         webSocketHandler = WebSocketHandler(url: baseUrl)
@@ -31,7 +31,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, M
         webSocketHandler.createSocket()
     }
     
-    public convenience init(symbol: MarketPair, config: BinanceApiConfiguration, marketDepthBackup: MarketDepthBackup) {
+    public convenience init(symbol: CryptoSymbol, config: BinanceApiConfiguration, marketDepthBackup: MarketDepthBackup) {
         self.init(symbol: symbol, config: config)
         self.marketDepth = MarketDepth(marketDepthBackup: marketDepthBackup)
 
@@ -80,7 +80,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, M
     
     // MARK: - Helpers
     
-    private func marketPairSymbol(_ symbol: MarketPair) -> String {
+    private func marketPairSymbol(_ symbol: CryptoSymbol) -> String {
         switch symbol {
         case .btc_usd:
             return "btcusdt"

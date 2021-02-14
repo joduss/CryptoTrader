@@ -4,7 +4,7 @@ final class BinanceTrading: BinanceApiFragment {
     
     private let sender: BinanceApiRequestSender
     
-    override init(symbol: MarketPair, config: BinanceApiConfiguration) {
+    override init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {
         sender = BinanceApiRequestSender(config: config)
         super.init(symbol: symbol, config: config)
     }

@@ -4,7 +4,7 @@ import JoLibrary
 
 public class SimulatedExchangePlatform: MarketDataStream {
     
-    public let symbol: MarketPair
+    public let symbol: CryptoSymbol
     public var subscriber: MarketDataStreamSubscriber?
 
     public private(set) var subscribedToTickerStream: Bool = false
@@ -18,7 +18,7 @@ public class SimulatedExchangePlatform: MarketDataStream {
     private let decoder = JSONDecoder()
     
     
-    init(marketPair: MarketPair, aggregatedTradesFilePath: String) {
+    init(marketPair: CryptoSymbol, aggregatedTradesFilePath: String) {
         self.aggregatedTradesFilePath = aggregatedTradesFilePath
         self.symbol = marketPair
     }
@@ -34,7 +34,7 @@ public class SimulatedExchangePlatform: MarketDataStream {
         while true {
             
             guard let line = reader.readLine() else {
-                (subscriber as? SimpleTrader)?.summary()
+                //(subscriber as? SimpleTrader)?.summary()
                 break
             }
             

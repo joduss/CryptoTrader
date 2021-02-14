@@ -15,7 +15,7 @@ class BinanceUserDataStream: BinanceApiFragment, UserDataStream, WebSocketDelega
         return webSocketHandler.socket!
     }
     
-    override init(symbol: MarketPair, config: BinanceApiConfiguration) {
+    override init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {
         requestPreparator = BinanceRequestPreparator(config: config)
         requestSender = BinanceApiRequestSender(config: config)
         webSocketHandler = WebSocketHandler()

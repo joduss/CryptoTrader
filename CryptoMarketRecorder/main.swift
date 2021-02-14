@@ -23,7 +23,7 @@ extension CryptoMarketRecorder {
         static var configuration = CommandConfiguration(abstract: "Record the market.")
         
         @Flag(exclusivity: .chooseFirst, help: "The market pair.")
-        var marketPair: MarketPair = .btc_usd
+        var marketPair: CryptoSymbol = .btc_usd
         
         @Argument(help: "Where to save the files for recording.")
         var recordFileDirectory: String

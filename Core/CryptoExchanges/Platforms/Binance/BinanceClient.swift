@@ -2,11 +2,11 @@ import Foundation
 
 class BinanceClient {
     
-    public let symbol: MarketPair
+    public let symbol: CryptoSymbol
     private let config: BinanceApiConfiguration
     private let requestSender: BinanceApiRequestSender
     
-    init(symbol: MarketPair, config: BinanceApiConfiguration) {
+    init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {
         self.symbol = symbol
         self.config = config
         requestSender = BinanceApiRequestSender(config: config)
