@@ -30,7 +30,22 @@ final class BinanceTrading: BinanceApiFragment {
         
     }
 
-    func send(order: TradingOrder, completion: () -> ()) {
-        // If Response => "{"code":" => Error
+    func send(order: TradingOrderNew, completion: @escaping (BinanceCreateOrderAckResponse) -> ()) {
+        var request = BinanceCreateOrderRequest(symbol: order.symbol,
+                                                side: order.side,
+                                                type: order.type,
+                                                qty: order.quantity,
+                                                id: order.id)
+        request.price = order.price
+        
+        sender.send(request, completion: {
+            result in
+            switch result {
+            case let .success(response):
+                completion(response)
+            case let .failure(error):
+                print("Failed to create a new order. \(error)")
+            }
+        })
     }
 }

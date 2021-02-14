@@ -91,7 +91,7 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         
         orderId = try values.decode(Int.self, forKey: .orderId)
         
-        eventTime = Date(timeIntervalSince1970: TimeInterval(try values.decode(Int.self, forKey: .eventTime)))
+        eventTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .eventTime)))
         
         symbol = try values.decode(String.self, forKey: .symbol)
         clientOrderId = try values.decode(String.self, forKey: .originalClientOrderId)
@@ -112,8 +112,8 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         
         commissionAmount = Double(try values.decode(String.self, forKey: .commissionAmount))!
         
-        transactionTime = Date(timeIntervalSince1970: TimeInterval(try values.decode(Int.self, forKey: .transactionTime)))
-        orderCreationTime = Date(timeIntervalSince1970: TimeInterval(try values.decode(Int.self, forKey: .orderCreationTime)))
+        transactionTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .transactionTime)))
+        orderCreationTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .orderCreationTime)))
 
         
         cumulativeQuoteAssetTransactiveQty = Double(try values.decode(String.self, forKey: .cumulativeQuoteAssetTransactiveQty))!

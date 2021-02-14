@@ -40,7 +40,7 @@ struct BinanceOpenOrderResponse: Decodable {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        symbol = try BinanceSymbolConverter.convert(symbol: try values.decode(String.self, forKey: .symbol))
+        symbol = try BinanceSymbolConverter.convert(try values.decode(String.self, forKey: .symbol))
         platformOrderId = try values.decode(Int.self, forKey: .platformOrderId)
         clientOrderId = try values.decode(String.self, forKey: .clientOrderId)
         
@@ -54,8 +54,12 @@ struct BinanceOpenOrderResponse: Decodable {
         type = try BinanceOrderTypeConverter.convert(value: try values.decode(String.self, forKey: .type))
         side = try BinanceOrderSideConverter.convert(try values.decode(String.self, forKey: .side))
 
-        time = Date(timeIntervalSince1970: try values.decode(TimeInterval.self, forKey: .time))
-        updateTime = Date(timeIntervalSince1970: try values.decode(TimeInterval.self, forKey: .updateTime))
+        time = Date(
+            timeIntervalSince1970:TimeInterval.fromMilliseconds(try values.decode(TimeInterval.self, forKey: .time))
+        )
+        updateTime = Date(
+            timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(TimeInterval.self, forKey: .updateTime))
+        )
         
         originalQuoteQty = Double(try values.decode(String.self, forKey: .originalQuoteQty))!
     }

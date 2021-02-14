@@ -12,7 +12,7 @@ struct BinanceListOpenOrderRequest: BinanceApiRequest {
     
     init(symbol: CryptoSymbol) {
         self.queryItems = [
-            URLQueryItem(name: "symbol", value: BinanceSymbolConverter.convert(symbol: symbol))
+            URLQueryItem(name: "symbol", value: BinanceSymbolConverter.convert(symbol))
         ]
     }
 }

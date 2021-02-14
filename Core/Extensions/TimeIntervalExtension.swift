@@ -21,4 +21,10 @@ extension TimeInterval {
         return TimeInterval(minutes * 60)
     }
     
+    static func fromMilliseconds(_ ms: Double) -> TimeInterval {
+        return TimeInterval(ms / 1000)
+    }
+    static func fromMilliseconds(_ ms: Int) -> TimeInterval {
+        return TimeInterval(ms / 1000)
+    }
 }
