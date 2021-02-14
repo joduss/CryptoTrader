@@ -1,6 +1,6 @@
 import Foundation
 
-enum TradingPlatformError: Error {
+enum ExchangePlatformError: Error {
     case parsingError(message: String)
     case error(error: Error)
     case generalError(message: String)

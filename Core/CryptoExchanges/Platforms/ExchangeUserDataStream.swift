@@ -1,19 +1,19 @@
 import Foundation
 
-protocol UserDataStreamSubscriber: class {
+protocol ExchangeUserDataStreamSubscriber: class {
     func updated(balance: Double)
     func updated(order: UserOrderUpdate)
 }
 
-protocol UserDataStream: class {
+protocol ExchangeUserDataStream: class {
     var subscribed: Bool { get }
     var webSocketHandler: WebSocketHandler { get }
-    var subscriber: UserDataStreamSubscriber? { get set }
+    var subscriber: ExchangeUserDataStreamSubscriber? { get set }
 
     func subscribe()
 }
 
-extension UserDataStream {
+extension ExchangeUserDataStream {
     func resubscribe() {
         if subscribed {
             self.subscribe()

@@ -8,7 +8,7 @@
 import Foundation
 
 
-public class Kraken: MarketDataStream, WebSocketDelegate {
+public class Kraken: ExchangeMarketDataStream, WebSocketDelegate {
     
     public let symbol: CryptoSymbol
 
@@ -29,7 +29,7 @@ public class Kraken: MarketDataStream, WebSocketDelegate {
         return webSocketHandler.socket!
     }
     
-    public var subscriber: MarketDataStreamSubscriber?
+    public var subscriber: ExchangeMarketDataStreamSubscriber?
     
     public init(symbol: CryptoSymbol) {
         self.symbol = symbol

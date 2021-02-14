@@ -1,6 +1,5 @@
 import Foundation
 
-// Can make this as a protocol!
 struct BinanceOpenOrderResponse: Decodable {
     let symbol: CryptoSymbol
     let platformOrderId: Int

@@ -38,7 +38,7 @@ struct BinanceOrderTypeConverter {
         case "LIMIT_MAKER":
             return .limitMaker
         default:
-            throw TradingPlatformError.generalError(message: "The order type \(value) is not supported.")
+            throw ExchangePlatformError.generalError(message: "The order type \(value) is not supported.")
         }
     }
 }

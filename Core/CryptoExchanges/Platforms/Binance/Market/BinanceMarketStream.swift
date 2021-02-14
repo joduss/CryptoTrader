@@ -1,7 +1,7 @@
 import Foundation
 import JoLibrary
 
-final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, MarketDataStream {
+final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, ExchangeMarketDataStream {
 
     private let baseUrl = URL(string: "wss://stream.binance.com:9443/ws/a")!
 
@@ -18,7 +18,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, M
     
     public var webSocketHandler: WebSocketHandler
     
-    public var subscriber: MarketDataStreamSubscriber?
+    public var subscriber: ExchangeMarketDataStreamSubscriber?
     
     
     public override init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {

@@ -128,7 +128,7 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         case "SELL":
             return .sell
         default:
-            throw TradingPlatformError.parsingError(message: "OrderSide unknown value '\(value)'")
+            throw ExchangePlatformError.parsingError(message: "OrderSide unknown value '\(value)'")
         }
     }
     
@@ -149,7 +149,7 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         case "LIMIT_MAKER":
             return .limitMaker
         default:
-            throw TradingPlatformError.parsingError(message: "OrderType unknown value '\(value)'")
+            throw ExchangePlatformError.parsingError(message: "OrderType unknown value '\(value)'")
         }
     }
     
@@ -168,7 +168,7 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         case "EXPIRED":
             return .expired
         default:
-            throw TradingPlatformError.parsingError(message: "OrderExecutionType unknown value '\(value)'")
+            throw ExchangePlatformError.parsingError(message: "OrderExecutionType unknown value '\(value)'")
         }
     }
     
@@ -187,7 +187,7 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         case "EXPIRED":
             return .expired
         default:
-            throw TradingPlatformError.parsingError(message: "OrderStatus unknown value '\(value)'")
+            throw ExchangePlatformError.parsingError(message: "OrderStatus unknown value '\(value)'")
         }
     }
 }

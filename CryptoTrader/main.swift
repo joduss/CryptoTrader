@@ -13,7 +13,7 @@ struct Trader: ParsableCommand {
     }
     
     @Flag(exclusivity: .chooseFirst, help: "The market pair.")
-    var marketPair: MarketPair = .btc_usd
+    var marketPair: CryptoSymbol = .btc_usd
     
     @Flag(exclusivity: .chooseFirst, help: "What to do")
     var action: Action = .simulate
@@ -22,6 +22,19 @@ struct Trader: ParsableCommand {
     var aggregatedTradeRecordsPath: String?
     
     mutating func run() throws {
+        
+        let config = BinanceApiConfiguration(key: BinanceTestApiKeys.apiKey, secret: BinanceTestApiKeys.secreteKey)
+        config.demo = true
+//        let b = BinanceUserDataStream(symbol: marketPair, config: config)
+//        b.subscribe()
+        
+        let binance = BinanceClient(symbol: marketPair, config: config)
+        
+        binance.trading.listOpenOrder(completion: {
+            response in
+            
+            print(response)
+        })
         
         sourcePrint("CryptoTrader started")
         
@@ -36,13 +49,14 @@ struct Trader: ParsableCommand {
             }
             
             print("Running trader with simulation api.")
-            let api = SimulatedExchangePlatform(marketPair: self.marketPair, aggregatedTradesFilePath: aggregatedTradeRecordsPath)
-            let trader = SimpleTrader(api: api)
+//            let api = SimulatedExchangePlatform(marketPair: self.marketPair, aggregatedTradesFilePath: aggregatedTradeRecordsPath)
+//            let trader = SimpleTrader(api: api)
             break
         }
     }
 }
 
 Trader.main()
+RunLoop.main.run()
 
 

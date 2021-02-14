@@ -18,7 +18,7 @@ struct BinanceOrderSideConverter {
         case "SELL":
             return .sell
         default:
-            throw TradingPlatformError.generalError(message: "OrderSide \(value) is not supported.")
+            throw ExchangePlatformError.generalError(message: "OrderSide \(value) is not supported.")
         }
     }
     

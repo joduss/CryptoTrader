@@ -11,7 +11,7 @@ struct BinanceSymbolConverter {
         case "ICXUSDT":
             return .icx_usd
         default:
-            throw TradingPlatformError.generalError(message: "Symbol \(symbol) is unknown")
+            throw ExchangePlatformError.generalError(message: "Symbol \(symbol) is unknown")
         }
     }
     

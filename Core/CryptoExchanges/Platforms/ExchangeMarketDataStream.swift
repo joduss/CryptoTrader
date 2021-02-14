@@ -1,26 +1,26 @@
 import Foundation
 
-public protocol MarketDataStreamSubscriber: class {
+public protocol ExchangeMarketDataStreamSubscriber: class {
     func process(ticker: MarketTicker)
     func process(trade: MarketAggregatedTrade)
     func process(depthUpdate: MarketDepth)
 }
 
-public protocol MarketDataStream: class, WebSocketDelegate {
+public protocol ExchangeMarketDataStream: class, WebSocketDelegate {
     var subscribedToTickerStream: Bool { get }
     var subscribedToAggregatedTradeStream: Bool { get }
     var subscribedToMarketDepthStream: Bool { get }
 
     var webSocketHandler: WebSocketHandler { get }
     var symbol: CryptoSymbol { get }
-    var subscriber: MarketDataStreamSubscriber? { get set }
+    var subscriber: ExchangeMarketDataStreamSubscriber? { get set }
     
     func subscribeToTickerStream()
     func subscribeToAggregatedTradeStream()
     func subscribeToMarketDepthStream()
 }
 
-extension MarketDataStream {
+extension ExchangeMarketDataStream {
     
     func resubscribe() {
         if subscribedToTickerStream {

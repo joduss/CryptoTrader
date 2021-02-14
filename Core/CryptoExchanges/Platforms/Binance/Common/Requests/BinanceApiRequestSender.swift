@@ -10,7 +10,7 @@ class BinanceApiRequestSender {
         self.requestPreparator = BinanceRequestPreparator(config: config)
     }
     
-    func send<BRequest: BinanceApiRequest>(_ request: BRequest, completion: @escaping (Result<BRequest.Response, TradingPlatformError>) -> ()) {
+    func send<BRequest: BinanceApiRequest>(_ request: BRequest, completion: @escaping (Result<BRequest.Response, ExchangePlatformError>) -> ()) {
         
         var urlComponent = URLComponents(url: config.urls.baseUrl.appendingPathComponent(request.resource), resolvingAgainstBaseURL: false)
         urlComponent?.queryItems = request.queryItems
@@ -38,7 +38,7 @@ class BinanceApiRequestSender {
         URLSession(configuration: URLSessionConfiguration.ephemeral).dataTask(with: urlRequest) {
             data, response, error in
             if let error = error {
-                completion(Result.failure(TradingPlatformError.error(error: error)))
+                completion(Result.failure(ExchangePlatformError.error(error: error)))
                 return
             }
             
@@ -50,14 +50,14 @@ class BinanceApiRequestSender {
                 } catch {
                     completion(
                         .failure(
-                            TradingPlatformError.parsingError(message: "Parsing error \(error) while parsing \(String(data: data, encoding: .utf8) ?? "String representatin cannot be done.")")
+                            ExchangePlatformError.parsingError(message: "Parsing error \(error) while parsing \(String(data: data, encoding: .utf8) ?? "String representatin cannot be done.")")
                         )
                     )
                     return
                 }
             }
             
-            completion(.failure(TradingPlatformError.generalError(message: "No error but not data...")))
+            completion(.failure(ExchangePlatformError.generalError(message: "No error but not data...")))
         }
         .resume()
     }

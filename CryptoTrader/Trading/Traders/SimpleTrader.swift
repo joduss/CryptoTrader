@@ -6,7 +6,7 @@ import Foundation
 // Pareil achat
 
 
-final class SimpleTrader: MarketDataStreamSubscriber {
+final class SimpleTrader: ExchangeMarketDataStreamSubscriber {
     
     private struct Parameters {
         ///The initial limit set at which the limits will be updated
@@ -34,7 +34,7 @@ final class SimpleTrader: MarketDataStreamSubscriber {
 
     
     let marketAnalyzer = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(2.01))
-    var api : MarketDataStream
+    var api : ExchangeMarketDataStream
     
     var orderSize: Double = 25
     
@@ -54,7 +54,7 @@ final class SimpleTrader: MarketDataStreamSubscriber {
         return balance > orderSize
     }
     
-    init(api: MarketDataStream) {
+    init(api: ExchangeMarketDataStream) {
         balance = initialBalance
         self.api = api
         self.api.subscriber = self
@@ -119,6 +119,7 @@ final class SimpleTrader: MarketDataStreamSubscriber {
         
         self.orders.removeAll(where: {$0 === order})
         closedOrders.append(order)
+        orderSize += sellProfits / 10
         
         sourcePrint("Total Profits: \(profits)")
     }

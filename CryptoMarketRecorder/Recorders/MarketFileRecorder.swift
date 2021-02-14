@@ -4,7 +4,7 @@ import JoLibrary
 /// A MarketRecorder recording to a file.
 final class MarketFileRecorder: MarketRecorder {
     
-    private let marketStream : MarketDataStream
+    private let marketStream : ExchangeMarketDataStream
     private let savingFrequency: Int
     
     private let printFrequency = 20
@@ -35,7 +35,7 @@ final class MarketFileRecorder: MarketRecorder {
     private var lastTrade: Double = 0
     private var lastTicker: MarketTicker?
 
-    init(api: MarketDataStream, savingFrequency: Int = 5000) {
+    init(api: ExchangeMarketDataStream, savingFrequency: Int = 5000) {
         self.marketStream = api
         self.savingFrequency = savingFrequency
      

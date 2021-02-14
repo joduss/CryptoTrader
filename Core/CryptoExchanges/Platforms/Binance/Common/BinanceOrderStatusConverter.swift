@@ -34,7 +34,7 @@ struct BinanceOrderStatusConverter {
         case "EXPIRED":
             return .expired
         default:
-            throw TradingPlatformError.generalError(message: "OrderStatus \(value) is not supported.")
+            throw ExchangePlatformError.generalError(message: "OrderStatus \(value) is not supported.")
         }
     }
     

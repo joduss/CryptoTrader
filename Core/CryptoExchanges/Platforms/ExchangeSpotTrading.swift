@@ -1,8 +1,8 @@
 import Foundation
 
-//protocol TradingApi: class {
+//protocol ExchangeSpotTrading: class {
 //
-//    func listOpenOrder(completion: @escaping ([TradingOrder]?) -> ()) 
+//    func listOpenOrder(completion: @escaping ([TradingOrder]?) -> ())
 //
 //    func cancelOrder(_ id: String)
 //

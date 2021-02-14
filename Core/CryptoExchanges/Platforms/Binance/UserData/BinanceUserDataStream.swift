@@ -1,6 +1,6 @@
 import Foundation
 
-class BinanceUserDataStream: BinanceApiFragment, UserDataStream, WebSocketDelegate {
+class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSocketDelegate {
     
     private let requestPreparator: BinanceRequestPreparator
     private(set) var subscribed: Bool = false
@@ -9,7 +9,7 @@ class BinanceUserDataStream: BinanceApiFragment, UserDataStream, WebSocketDelega
     
     private var listenKey: String?
     
-    var subscriber: UserDataStreamSubscriber?
+    var subscriber: ExchangeUserDataStreamSubscriber?
 
     private var socket: WebSocket {
         return webSocketHandler.socket!
