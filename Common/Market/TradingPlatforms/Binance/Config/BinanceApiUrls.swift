@@ -15,18 +15,18 @@ struct BinanceApiRealUrls: BinanceApiUrls {
     let baseWssUrl = URL(string: "wss://stream.binance.com:9443/ws")!
 }
 
+
 protocol BinanceApiUrls {
     var baseUrl: URL { get }
     var baseWssUrl: URL { get }
-    var userDataListenKeyURL: URL { get }
 }
 
 extension BinanceApiUrls {
-    var userDataListenKeyURL: URL {
+    var userDataStreamURL: URL {
         return self.baseUrl.appendingPathComponent("/api/v3/userDataStream")
     }
     
-    var userDataStreamURL: URL {
-        return self.baseWssUrl.appendingPathComponent("")
+    func userDataStreamWssUrl(listenKey: String) -> URL {
+        return baseWssUrl.appendingPathComponent("/\(listenKey)")
     }
 }

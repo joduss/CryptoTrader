@@ -108,7 +108,6 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, M
     // MARK: - WebSocketDelegate
     
     public func process(response: String) {
-        
         do {
             try parse(response)
         } catch {

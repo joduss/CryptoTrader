@@ -1,6 +1,6 @@
 import Foundation
 
-protocol UserDataStreamSubscriber: class, WebSocketDelegate {
+protocol UserDataStreamSubscriber: class {
     func updated(balance: Double)
     func updated(order: UserOrderUpdate)
 }
@@ -8,6 +8,7 @@ protocol UserDataStreamSubscriber: class, WebSocketDelegate {
 protocol UserDataStream: class {
     var subscribed: Bool { get }
     var webSocketHandler: WebSocketHandler { get }
+    var subscriber: UserDataStreamSubscriber? { get set }
 
     func subscribe()
 }
