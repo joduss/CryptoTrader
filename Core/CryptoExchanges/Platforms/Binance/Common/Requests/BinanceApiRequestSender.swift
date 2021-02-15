@@ -26,14 +26,9 @@ class BinanceApiRequestSender {
             break
         }
         
-        switch request.method {
-        case .get:
-            urlRequest.httpMethod = "GET"
-        case .post:
-            urlRequest.httpMethod = "POST"
-        case .put:
-            urlRequest.httpMethod = "PUT"
-        }
+
+        urlRequest.httpMethod = request.method.rawValue
+
         
         URLSession(configuration: URLSessionConfiguration.ephemeral).dataTask(with: urlRequest) {
             data, response, error in

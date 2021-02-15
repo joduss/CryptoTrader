@@ -6,7 +6,7 @@ struct BinanceUserDataStreamKeepAliveRequest: BinanceApiRequest {
     
     typealias Response = BinanceEmptyResponse
 
-    let security: RequestSecurity = .signed
+    let security: BinanceRequestSecurity = .signed
     let method: HttpMethod = .put
     let resource = "/api/v3/userDataStream"
     let queryItems: [URLQueryItem]?

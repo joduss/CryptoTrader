@@ -3,7 +3,7 @@ import Foundation
 struct BinanceCreateOrderRequest: BinanceApiRequest {
     typealias Response = BinanceCreateOrderAckResponse
 
-    let security: RequestSecurity = .signed
+    let security: BinanceRequestSecurity = .signed
     let method: HttpMethod = .post
     let resource = "/api/v3/order"
     
