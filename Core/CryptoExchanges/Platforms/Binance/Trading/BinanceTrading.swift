@@ -26,8 +26,20 @@ final class BinanceTrading: BinanceApiFragment {
         })
     }
     
-    public func cancelOrder(_ id: String) {
+    public func cancelOrder(symbol: CryptoSymbol, id: String, newId: String? = nil, completion: @escaping (Bool) -> ()) {
+        var request = BinanceCancelOrderRequest(symbol: symbol, id: id, newId: newId)
         
+        sender.send(request, completion: {
+            result in
+            switch result {
+            case let .success(response):
+                sourcePrint("Response: \(response)")
+                completion(true)
+            case let .failure(error):
+                sourcePrint("Error while cancelling the request \(id) => \(error)")
+                completion(false)
+            }
+        })
     }
 
     func send(order: TradingOrderNew, completion: @escaping (BinanceCreateOrderAckResponse) -> ()) {
