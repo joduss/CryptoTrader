@@ -56,8 +56,8 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
     let transactionTime : Date
     let tradeId: Int
     let orderCreationTime: Date
-    let cumulativeQuoteAssetTransactiveQty: Double
-    let lastQuoteAssetTransactorQty: Double
+    let cumulativeQuoteAssetTransactedQty: Double
+    let lastQuoteAssetTransactedQty: Double
     let quoteOrderQty: Double
 
 
@@ -116,8 +116,8 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         orderCreationTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .orderCreationTime)))
 
         
-        cumulativeQuoteAssetTransactiveQty = Double(try values.decode(String.self, forKey: .cumulativeQuoteAssetTransactiveQty))!
-        lastQuoteAssetTransactorQty = Double(try values.decode(String.self, forKey: .lastQuoteAssetTransactorQty))!
+        cumulativeQuoteAssetTransactedQty = Double(try values.decode(String.self, forKey: .cumulativeQuoteAssetTransactiveQty))!
+        lastQuoteAssetTransactedQty = Double(try values.decode(String.self, forKey: .lastQuoteAssetTransactorQty))!
         quoteOrderQty = Double(try values.decode(String.self, forKey: .quoteOrderQty))!
     }
     

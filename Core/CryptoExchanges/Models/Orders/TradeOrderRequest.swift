@@ -1,16 +1,16 @@
 import Foundation
 
-struct TradingOrderNew {
+struct TradeOrderRequest {
     
     let symbol: CryptoSymbol
-    let quantity: Double
-    let price: Double?
+    var quantity: Double
+    var price: Double?
     let side: OrderSide
     let type: OrderType
     let id: String
     
-    static func limitSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func limitSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
                                side: .sell,
@@ -18,8 +18,8 @@ struct TradingOrderNew {
                                id: id)
     }
     
-    static func limitBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func limitBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
                                side: .buy,
@@ -27,8 +27,8 @@ struct TradingOrderNew {
                                id: id)
     }
     
-    static func marketBuy(symbol: CryptoSymbol, qty: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func marketBuy(symbol: CryptoSymbol, qty: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: nil,
                                side: .buy,
@@ -36,8 +36,8 @@ struct TradingOrderNew {
                                id: id)
     }
     
-    static func marketSell(symbol: CryptoSymbol, qty: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func marketSell(symbol: CryptoSymbol, qty: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: nil,
                                side: .sell,
@@ -45,8 +45,8 @@ struct TradingOrderNew {
                                id: id)
     }
     
-    static func stopLossSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func stopLossSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
                                side: .sell,
@@ -54,8 +54,8 @@ struct TradingOrderNew {
                                id: id)
     }
     
-    static func stopLossBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradingOrderNew {
-        return TradingOrderNew(symbol: symbol,
+    static func stopLossBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
+        return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
                                side: .buy,

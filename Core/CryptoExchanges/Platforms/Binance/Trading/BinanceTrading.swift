@@ -42,7 +42,7 @@ final class BinanceTrading: BinanceApiFragment {
         })
     }
 
-    func send(order: TradingOrderNew, completion: @escaping (BinanceCreateOrderAckResponse) -> ()) {
+    func send(order: TradeOrderRequest, completion: @escaping (BinanceCreateOrderAckResponse) -> ()) {
         var request = BinanceCreateOrderRequest(symbol: order.symbol,
                                                 side: order.side,
                                                 type: order.type,

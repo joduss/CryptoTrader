@@ -19,6 +19,10 @@ class OutputDateFormatter {
     func format(date: Date) -> String {
         return dateFormatter.string(from: date)
     }
+    
+    static func format(date: Date) -> String {
+        return OutputDateFormatter.instance.dateFormatter.string(from: date)
+    }
 }
 
 

@@ -9,7 +9,7 @@ class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSock
     
     private var listenKey: String?
     
-    var subscriber: ExchangeUserDataStreamSubscriber?
+    weak var subscriber: ExchangeUserDataStreamSubscriber?
 
     private var socket: WebSocket {
         return webSocketHandler.socket!
@@ -87,9 +87,24 @@ class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSock
     
     private func parse(response: String) throws {
         if (response.starts(with: "{\"e\":\"executionReport\"")) {
-            let report = try JSONDecoder().decode(BinanceUserDataStreamExecutionOrderResponse.self, from: response.data(using: .utf8)!)
+            let binanceReport = try JSONDecoder().decode(BinanceUserDataStreamExecutionOrderResponse.self, from: response.data(using: .utf8)!)
             
-            print(report)
+            let report = OrderExecutionReport(orderCreationTime: binanceReport.orderCreationTime,
+                                              symbol: try BinanceSymbolConverter.convert(binanceReport.symbol),
+                                              clientOrderId: binanceReport.clientOrderId,
+                                              side: binanceReport.side,
+                                              orderType: binanceReport.orderType,
+                                              price: binanceReport.lastExecutedPrice,
+                                              currentExecutionType: binanceReport.currentExecutionType,
+                                              currentOrderStatus: binanceReport.currentOrderStatus,
+                                              lastExecutedQuantity: binanceReport.lastExecutedQuantity,
+                                              cumulativeFilledQuantity: binanceReport.cumulativeFilledQuantity,
+                                              lastExecutedPrice: binanceReport.lastExecutedPrice,
+                                              commissionAmount: binanceReport.commissionAmount,
+                                              cumulativeQuoteAssetQuantity: binanceReport.cumulativeQuoteAssetTransactedQty,
+                                              lastQuoteAssetExecutedQuantity: binanceReport.lastQuoteAssetTransactedQty)
+            
+            subscriber?.updated(order: report)
         }
     }
     

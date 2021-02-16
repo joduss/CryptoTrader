@@ -1,8 +1,8 @@
 import Foundation
 
 protocol ExchangeUserDataStreamSubscriber: class {
-    func updated(balance: Double)
-    func updated(order: UserOrderUpdate)
+    //func updated(balance: Double)
+    func updated(order: OrderExecutionReport)
 }
 
 protocol ExchangeUserDataStream: class {
