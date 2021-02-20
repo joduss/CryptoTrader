@@ -6,14 +6,14 @@ public protocol ExchangeMarketDataStreamSubscriber: class {
     func process(depthUpdate: MarketDepth)
 }
 
-public protocol ExchangeMarketDataStream: class, WebSocketDelegate {
+public protocol ExchangeMarketDataStream: class {
     var subscribedToTickerStream: Bool { get }
     var subscribedToAggregatedTradeStream: Bool { get }
     var subscribedToMarketDepthStream: Bool { get }
 
     var webSocketHandler: WebSocketHandler { get }
     var symbol: CryptoSymbol { get }
-    var subscriber: ExchangeMarketDataStreamSubscriber? { get set }
+    var marketDataStreamSubscriber: ExchangeMarketDataStreamSubscriber? { get set }
     
     func subscribeToTickerStream()
     func subscribeToAggregatedTradeStream()

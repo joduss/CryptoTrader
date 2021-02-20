@@ -1,6 +1,6 @@
 import Foundation
 
-class BinanceClient {
+class BinanceClient: ExchangeClient {
     
     public let symbol: CryptoSymbol
     private let config: BinanceApiConfiguration
@@ -12,15 +12,15 @@ class BinanceClient {
         requestSender = BinanceApiRequestSender(config: config)
     }
     
-    lazy private(set) var marketStream : BinanceMarketStream = {
+    lazy private(set) var marketStream : ExchangeMarketDataStream = {
         return BinanceMarketStream(symbol: symbol, config: config)
     }()
     
-    lazy private(set) var userDataStream : BinanceUserDataStream = {
+    lazy private(set) var userDataStream : ExchangeUserDataStream = {
         return BinanceUserDataStream(symbol: symbol, config: config)
     }()
     
-    lazy private(set) var trading : BinanceTrading = {
+    lazy private(set) var trading : ExchangeSpotTrading = {
         return BinanceTrading(symbol: symbol, config: config)
     }()
 }

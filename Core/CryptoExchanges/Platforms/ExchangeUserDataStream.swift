@@ -8,15 +8,15 @@ protocol ExchangeUserDataStreamSubscriber: class {
 protocol ExchangeUserDataStream: class {
     var subscribed: Bool { get }
     var webSocketHandler: WebSocketHandler { get }
-    var subscriber: ExchangeUserDataStreamSubscriber? { get set }
+    var userDataStreamSubscriber: ExchangeUserDataStreamSubscriber? { get set }
 
-    func subscribe()
+    func subscribeUserDataStream()
 }
 
 extension ExchangeUserDataStream {
     func resubscribe() {
         if subscribed {
-            self.subscribe()
+            self.subscribeUserDataStream()
         }
     }
     

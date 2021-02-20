@@ -3,7 +3,7 @@ import Foundation
 
 protocol ExchangeClient {
     
-    // ExchangeMaterdataStream
-    // user data stream
-    // trading
+    var marketStream : ExchangeMarketDataStream { get }
+    var userDataStream : ExchangeUserDataStream { get }
+    var trading : ExchangeSpotTrading { get }
 }

@@ -18,7 +18,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
     
     public var webSocketHandler: WebSocketHandler
     
-    public var subscriber: ExchangeMarketDataStreamSubscriber?
+    public var marketDataStreamSubscriber: ExchangeMarketDataStreamSubscriber?
     
     
     public override init(symbol: CryptoSymbol, config: BinanceApiConfiguration) {
@@ -134,7 +134,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
                                               price: binanceTrade.price,
                                               quantity: binanceTrade.quantity,
                                               buyerIsMaker: binanceTrade.buyerIsMarker)
-            subscriber?.process(trade: trade)
+            marketDataStreamSubscriber?.process(trade: trade)
             return
         }
         
@@ -147,7 +147,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
                                       bidQuantity: binanceTicker.bidQuantity,
                                       askPrice: binanceTicker.askPrice,
                                       askQuantity: binanceTicker.askQuantity)
-            subscriber?.process(ticker: ticker)
+            marketDataStreamSubscriber?.process(ticker: ticker)
             return
         }
         
@@ -163,7 +163,7 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
             
             marketDepth.updateId(binanceDepth.eventTime)
                         
-            subscriber?.process(depthUpdate: marketDepth)
+            marketDataStreamSubscriber?.process(depthUpdate: marketDepth)
             return
         }
     }

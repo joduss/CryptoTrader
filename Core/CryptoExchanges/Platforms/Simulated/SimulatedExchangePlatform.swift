@@ -5,7 +5,7 @@ import JoLibrary
 public class SimulatedExchangePlatform: ExchangeMarketDataStream {
     
     public let symbol: CryptoSymbol
-    public var subscriber: ExchangeMarketDataStreamSubscriber?
+    public var marketDataStreamSubscriber: ExchangeMarketDataStreamSubscriber?
 
     public private(set) var subscribedToTickerStream: Bool = false
     public private(set) var subscribedToAggregatedTradeStream: Bool = false
@@ -66,7 +66,7 @@ public class SimulatedExchangePlatform: ExchangeMarketDataStream {
                 
                 DateFactory.simulated = true
                 DateFactory.now = trade.date
-                self.subscriber?.process(trade: trade)
+                self.marketDataStreamSubscriber?.process(trade: trade)
                 self.semaphore.signal()
             }
         }

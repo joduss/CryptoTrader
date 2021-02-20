@@ -57,7 +57,7 @@ final class SimulationTrader: ExchangeMarketDataStreamSubscriber {
     init(api: ExchangeMarketDataStream) {
         balance = initialBalance
         self.api = api
-        self.api.subscriber = self
+        self.api.marketDataStreamSubscriber = self
         api.subscribeToAggregatedTradeStream()
     }
 

@@ -9,7 +9,7 @@ class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSock
     
     private var listenKey: String?
     
-    weak var subscriber: ExchangeUserDataStreamSubscriber?
+    weak var userDataStreamSubscriber: ExchangeUserDataStreamSubscriber?
 
     private var socket: WebSocket {
         return webSocketHandler.socket!
@@ -23,7 +23,7 @@ class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSock
         super.init(symbol: symbol, config: config)
     }
     
-    func subscribe() {
+    func subscribeUserDataStream() {
         self.createListenKey(completionHandler: { listenKey in
             self.listenKey = listenKey
             sourcePrint("Listen key obtained. Creating the websocket")
@@ -104,7 +104,7 @@ class BinanceUserDataStream: BinanceApiFragment, ExchangeUserDataStream, WebSock
                                               cumulativeQuoteAssetQuantity: binanceReport.cumulativeQuoteAssetTransactedQty,
                                               lastQuoteAssetExecutedQuantity: binanceReport.lastQuoteAssetTransactedQty)
             
-            subscriber?.updated(order: report)
+            userDataStreamSubscriber?.updated(order: report)
         }
     }
     

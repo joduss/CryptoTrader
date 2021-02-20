@@ -26,7 +26,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
                                                         currentBalance: currentBalance)
         
         
-        self.api.marketStream.subscriber = self
+        self.api.marketStream.marketDataStreamSubscriber = self
     }
     
     func updated(order: OrderExecutionReport) {

@@ -1,6 +1,6 @@
 import Foundation
 
-final class BinanceTrading: BinanceApiFragment {
+final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
     
     private let sender: BinanceApiRequestSender
     
