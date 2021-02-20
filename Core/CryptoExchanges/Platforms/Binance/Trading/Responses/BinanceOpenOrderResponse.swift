@@ -1,6 +1,7 @@
 import Foundation
 
 struct BinanceOpenOrderResponse: Decodable {
+    
     let symbol: CryptoSymbol
     let platformOrderId: Int
     let clientOrderId: String
@@ -62,5 +63,22 @@ struct BinanceOpenOrderResponse: Decodable {
         )
         
         originalQuoteQty = Double(try values.decode(String.self, forKey: .originalQuoteQty))!
+    }
+    
+    init(symbol: CryptoSymbol, platformOrderId: Int, clientOrderId: String, price: Double, originalQty: Double, executedQty: Double, cummulativeQuoteQty: Double, stopPrice: Double, status: OrderStatus, type: OrderType, side: OrderSide, time: Date, updateTime: Date, originalQuoteQty: Double) {
+        self.symbol = symbol
+        self.platformOrderId = platformOrderId
+        self.clientOrderId = clientOrderId
+        self.price = price
+        self.originalQty = originalQty
+        self.executedQty = executedQty
+        self.cummulativeQuoteQty = cummulativeQuoteQty
+        self.stopPrice = stopPrice
+        self.status = status
+        self.type = type
+        self.side = side
+        self.time = time
+        self.updateTime = updateTime
+        self.originalQuoteQty = originalQuoteQty
     }
 }

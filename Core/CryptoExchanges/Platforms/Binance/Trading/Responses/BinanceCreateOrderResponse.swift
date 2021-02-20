@@ -33,4 +33,11 @@ struct BinanceCreateOrderAckResponse: Decodable {
             timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .transactionTime))
         )
     }
+    
+    init(symbol: CryptoSymbol, clientOrderId: String, platformOrderId: Int, transactionTime: Date) {
+        self.symbol = symbol
+        self.clientOrderId = clientOrderId
+        self.platformOrderId = platformOrderId
+        self.transactionTime = transactionTime
+    }
 }

@@ -6,17 +6,17 @@ final class MarketPerSecondHistory: MarketHistorySlice {
     
     private var lastCleanup = 0
     
-    private var currentTrade: MarketAggregatedTrade? = nil
+    private var currentTrade: DatedPrice? = nil
     private var currentTradeAggregationCount = 0.0
     
     init(intervalToKeep: TimeInterval) {
         self.intervalToKeep = intervalToKeep
-        super.init(prices: ArraySlice<MarketAggregatedTrade>())
+        super.init(prices: ArraySlice<DatedPrice>())
         self.prices.reserveCapacity(100000)
     }
     
     /// Add a record to the market history.
-    func record(_ newTrade: MarketAggregatedTrade) {
+    func record(_ newTrade: DatedPrice) {
         
         guard let currentTrade = self.currentTrade else {
             self.currentTrade = newTrade
@@ -39,13 +39,9 @@ final class MarketPerSecondHistory: MarketHistorySlice {
         }
         else {
             let secondAggregatedTrade =
-                MarketAggregatedTrade(
-                    id: 0,
-                    date: currentTrade.date,
-                    symbol: currentTrade.symbol,
+                DatedPrice(
                     price: (currentTrade.price * currentTradeAggregationCount + newTrade.price) / (currentTradeAggregationCount + 1),
-                    quantity: currentTrade.quantity + newTrade.quantity,
-                    buyerIsMaker: true)
+                    date: currentTrade.date)
             currentTradeAggregationCount += 1
             self.currentTrade = secondAggregatedTrade
             self.prices.removeLast()

@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "IkigaJSON",
+        "repositoryURL": "https://github.com/Ikiga/IkigaJSON.git",
+        "state": {
+          "branch": null,
+          "revision": "107f2addba0fdbb2c5aa90bce4b1cc7a1e1fbd80",
+          "version": "2.0.3"
+        }
+      },
+      {
         "package": "JoLibrary",
         "repositoryURL": "git@github.com:joduss/JoLibrary.git",
         "state": {
@@ -17,6 +26,15 @@
           "branch": null,
           "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
           "version": "0.3.2"
+        }
+      },
+      {
+        "package": "swift-nio",
+        "repositoryURL": "https://github.com/apple/swift-nio.git",
+        "state": {
+          "branch": null,
+          "revision": "6d3ca7e54e06a69d0f2612c2ce8bb8b7319085a4",
+          "version": "2.26.0"
         }
       }
     ]

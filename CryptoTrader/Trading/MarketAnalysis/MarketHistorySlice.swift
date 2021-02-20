@@ -10,13 +10,13 @@ import JoLibrary
 
 open class MarketHistorySlice {
     
-    public internal(set) var prices: ArraySlice<MarketAggregatedTrade>
+    public internal(set) var prices: ArraySlice<DatedPrice>
     
     private var averagePrice: Double!
     private var min: Double!
     private var max: Double!
     
-    public init(prices: ArraySlice<MarketAggregatedTrade>) {
+    public init(prices: ArraySlice<DatedPrice>) {
         self.prices = prices
     }
     

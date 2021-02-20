@@ -19,7 +19,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var closedBTSSellOperations: [TraderBTSSellOperation] = []
 
     private var quantityToBuy: Double = 0
-    private let exchange: BinanceClient! = nil
+    private var exchange: ExchangeClient
     
     private var locked = false
     
@@ -39,9 +39,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     
-    init(symbol: CryptoSymbol, config: SimpleTraderStrategyConfiguration, initialBalance: Double, currentBalance: Double) {
+    init(exchange: ExchangeClient, config: SimpleTraderStrategyConfiguration, initialBalance: Double, currentBalance: Double) {
         self.config = config
-        self.symbol = symbol
+        self.exchange = exchange
+        self.symbol = exchange.symbol
         self.currentBalance = currentBalance
         self.initialBalance = initialBalance
     }
@@ -148,6 +149,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         /// at least if there is a clear downward trend.
         
         self.currentAskPrice = price
+        marketAnalyzer.record(DatedPrice(price: price, date: DateFactory.now))
         
         // Locking
         if locked {
@@ -161,13 +163,11 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         // Buy prepared
         if let buyOperation = self.openBTSBuyOperation {
-            
             guard let buyPrice = buyOperation.buyOrder.price else {
                 return
             }
             
             // If the price is higher than the buyOperation, then the operation should be executed anytime soon.
-
             // else, we plan a buy if the price goes up again.
             if price < buyPrice -% config.updatePrepareBuyOverPricePercent {
                 // Cancel then recreate

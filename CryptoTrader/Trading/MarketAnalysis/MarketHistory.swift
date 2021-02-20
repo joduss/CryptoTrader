@@ -15,12 +15,12 @@ final class MarketHistory: MarketHistorySlice {
     
     init(intervalToKeep: TimeInterval) {
         self.intervalToKeep = intervalToKeep
-        super.init(prices: ArraySlice<MarketAggregatedTrade>())
+        super.init(prices: ArraySlice<DatedPrice>())
         self.prices.reserveCapacity(10000)
     }
     
     /// Add a record to the market history.
-    func record(_ trade: MarketAggregatedTrade) {
+    func record(_ trade: DatedPrice) {
         prices.append(trade)
         
         lastCleanup += 1

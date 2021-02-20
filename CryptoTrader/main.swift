@@ -2,6 +2,8 @@ import Foundation
 import ArgumentParser
 import Cocoa
 import os
+import JoLibrary
+import IkigaJSON
 
 let arguments = CommandLine.arguments
 
@@ -18,39 +20,14 @@ struct TraderMain: ParsableCommand {
     @Flag(exclusivity: .chooseFirst, help: "What to do")
     var action: Action = .simulate
     
-    @Argument(help: "Where to save the files for recording.")
-    var aggregatedTradeRecordsPath: String?
+    @Argument(help: "Recorded tickers file.")
+    var recordedTickersFile: String?
+    
+    @Argument(help: "Keep every N tickers.")
+    var keepEvery: String?
+    
     
     mutating func run() throws {
-        
-        let config = BinanceApiConfiguration(key: BinanceTestApiKeys.apiKey, secret: BinanceTestApiKeys.secreteKey)
-        config.demo = true
-//        let b = BinanceUserDataStream(symbol: marketPair, config: config)
-//        b.subscribe()
-        
-        let binance = BinanceClient(symbol: marketPair, config: config)
-//
-//        binance.trading.listOpenOrder(completion: {
-//            response in
-//
-//            print(response)
-//        })
-        
-//        binance.trading.send(order: TradingOrderNew(symbol: .btc_usd,
-//                                                    quantity: 0.001,
-//                                                    price: 10000,
-//                                                    side: .buy,
-//                                                    type: .limit,
-//                                                    id: "abcd"), completion: {
-//                                                        response in
-//                                                        print(response)
-//                                                    })
-        
-        binance.trading.cancelOrder(symbol: .btc_usd, id: "my_order_id_2", newId:"fuck", completion: {
-            success in
-            sourcePrint("Success: \(success)")
-        })
-        
         sourcePrint("CryptoTrader started")
         
         switch action {
@@ -59,15 +36,46 @@ struct TraderMain: ParsableCommand {
             break
         case .simulate:
             
-            guard let aggregatedTradeRecordsPath = aggregatedTradeRecordsPath else {
+            guard let recordedTickersFile = recordedTickersFile else {
                 TraderMain.exit(withError: ValidationError("A path to the file containing data for simulation is required!"))
             }
             
-//            DispatchQueue.global().async { [self] in
-//            print("Running trader with simulation api.")
-//            let api = SimulatedExchangePlatform(marketPair: self.marketPair, aggregatedTradesFilePath: aggregatedTradeRecordsPath)
-//            let trader = SimulationTrader(api: api)
-//            }
+            
+            print("Running trader with simulation api.")
+            
+            let reader = TextFileReader.openFile(at: recordedTickersFile)
+            var idx = 0
+            let keepEveryNTicker = Int(keepEvery ?? "5") ?? 5
+            
+            let jsonDecoder = JSONDecoder()
+            var tickers = [MarketTicker]()
+            tickers.reserveCapacity(30000000)
+            
+            while true {
+                guard let line = reader.readLine() else {
+                    break
+                }
+                
+                if idx > 4000 {
+                    break
+                }
+                
+                idx += 1
+                
+                if (idx % keepEveryNTicker != 0) {
+                    continue
+                }
+                
+                let data = line.data(using: .utf8)!
+                let ticker = try jsonDecoder.decode(MarketTicker.self, from: data)
+                tickers.append(ticker)
+            }
+            
+            let simulatedExchange = SimulatedFullExchange(symbol: .btc_usd, tickers: tickers)
+            let trader = SimpleTrader(client: simulatedExchange, initialBalance: 300, currentBalance: 300, maxOrderCount: 12)
+            
+            simulatedExchange.start()
+            
             break
         }
         

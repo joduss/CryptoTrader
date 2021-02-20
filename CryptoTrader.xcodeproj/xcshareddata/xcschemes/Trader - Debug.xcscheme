@@ -56,7 +56,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/btc-08-02-2021/btc-29-01-2021-08-02-2021.trades&quot;"
+            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/Backups/btc-08-02-2021/merged.tickers&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

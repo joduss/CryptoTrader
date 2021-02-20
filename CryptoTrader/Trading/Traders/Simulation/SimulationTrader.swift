@@ -67,7 +67,7 @@ final class SimulationTrader: ExchangeMarketDataStreamSubscriber {
     }
     
     func process(trade: MarketAggregatedTrade) {
-        marketAnalyzer.record(trade)
+        marketAnalyzer.record(DatedPrice(price: trade.price, date: trade.date))
         decide(price: trade.price)
     }
     

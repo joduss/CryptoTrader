@@ -1,10 +1,8 @@
 import Foundation
 
 class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSubscriber {
-
     
-    
-    var api : BinanceClient
+    var client : ExchangeClient
     
     var profits: Double = 0
     var strategy: SimpleTraderStrategy
@@ -12,21 +10,23 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     private var decisionCount = 0
 
     
-    init(client: BinanceClient, initialBalance: Double, currentBalance: Double, maxOrderCount: Int) {
-        self.api = client
-//        self.api.marketStream.subscribeToTickerStream()
-        self.api.marketStream.subscribeToAggregatedTradeStream()
+    init(client: ExchangeClient, initialBalance: Double, currentBalance: Double, maxOrderCount: Int) {
+        self.client = client
         
         var config = SimpleTraderStrategyConfiguration()
         config.maxOrdersCount = maxOrderCount
         
-        self.strategy = SimpleTraderBTSStrategy(symbol: client.symbol,
-                                                        config: config,
-                                                        initialBalance: initialBalance,
-                                                        currentBalance: currentBalance)
+        self.strategy = SimpleTraderBTSStrategy(exchange: client,
+                                                config: config,
+                                                initialBalance: initialBalance,
+                                                currentBalance: currentBalance)
         
         
-        self.api.marketStream.marketDataStreamSubscriber = self
+        self.client.marketStream.marketDataStreamSubscriber = self
+        self.client.userDataStream.userDataStreamSubscriber = self
+        
+        self.client.marketStream.subscribeToTickerStream()
+        self.client.userDataStream.subscribeUserDataStream()
     }
     
     func updated(order: OrderExecutionReport) {
