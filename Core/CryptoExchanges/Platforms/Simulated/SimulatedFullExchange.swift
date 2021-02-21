@@ -14,6 +14,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     private var currentTicker: MarketTicker
     private let tickers: [MarketTicker]
     private var exchangeOrderId = 1
+    private var group = DispatchGroup()
     
     init(symbol: CryptoSymbol, tickers: [MarketTicker]) {
         self.tickers = tickers
@@ -29,15 +30,16 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     
     func start() {
         DateFactory.simulated = true
-
+        
         for ticker in tickers {
-            DateFactory.now = ticker.date
-            marketDataStreamSubscriber?.process(ticker: ticker)
+            onNewTicker(ticker)
         }
     }
     
     private func onNewTicker(_ ticker: MarketTicker) {
-        executeOrders(ticker)
+        DateFactory.now = ticker.date
+        self.executeOrders(ticker)
+        self.marketDataStreamSubscriber?.process(ticker: ticker)
     }
     
     private func executeOrders(_ ticker: MarketTicker) {
@@ -58,6 +60,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 return  ticker.askPrice <= order.price!
             case .stopLoss:
                 return ticker.askPrice >= order.price!
+            case .stopLossLimit:
+                return ticker.askPrice >= order.price!
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
@@ -73,9 +77,13 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 price = order.price! // Worst price
             case .stopLoss:
                 price = ticker.askPrice
+            case .stopLossLimit:
+                price = ticker.askPrice
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
+            
+            sourcePrint("Order \(order) has been fullfiled.")
             
             let report = OrderExecutionReport(
                 orderCreationTime: DateFactory.now,
@@ -90,10 +98,13 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 cumulativeFilledQuantity: order.quantity,
                 lastExecutedPrice: price,
                 commissionAmount: Percent(0.1) * order.quantity * price,
-                cumulativeQuoteAssetQuantity: order.quantity * price * Percent(1 - 0.1).value,
-                lastQuoteAssetExecutedQuantity: order.quantity * price * Percent(1 - 0.1).value)
+                cumulativeQuoteAssetQuantity: order.quantity * price -% Percent(0.1),
+                lastQuoteAssetExecutedQuantity: order.quantity * price -% Percent(0.1))
             
             userDataStreamSubscriber?.updated(order: report)
+            
+            let idx = orderRequests.firstIndex(where: {$0.id == order.id})!
+            orderRequests.remove(at: idx)
         }
         
     }
@@ -130,6 +141,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 fatalError("\(order.type) is not a supported buy order.")
             }
             
+            sourcePrint("Order \(order) has been fullfiled.")
+
             let report = OrderExecutionReport(
                 orderCreationTime: DateFactory.now,
                 symbol: symbol,
@@ -143,10 +156,13 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 cumulativeFilledQuantity: order.quantity,
                 lastExecutedPrice: price,
                 commissionAmount: Percent(0.1) * order.quantity * price,
-                cumulativeQuoteAssetQuantity: order.quantity * price * Percent(1 - 0.1).value,
-                lastQuoteAssetExecutedQuantity: order.quantity * price * Percent(1 - 0.1).value)
+                cumulativeQuoteAssetQuantity: (order.quantity * price) -% Percent(0.1),
+                lastQuoteAssetExecutedQuantity: order.quantity * price -% Percent(1 - 0.1))
             
             userDataStreamSubscriber?.updated(order: report)
+            
+            let idx = orderRequests.firstIndex(where: {$0.id == order.id})!
+            orderRequests.remove(at: idx)
         }
     }
     
@@ -203,22 +219,20 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         symbol: CryptoSymbol, id: String, newId: String?, completion: @escaping (Bool) -> Void
     ) {
         let idxToRemove = orderRequests.firstIndex(where: {$0.id == id})!
+        
         orderRequests.remove(at: idxToRemove)
         
+        sourcePrint("Cancelled order \(id)")
         completion(true)
     }
     
     func send(order: TradeOrderRequest, completion: @escaping (Bool) -> Void)
     {
         orderRequests.append(order)
-        
         exchangeOrderId += 1
-        completion(BinanceCreateOrderAckResponse(symbol: order.symbol,
-                                                 clientOrderId: order.id,
-                                                 platformOrderId: exchangeOrderId,
-                                                 transactionTime: DateFactory.now))
         
-        executeOrders(currentTicker)
+        sourcePrint("Created order \(order)")
+        completion(true)
     }
     
 }
