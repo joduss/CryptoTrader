@@ -4,7 +4,7 @@ protocol ExchangeSpotTrading: class {
 
     func listOpenOrder(completion: @escaping ([BinanceOpenOrderResponse]?) -> ())
     func cancelOrder(symbol: CryptoSymbol, id: String, newId: String?, completion: @escaping (Bool) -> ())
-    func send(order: TradeOrderRequest, completion: @escaping (BinanceCreateOrderAckResponse) -> ())
+    func send(order: TradeOrderRequest, completion: @escaping (Bool) -> ())
 }
 
 extension ExchangeSpotTrading {

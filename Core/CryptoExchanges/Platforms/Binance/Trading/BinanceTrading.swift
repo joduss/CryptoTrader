@@ -42,7 +42,7 @@ final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
         })
     }
 
-    func send(order: TradeOrderRequest, completion: @escaping (BinanceCreateOrderAckResponse) -> ()) {
+    func send(order: TradeOrderRequest, completion: @escaping (Bool) -> ()) {
         var request = BinanceCreateOrderRequest(symbol: order.symbol,
                                                 side: order.side,
                                                 type: order.type,
@@ -54,9 +54,10 @@ final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
             result in
             switch result {
             case let .success(response):
-                completion(response)
+                completion(true)
             case let .failure(error):
                 print("Failed to create a new order. \(error)")
+                completion(false)
             }
         })
     }

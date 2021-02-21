@@ -208,7 +208,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         completion(true)
     }
     
-    func send(order: TradeOrderRequest, completion: @escaping (BinanceCreateOrderAckResponse) -> Void)
+    func send(order: TradeOrderRequest, completion: @escaping (Bool) -> Void)
     {
         orderRequests.append(order)
         
