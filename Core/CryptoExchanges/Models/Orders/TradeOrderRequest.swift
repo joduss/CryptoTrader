@@ -1,6 +1,6 @@
 import Foundation
 
-struct TradeOrderRequest {
+struct TradeOrderRequest: CustomStringConvertible {
     
     let symbol: CryptoSymbol
     var quantity: Double
@@ -61,6 +61,10 @@ struct TradeOrderRequest {
                                side: .buy,
                                type: .stopLoss,
                                id: id)
+    }
+    
+    var description: String {
+        return "TradeOrderRequest '\(id)': \(type) \(side) \(quantity)@\(price ?? 0)"
     }
     
 }
