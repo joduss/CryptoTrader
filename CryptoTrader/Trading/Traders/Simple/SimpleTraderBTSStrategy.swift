@@ -7,7 +7,11 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private let marketAnalyzer: MarketPerSecondHistory = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(6))
     private let symbol: CryptoSymbol
     
-    private var currentBalance: Double
+    private var currentBalance: Double {
+        didSet {
+            print("CB: \(currentBalance)")
+        }
+    }
     private var initialBalance: Double
     private var profits: Double = 0
     
@@ -22,9 +26,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var exchange: ExchangeClient
     
     private var locked = false
-    
-    private let semaphore = DispatchSemaphore(value: 1)
-    
     
     private var lastBuyPrice: Double? {
         return lastBuyOrder?.trade.price
@@ -53,13 +54,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // ================================================================
 
     func update(report: OrderExecutionReport) {
-        
-        semaphore.wait()
-        
-        defer {
-            semaphore.signal()
-        }
-        
         if (report.side == .buy) {
             guard let buyOperation = self.openBTSBuyOperation else { return }
             buyOperation.update(report)
@@ -104,9 +98,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 break
                 // Nothing
             case .filled:
-                print("Order \(matchingOperation.sellOrder!) has been filled. ")
-                print("\t Profits: ")
                 profits += matchingOperation.profits
+                print("Order \(matchingOperation.sellOrder!) has been filled.")
+                print("\t Total Profits: \(profits)")
                 currentBalance += report.lastQuoteAssetExecutedQuantity
                 closedBTSSellOperations.append(matchingOperation)
                 openBTSSellOperations.remove(at: matchingOperationIndex)
@@ -163,23 +157,17 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         // Buy prepared
         if let buyOperation = self.openBTSBuyOperation {
+//            let createAtPrice = buyOperation.createAtPrice
+            
             guard let buyPrice = buyOperation.buyOrder.price else {
                 return
             }
             
             // If the price is higher than the buyOperation, then the operation should be executed anytime soon.
             // else, we plan a buy if the price goes up again.
-            if price < buyPrice -% config.updatePrepareBuyOverPricePercent {
+            if price < buyPrice -% config.buyUpdateStopLossPercent {
                 // Cancel then recreate
-                cancel(order: buyOperation.buyOrder, completion: {
-                    result in
-                    if (result) {
-                        self.prepareBuy(currentPrice: price)
-                    }
-                    else {
-                        print("Failed to cancel the order.")
-                    }
-                })
+                self.prepareBuy(currentPrice: price)
                 return
             }
             return
@@ -211,7 +199,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             if lastBuyOrderPrice < price {
                 // Compared to last buy, the price went quite up.
                 // We want to buy and see what will happen. Hopefully stil going up to we can sell at a even higher price
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) > Percent(config.initialUpperLimitPercent) {
+                if Percent(differenceOf: price, from: lastBuyOrderPrice) > Percent(config.buyNextBuyOrderPercent) {
                     prepareBuy(currentPrice: price)
                     return
                 }
@@ -260,19 +248,32 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     private func prepareBuy(currentPrice: Double) {
-        let buyPrice = currentPrice +% config.prepareBuyOverPricePercent
+        let buyPrice = currentPrice +% config.buyStopLossPercent
         
         if let buyOperation = self.openBTSBuyOperation {
+            let group = DispatchGroup()
+            group.enter()
+            
             cancel(order: buyOperation.buyOrder, completion: {
                 result in
                 if (result) {
-                    self.openBTSBuyOperation = self.createBuyOrder(price: buyPrice,
-                                                          type: .stopLossLimit)
+                    // If it has already been partially filled, we just buy the remaining qty.
+                    // otherwise, we buy for a certain amount of $ (initial op).
+                    if buyOperation.status == .partiallyFilled {
+                        self.openBTSBuyOperation = self.updatedBuyOrder(price: buyPrice, order: buyOperation.buyOrder)
+                    }
+                    else {
+                        self.openBTSBuyOperation = self.createBuyOrder(price: buyPrice,
+                                                              type: .stopLossLimit)
+                    }
                 }
                 else {
                     print("Failed to cancel the order.")
                 }
+                group.leave()
             })
+            
+            group.wait()
         }
         else {
             openBTSBuyOperation = createBuyOrder(price: buyPrice, type: .stopLossLimit)
@@ -283,13 +284,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: Decisiong about selling
     
     func updateBid(price: Double) {
-        
-        semaphore.wait()
-        
-        defer {
-            semaphore.signal()
-        }
-        
         self.currentBidPrice = price
         
         for operation in openBTSSellOperations {
@@ -320,10 +314,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         var lowLimitPercentDrop: Percent = Percent(differenceOf: price, from: operation.trade.price) / config.sellLowerLimitDivisor
         
-        if lowLimitPercentDrop > config.maxSellLowerLimitPercent {
-            lowLimitPercentDrop = config.maxSellLowerLimitPercent
+        if lowLimitPercentDrop > config.sellStopLossProfitPercent {
+            lowLimitPercentDrop = config.sellStopLossProfitPercent
         }
-        if lowLimitPercentDrop < config.minLowerLimitPercent + 0.1 {
+        if lowLimitPercentDrop < config.sellMinProfitPercent + 0.1 {
             return
         }
         
@@ -332,7 +326,22 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                                                     qty: operation.trade.quantity,
                                                     price: price -% lowLimitPercentDrop,
                                                     id: orderId)
-        operation.sellOrder = order
+        sourcePrint("Sending request to create order \(orderId)")
+        
+        let group = DispatchGroup()
+        group.enter()
+        
+        exchange.trading.send(order: order, completion: { [self] result in
+            if result == false {
+                operation.sellOrder = nil
+            }
+            else {
+                operation.sellOrder = order
+            }
+            group.leave()
+        })
+        group.wait()
+
         return
     }
     
@@ -343,6 +352,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         guard price > operationSellPrice +% config.updateSellUpperLimitPercent else {
             return
         }
+        let group = DispatchGroup()
+        group.enter()
         
         cancel(order: sellOrder, completion: {
             result in
@@ -350,12 +361,13 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             if (result) {
                 operation.sellOrder = nil
                 self.createOrderFor(operation: operation, price: price)
-//                openBTSSellOperations.removeAll(where: {$0 === operation})
             }
             else {
                 sourcePrint("Failed to cancel order.")
             }
+            group.leave()
         })
+        group.wait()
     }
     
     // MARK: Helpers
@@ -389,36 +401,36 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             print(openBuy.description())
         }
         
-        sourcePrint("\nExecuted operations.")
-        sourcePrint("\n-----------")
+        print("\nExecuted operations.")
+        print("\n-----------")
         for closeOrder in self.closedBTSSellOperations {
-            sourcePrint(closeOrder.description(currentPrice: currentPrice))
-            sourcePrint("---")
+            print(closeOrder.description(currentPrice: currentPrice))
+            print("---")
         }
         
-        sourcePrint("\n\n\n----------------------")
-        sourcePrint("Open sell orders")
-        sourcePrint("\n-----------")
+        print("\n\n\n----------------------")
+        print("Open sell orders")
+        print("\n-----------")
         
         for closeOrder in self.openBTSSellOperations {
-            sourcePrint(closeOrder.description(currentPrice: currentPrice))
-            sourcePrint("---")
+            print(closeOrder.description(currentPrice: currentPrice))
+            print("---")
         }
         
         let firstOrder = closedBTSSellOperations.sorted(by: {$0.trade.date < $1.trade.date}).first!
         let timeInterval = DateFactory.now - firstOrder.trade.date
         
-        sourcePrint("========================= ")
-        sourcePrint("Summary")
-        sourcePrint("========================= \n")
+        print("========================= ")
+        print("Summary")
+        print("========================= \n")
         
-        sourcePrint("Duration: \(timeInterval / 3600 / 24) days \n\n")
-        sourcePrint("Current balance: \(currentBalance)")
-        sourcePrint("Coins: \(coins) @ \(currentPrice)")
-        sourcePrint("Profits: \(profits) (\(Percent(ratioOf: profits, to: initialBalance).percentage) %) / Per day: \(profits / (timeInterval / 3600 / 24))")
+        print("Duration: \(timeInterval / 3600 / 24) days \n\n")
+        print("Current balance: \(currentBalance)")
+        print("Coins: \(coins) @ \(currentPrice)")
+        print("Profits: \(profits) (\(Percent(ratioOf: profits, to: initialBalance).percentage) %) / Per day: \(profits / (timeInterval / 3600 / 24))")
         
         
-        sourcePrint("Total assets value: \(coins * currentPrice + currentBalance) / Initial value: \(initialBalance)")
+        print("Total assets value: \(coins * currentPrice + currentBalance) / Initial value: \(initialBalance)")
     }
     
     private func printCurrentOrders() {
@@ -429,19 +441,47 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
     private func cancel(order: TradeOrderRequest, completion: @ escaping (Bool) -> ()) {
         self.exchange.trading.cancelOrder(symbol: symbol, id: order.id, completion: {
-            result in completion(result)
+            result in
+            if result && order.side == .buy {
+                self.currentBalance += order.price! * order.quantity
+            }
+            completion(result)
         })
     }
     
-    private func createBuyOrder(price: Double, type: OrderType, qty: Double? = nil) -> TraderBTSBuyOperation {
-        let quantity = qty ?? initialBalance / Double(config.maxOrdersCount)
+    private func createBuyOrder(price: Double, type: OrderType) -> TraderBTSBuyOperation? {
+        let value = initialBalance / Double(config.maxOrdersCount)
+        let quantityToBuy = value / price
+        
+        if currentBalance - quantityToBuy < 0 {
+            return nil
+        }
+        currentBalance -= value
+        
         let order = TradeOrderRequest(symbol: symbol,
-                                      quantity: quantity,
+                                      quantity: quantityToBuy,
                                       price: price,
                                       side: .buy,
                                       type: type,
-                                      id: "BUY \(OutputDateFormatter.format(date: DateFactory.now))-\(price)-\(quantity)")
+                                      id: "BUY \(OutputDateFormatter.format(date: DateFactory.now))-\(quantityToBuy)@\(price)=\(value)")
+        self.exchange.trading.send(order: order, completion: { result in print(result)})
         
         return TraderBTSBuyOperation(buyOrder: order)
+    }
+    
+    
+    private func updatedBuyOrder(price: Double, order: TradeOrderRequest) -> TraderBTSBuyOperation? {
+        let orderValue = order.quantity * order.price!
+        let quantityToBuy = orderValue / price
+                
+        let newOrder = TradeOrderRequest(symbol: symbol,
+                                         quantity: quantityToBuy,
+                                         price: price,
+                                         side: .buy,
+                                         type: order.type,
+                                         id: "UPDATE BUY \(OutputDateFormatter.format(date: DateFactory.now))-\(quantityToBuy)@\(price)=\(orderValue)")
+        self.exchange.trading.send(order: order, completion: { result in print(result)})
+        
+        return TraderBTSBuyOperation(buyOrder: newOrder)
     }
 }

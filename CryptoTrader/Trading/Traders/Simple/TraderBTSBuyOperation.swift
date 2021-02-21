@@ -8,12 +8,17 @@ class TraderBTSBuyOperation {
     
     private(set) var status: OrderStatus = .new
     
-    init(buyOrder: TradeOrderRequest) {
-        
+    /// Price on the market at the time the order was created
+//    var createAtPrice: Double = 0
+    
+//    init(buyOrder: TradeOrderRequest, createdAtPrice price:Double) {
+        init(buyOrder: TradeOrderRequest) {
+
         guard buyOrder.side == .buy else {
             fatalError("A buy order for the 'TraderBTSBuyOperation' must have side 'BUY'!")
         }
         
+//        self.createAtPrice = price
         self.buyOrder = buyOrder
         originalBuyOrderQuantity = buyOrder.quantity
     }

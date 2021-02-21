@@ -8,7 +8,25 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     var strategy: SimpleTraderStrategy
     
     private var decisionCount = 0
-
+    
+//    private let orderSemaphore = DispatchSemaphore(1)
+    private let updateProcessSemaphore = DispatchSemaphore(value: 1)
+    private let isUpdatingVariableSemaphore = DispatchSemaphore(value: 1)
+    private var _isUpdating = false
+    
+    private var isUpdating: Bool {
+        get {
+            isUpdatingVariableSemaphore.wait()
+            let value = _isUpdating
+            isUpdatingVariableSemaphore.signal()
+            return value
+        }
+        set {
+            isUpdatingVariableSemaphore.wait()
+            _isUpdating = newValue
+            isUpdatingVariableSemaphore.signal()
+        }
+    }
     
     init(client: ExchangeClient, initialBalance: Double, currentBalance: Double, maxOrderCount: Int) {
         self.client = client
@@ -30,10 +48,24 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     }
     
     func updated(order: OrderExecutionReport) {
+        updateProcessSemaphore.wait()
+        isUpdating = true
+
         strategy.update(report: order)
+        
+        isUpdating = false
+        updateProcessSemaphore.signal()
     }
     
     func process(ticker: MarketTicker) {
+        
+        if isUpdating {
+            return
+        }
+
+        updateProcessSemaphore.wait()
+        isUpdating = true
+
         decisionCount += 1
         
         if decisionCount % 200 == 0 {
@@ -42,9 +74,13 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         
         strategy.updateBid(price: ticker.bidPrice)
         strategy.updateAsk(price: ticker.askPrice)
+        
+        isUpdating = false
+        updateProcessSemaphore.signal()
     }
     
     func process(trade: MarketAggregatedTrade) {
+        
     }
     
     func process(depthUpdate: MarketDepth) { }

@@ -11,9 +11,13 @@ class TraderBTSSellOperation {
         }
     }
     
+    private let uuid = UUID().uuidString
     private(set) var status: OrderStatus = .new
     private(set) var trade: TraderBTSTrade
     private(set) var profits = 0.0
+    
+    /// What was the price when this operation was updated for the last time.
+//    var updatedAtPrice: Double
 
     init(sellOrder: TradeOrderRequest, trade: TraderBTSTrade) {
         guard sellOrder.side == .sell else {
