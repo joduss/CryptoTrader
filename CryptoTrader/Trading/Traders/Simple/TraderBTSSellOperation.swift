@@ -1,80 +1,56 @@
 import Foundation
 
 
-class TraderBTSSellOperation {
+class TraderBTSSellOperation: CustomStringConvertible {
     
-    var sellOrder: TradeOrderRequest? {
-        didSet{
-            if let newOrder = sellOrder, newOrder.side != .sell {
-                fatalError("A buy order for the 'TraderBTSBuyOperation' must have side 'SELL'!")
-            }
-        }
-    }
+    let uuid = UUID().uuidString.truncate(length: 5)
     
-    private let uuid = UUID().uuidString
-    private(set) var status: OrderStatus = .new
-    private(set) var trade: TraderBTSTrade
-    private(set) var profits = 0.0
+    // If the price goes below the stop-loss-price, a market order is executed.
+    var stopLossPrice: Double = 0
     
-    /// What was the price when this operation was updated for the last time.
-//    var updatedAtPrice: Double
+    // If the price goes over, the stop-loss and update-price are updated.
+    var updateWhenAbovePrice: Double = 0
 
-    init(sellOrder: TradeOrderRequest, trade: TraderBTSTrade) {
-        guard sellOrder.side == .sell else {
-            fatalError("A buy order for the 'TraderBTSBuyOperation' must have side 'SELL'!")
-        }
-        
-        self.trade = trade
-        self.sellOrder = sellOrder
-    }
-    
+    private(set) var status: OrderStatus = .new
+    let initialTrade: TraderBTSTrade
+    private(set) var profits = 0.0
+    private(set) var closingTrade: TraderBTSTrade?
+
     init(trade: TraderBTSTrade) {
-        self.trade = trade
+        self.initialTrade = trade
     }
     
-    func update(_ report: OrderExecutionReport) {
-        guard report.clientOrderId == sellOrder?.id else { return }
+    func closing(with order: TraderBTSTrade) {
+        status = .filled
+        closingTrade = order
         
-        status = report.currentOrderStatus
-        
-        switch report.currentOrderStatus {
-        case .partiallyFilled:
-            self.sellOrder?.quantity = trade.quantity - report.cumulativeFilledQuantity
-            break
-        case .filled:
-            profits = report.cumulativeQuoteAssetQuantity - trade.value
-            sourcePrint(
-                "BTS - Sold \(trade.quantity)@\(report.averagePrice), bought for \(trade.price) " +
-                "the \(OutputDateFormatter.format(date: trade.date))). " +
-                "Profits: \(profits) (\(Percent(differenceOf: report.cumulativeQuoteAssetQuantity, from: trade.value))%)"
-            )
-            self.sellOrder?.quantity = 0
-        default: break
-        }
+        profits = order.value - initialTrade.value
     }
+    
+    var description: String {
+        return description(currentPrice: closingTrade?.price ?? initialTrade.price)
+    }
+    
     
     func description(currentPrice: Double) -> String {
         
-        guard self.sellOrder != nil else {
-            return "BTS - Sell (Pending) - \(status)- Bought at: \(trade.price) the \(OutputDateFormatter.format(date: trade.date)) - Qty: \(trade.quantity)"
-        }
-        
         switch status {
         case .new:
-            let currentValue = currentPrice * trade.quantity
-            let originalValue = trade.value
-            let diff = Percent(differenceOf: currentValue, from: originalValue)
-            return "BTS operation waiting to be sold. Value: original = \(originalValue), original = \(currentValue) (\(diff)%). Original "
+            let currentValue = currentPrice * initialTrade.quantity
+            let originalValue = initialTrade.value
+            let diff = Percent(differenceOf: currentValue, from: originalValue).percentage
+            return "Open BTS Sell Operation. Value: original = \(originalValue), current = \(currentValue) (\(diff)%). (\(initialTrade.price) => \(currentPrice) "
         case .partiallyFilled:
-            return "BTS operation partially filled."
+            return "BTS Sell Operation partially filled."
         case .filled:
-            return "BTS operation completed with profits: \(profits) (\(Percent(ratioOf: profits, to: trade.price))%)"
+            let diff = Percent(differenceOf: closingTrade!.value, from: initialTrade.value).percentage
+            return "Closed BTS Sell Operation. Value: original = \(initialTrade.value), current = \(closingTrade!.value) (\(diff)%). (\(initialTrade.price) => \(currentPrice) "
         case .cancelled:
-            return "BTS op cancelled"
+            return "BTS Sell Operation cancelled"
         case .rejected:
-            return "BTS op rejected"
+            return "BTS Sell Operation rejected"
         case .expired:
-            return "BTS op expired"
+            return "BTS Sell Operation expired"
         }
     }
 }

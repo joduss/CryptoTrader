@@ -2,9 +2,9 @@ import Foundation
 
 protocol ExchangeSpotTrading: class {
 
-    func listOpenOrder(completion: @escaping ([BinanceOpenOrderResponse]?) -> ())
+    func listOpenOrder(completion: @escaping ([BinanceOrderSummaryResponse]?) -> ())
     func cancelOrder(symbol: CryptoSymbol, id: String, newId: String?, completion: @escaping (Bool) -> ())
-    func send(order: TradeOrderRequest, completion: @escaping (Bool) -> ())
+    func send(order: TradeOrderRequest, completion: @escaping (Result<CreatedOrder, ExchangePlatformError>) -> ())
 }
 
 extension ExchangeSpotTrading {

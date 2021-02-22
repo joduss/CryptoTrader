@@ -1,5 +1,6 @@
 import Foundation
 
+/// BinanceTrading is good.
 final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
     
     private let sender: BinanceApiRequestSender
@@ -9,7 +10,7 @@ final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
         super.init(symbol: symbol, config: config)
     }
     
-    func listOpenOrder(completion: @escaping ([BinanceOpenOrderResponse]?) -> ()) {
+    func listOpenOrder(completion: @escaping ([BinanceOrderSummaryResponse]?) -> ()) {
         let request = BinanceListOpenOrderRequest(symbol: self.symbol)
         sender.send(request, completion: {
             result in
@@ -27,7 +28,7 @@ final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
     }
     
     public func cancelOrder(symbol: CryptoSymbol, id: String, newId: String? = nil, completion: @escaping (Bool) -> ()) {
-        var request = BinanceCancelOrderRequest(symbol: symbol, id: id, newId: newId)
+        let request = BinanceCancelOrderRequest(symbol: symbol, id: id, newId: newId)
         
         sender.send(request, completion: {
             result in
@@ -42,22 +43,31 @@ final class BinanceTrading: BinanceApiFragment, ExchangeSpotTrading {
         })
     }
 
-    func send(order: TradeOrderRequest, completion: @escaping (Bool) -> ()) {
+    func send(order: TradeOrderRequest, completion: @escaping (Result<CreatedOrder, ExchangePlatformError>) -> ()) {
         var request = BinanceCreateOrderRequest(symbol: order.symbol,
                                                 side: order.side,
                                                 type: order.type,
-                                                qty: order.quantity,
-                                                id: order.id)
+                                                id: order.id,
+                                                qty: order.quantity)
         request.price = order.price
+        request.value = order.value
+        
+        if order.type == .stopLossLimit || order.type == .takeProfitLimit {
+            if order.side == .buy {
+                request.stopPrice = order.price
+            }
+            else {
+                request.stopPrice = order.price
+            }
+        }
         
         sender.send(request, completion: {
             result in
             switch result {
             case let .success(response):
-                completion(true)
+                completion(.success(response.toCreatedOrder()))
             case let .failure(error):
-                print("Failed to create a new order. \(error)")
-                completion(false)
+                completion(.failure(error))
             }
         })
     }

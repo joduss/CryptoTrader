@@ -33,11 +33,16 @@ struct TraderMain: ParsableCommand {
     // MARK: Command line main.
     // ------------------------------
     func run() throws {
+        
         sourcePrint("CryptoTrader started")
         
         switch action {
         case .trade:
-            TraderMain.exit(withError: ValidationError("Trading is not yet supported"))
+            
+            let simulatedExchange = BinanceClient(symbol: .btc_usd, config: BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey))
+            let trader = SimpleTrader(client: simulatedExchange, initialBalance: 97, currentBalance: 97, maxOrderCount: 9)
+            
+            
             break
         case .simulate:
             
@@ -51,6 +56,7 @@ struct TraderMain: ParsableCommand {
                 do {
                     try self.simulate(recordedTickersFile: recordedTickersFile)
                     print("DONE")
+                    TraderMain.exit()
                 }
                 catch {
                     sourcePrint("SIMULATION FAILED")
@@ -94,7 +100,7 @@ struct TraderMain: ParsableCommand {
             
             idx += 1
 
-            if idx > 100000000 { break }
+//            if idx > 1000000 { break }
             if (idx % keepEveryNTicker != 0) { continue }
 
             let data = line.data(using: .utf8)!

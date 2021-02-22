@@ -1,7 +1,7 @@
 import Foundation
 
 struct BinanceListOpenOrderRequest: BinanceApiRequest {
-    typealias Response = [BinanceOpenOrderResponse]
+    typealias Response = [BinanceOrderSummaryResponse]
     
     let security: BinanceRequestSecurity = .signed
     let method: HttpMethod = .get

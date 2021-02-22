@@ -1,65 +1,46 @@
 import Foundation
 
 /// 'Buy then Sell' operation consisting in buying then selling at a higher price.
-class TraderBTSBuyOperation {
+class TraderBTSBuyOperation: CustomStringConvertible {
     
-    private(set) var originalBuyOrderQuantity: Double
-    private(set) var buyOrder: TradeOrderRequest
+    
+    let uuid: String = UUID().uuidString.truncate(length: 5)
+    var stopLossPrice: Double = 0
+    var updateWhenBelowPrice: Double = 0
+
+    private(set) var qty: Double = 0
+    private(set) var price: Double = 0
     
     private(set) var status: OrderStatus = .new
     
-    /// Price on the market at the time the order was created
-//    var createAtPrice: Double = 0
-    
-//    init(buyOrder: TradeOrderRequest, createdAtPrice price:Double) {
-        init(buyOrder: TradeOrderRequest) {
-
-        guard buyOrder.side == .buy else {
-            fatalError("A buy order for the 'TraderBTSBuyOperation' must have side 'BUY'!")
-        }
-        
-//        self.createAtPrice = price
-        self.buyOrder = buyOrder
-        originalBuyOrderQuantity = buyOrder.quantity
+    var value: Double {
+        return qty * price
     }
+    
+    var description: String {
+        return "TODO"
+    }
+
     
     /// Updates the operation with the trade information.
-    func update(_ trade: OrderExecutionReport) {
-        guard trade.clientOrderId == buyOrder.id else { return }
-        
-        status = trade.currentOrderStatus
-        
-        switch trade.currentOrderStatus {
-//        case .new:
-//            status = .new
-//            break
-////            return nil
-//        case .filled:
-//            status = .filled
-//            break
-
-//            completed = true
-//            return TraderBTSSellOperation(price: trade.price, quantity: trade.lastExecutedQuantity)
-        case .partiallyFilled:
-            buyOrder.quantity = originalBuyOrderQuantity - trade.cumulativeFilledQuantity
-            
-            break
+//    func update(_ trade: OrderExecutionReport) {
+//        guard trade.clientOrderId == buyOrder.id else { return }
 //
-////            return TraderBTSSellOperation(price: trade.price, quantity: trade.lastExecutedQuantity)
-//        case .cancelled:
+//        status = trade.currentOrderStatus
+//
+//        switch trade.currentOrderStatus {
+//        case .partiallyFilled:
+//            buyOrder.quantity = originalQty - trade.cumulativeFilledQuantity
 //            break
-////            return nil
-//        case .rejected:
-//            break
-////            return nil
-//        case .expired:
-////            return nil
-//            break
-        default: break
-        }
-    }
-    
-    func description() -> String {
-        return "BTS-Buy - \(buyOrder.id) - \(status) - Price: \(buyOrder.price!) - Qty: \(buyOrder.quantity)"
-    }
+//        default: break
+//        }
+//    }
+//
+//    func update(order: TradeOrderRequest) {
+//        self.buyOrder = order
+//    }
+//
+//    func description() -> String {
+//        return "BTS-Buy - \(buyOrder.id) - \(status) - Price: \(buyOrder.price!) - Qty: \(buyOrder.quantity)"
+//    }
 }

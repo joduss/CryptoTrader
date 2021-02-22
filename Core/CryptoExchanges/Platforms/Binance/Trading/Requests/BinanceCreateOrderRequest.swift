@@ -1,7 +1,7 @@
 import Foundation
 
 struct BinanceCreateOrderRequest: BinanceApiRequest {
-    typealias Response = BinanceCreateOrderAckResponse
+    typealias Response = BinanceCreateOrderFullResponse
 
     let security: BinanceRequestSecurity = .signed
     let method: HttpMethod = .post
@@ -10,16 +10,18 @@ struct BinanceCreateOrderRequest: BinanceApiRequest {
     // MARK: Order data
     
     let symbol: CryptoSymbol
-    let quantity: Double
+    let quantity: Double?
     let id: String
     let side: OrderSide
     let type: OrderType
     
+    var value: Double?
     var price: Double?
     var stopPrice: Double?
     
     
-    init(symbol: CryptoSymbol, side: OrderSide, type: OrderType, qty: Double, id: String) {
+    init(symbol: CryptoSymbol, side: OrderSide, type: OrderType, id: String,
+         qty: Double? = nil, price: Double? = nil, value: Double? = nil) {
         self.symbol = symbol
         self.quantity = qty
         self.id = id
@@ -28,21 +30,35 @@ struct BinanceCreateOrderRequest: BinanceApiRequest {
     }
     
     var queryItems: [URLQueryItem]? {
+        
+        let qtyFormatter = NumberFormatter()
+        qtyFormatter.maximumFractionDigits = 8
+        
+        let priceFormatter = NumberFormatter()
+        priceFormatter.maximumFractionDigits = 2
+        
         var items = [
             URLQueryItem(name: "symbol", value: BinanceSymbolConverter.convert(symbol)),
             URLQueryItem(name: "newClientOrderId", value: id),
-            URLQueryItem(name: "quantity", value: "\(quantity)"),
             URLQueryItem(name: "side", value: "\(BinanceOrderSideConverter.convert(side))"),
             URLQueryItem(name: "type", value: "\(BinanceOrderTypeConverter.convert(type: type))"),
-            URLQueryItem(name: "newOrderRespType", value: "ACK")
+            URLQueryItem(name: "newOrderRespType", value: "FULL")
         ]
         
         if let price = self.price, self.type != .market {
-            items.append(URLQueryItem(name: "price", value: "\(price)"))
+            items.append(URLQueryItem(name: "price", value: priceFormatter.string(from: price)))
+        }
+        
+        if let quantity = self.quantity {
+            items.append(URLQueryItem(name: "quantity", value: qtyFormatter.string(from: quantity)))
+        }
+        
+        if let value = self.value {
+            items.append(URLQueryItem(name: "quoteOrderQty", value: qtyFormatter.string(from: value)))
         }
         
         if let stopPrice = self.stopPrice {
-            items.append(URLQueryItem(name: "stopPrice", value: "\(stopPrice)"))
+            items.append(URLQueryItem(name: "stopPrice", value: priceFormatter.string(from: stopPrice)))
         }
         
         if self.type != .market {

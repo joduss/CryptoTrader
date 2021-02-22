@@ -52,12 +52,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/market-10-trades-migrated.trades&quot;"
-            isEnabled = "NO">
+            argument = "--btc_usd --simulate &quot;//Users/jonathanduss/Documents/Data Mining/Backups/btc-current/btc.tickers&quot;"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/Backups/btc-08-02-2021/merged.tickers&quot;"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
