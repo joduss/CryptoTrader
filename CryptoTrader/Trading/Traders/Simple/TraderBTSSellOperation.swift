@@ -1,9 +1,9 @@
 import Foundation
 
 
-class TraderBTSSellOperation: CustomStringConvertible {
+class TraderBTSSellOperation: CustomStringConvertible, Codable {
     
-    let uuid = UUID().uuidString.truncate(length: 5)
+    let uuid: String
     
     // If the price goes below the stop-loss-price, a market order is executed.
     var stopLossPrice: Double = 0
@@ -17,6 +17,7 @@ class TraderBTSSellOperation: CustomStringConvertible {
     private(set) var closingTrade: TraderBTSTrade?
 
     init(trade: TraderBTSTrade) {
+        uuid = UUID().uuidString.truncate(length: 5)
         self.initialTrade = trade
     }
     

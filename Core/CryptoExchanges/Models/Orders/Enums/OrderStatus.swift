@@ -1,7 +1,7 @@
 import Foundation
 
 
-enum OrderStatus {
+enum OrderStatus: String, Codable {
     case new
     case partiallyFilled
     case filled

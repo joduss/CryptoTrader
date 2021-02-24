@@ -1,6 +1,6 @@
 import Foundation
 
-struct TraderBTSTrade {
+struct TraderBTSTrade: Codable {
     
     var price: Double
     var quantity: Double
