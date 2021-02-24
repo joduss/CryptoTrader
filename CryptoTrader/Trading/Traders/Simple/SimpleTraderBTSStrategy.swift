@@ -3,7 +3,7 @@ import Foundation
 
 class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
-    private let config: SimpleTraderStrategyConfiguration
+    private let config: TraderBTSStrategyConfiguration
     private let marketAnalyzer: MarketPerSecondHistory = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(6))
     private let symbol: CryptoSymbol
     

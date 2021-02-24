@@ -31,7 +31,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     init(client: ExchangeClient, initialBalance: Double, currentBalance: Double, maxOrderCount: Int) {
         self.client = client
         
-        var config = SimpleTraderStrategyConfiguration()
+        var config = TraderBTSStrategyConfiguration()
         config.maxOrdersCount = maxOrderCount
         
         self.strategy = SimpleTraderBTSStrategy(exchange: client,

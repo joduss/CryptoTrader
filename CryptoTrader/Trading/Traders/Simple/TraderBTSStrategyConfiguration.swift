@@ -1,7 +1,7 @@
 import Foundation
 
 
-struct SimpleTraderStrategyConfiguration {
+struct TraderBTSStrategyConfiguration {
     
     var maxOrdersCount: Int = 9
     

@@ -224,7 +224,7 @@
 		6BCA377A25C5D30400B58E3C /* FileMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA377925C5D30400B58E3C /* FileMerger.swift */; };
 		6BCCFBB225E0377A0098E769 /* TraderBTSBuyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBB125E0377A0098E769 /* TraderBTSBuyOperation.swift */; };
 		6BCCFBB825E037890098E769 /* TraderBTSSellOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */; };
-		6BCCFBD625E03D7A0098E769 /* SimpleTraderStrategyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBD525E03D7A0098E769 /* SimpleTraderStrategyConfiguration.swift */; };
+		6BCCFBD625E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */; };
 		6BCCFBDC25E043490098E769 /* TraderBTSExecutedBuyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBDB25E043490098E769 /* TraderBTSExecutedBuyOperation.swift */; };
 		6BCCFBE625E108E30098E769 /* TraderBTSTrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */; };
 		6BD2A46925D6F1770035073B /* BinanceUserDataStreamExecutionOrderResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2BF71A25CF6DD400C82350 /* BinanceUserDataStreamExecutionOrderResponse.swift */; };
@@ -384,7 +384,7 @@
 		6BCA377925C5D30400B58E3C /* FileMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMerger.swift; sourceTree = "<group>"; };
 		6BCCFBB125E0377A0098E769 /* TraderBTSBuyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSBuyOperation.swift; sourceTree = "<group>"; };
 		6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSSellOperation.swift; sourceTree = "<group>"; };
-		6BCCFBD525E03D7A0098E769 /* SimpleTraderStrategyConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleTraderStrategyConfiguration.swift; sourceTree = "<group>"; };
+		6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSStrategyConfiguration.swift; sourceTree = "<group>"; };
 		6BCCFBDB25E043490098E769 /* TraderBTSExecutedBuyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSExecutedBuyOperation.swift; sourceTree = "<group>"; };
 		6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSTrade.swift; sourceTree = "<group>"; };
 		6BD322E725CA071600FDDFD4 /* CryptoPreprocessor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CryptoPreprocessor; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -458,10 +458,10 @@
 				6B1373F525DAF6FA0061CBBE /* SimpleTraderBTSStrategy.swift */,
 				6BCCFBB125E0377A0098E769 /* TraderBTSBuyOperation.swift */,
 				6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */,
-				6BCCFBD525E03D7A0098E769 /* SimpleTraderStrategyConfiguration.swift */,
 				6BCCFBDB25E043490098E769 /* TraderBTSExecutedBuyOperation.swift */,
 				6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */,
 				6B598DD625E4337C00D483F4 /* TraderBTSIdGenerator.swift */,
+				6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */,
 			);
 			path = Simple;
 			sourceTree = "<group>";
@@ -1022,7 +1022,7 @@
 				6BA6B49925D081D900D53521 /* BinanceApiUrls.swift in Sources */,
 				6BCCFBB225E0377A0098E769 /* TraderBTSBuyOperation.swift in Sources */,
 				6BEE163625BDA949002E2DC6 /* SimulatedExchangePlatform.swift in Sources */,
-				6BCCFBD625E03D7A0098E769 /* SimpleTraderStrategyConfiguration.swift in Sources */,
+				6BCCFBD625E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift in Sources */,
 				6BA1C53925B4D6FA00ECEB5F /* KrakenTickerResponse.swift in Sources */,
 				6BAC335A25E448640066D080 /* CreatedOrder.swift in Sources */,
 				6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */,
