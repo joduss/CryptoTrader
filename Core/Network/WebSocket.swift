@@ -23,6 +23,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     private let url: URL
     private var webSocketTask: URLSessionWebSocketTask!
     private var session: URLSession!
+    private var timer: Timer?
     
     public var delegate: WebSocketDelegate?
     public var pingInterval: Double = 120
@@ -61,6 +62,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
                 sourcePrint("Error when sending PING \(error)")
                 onCompleted?(false)
                 strongSelf.delegate?.error()
+                self?.timer?.invalidate()
             } else {
                 sourcePrint("Web Socket connection is alive")
                 onCompleted?(true)
@@ -69,6 +71,16 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
                 }
             }
         }
+    }
+    
+    private func setupPingTimer() {
+        self.timer?.invalidate()
+        
+        self.timer = Timer(timeInterval: TimeInterval.fromMinutes(2), repeats: true, block: { [weak self] _ in
+            self?.ping()
+        })
+        
+        self.timer?.fire()
     }
     
     // MARK : Communication
@@ -110,22 +122,25 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         sourcePrint("Web Socket did connect")
-        ping()
+        setupPingTimer()
         receive()
     }
     
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         sourcePrint("Web socket did close")
+        self.timer?.invalidate()
         delegate?.didClose()
     }
     
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         sourcePrint("URL Session invalid with error \(String(describing: error))")
+        self.timer?.invalidate()
         delegate?.error()
     }
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         sourcePrint("Completed with error \(String(describing: error))")
+        self.timer?.invalidate()
         delegate?.error()
     }
     
