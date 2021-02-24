@@ -9,7 +9,6 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     
     private var decisionCount = 0
     
-//    private let orderSemaphore = DispatchSemaphore(1)
     private let updateProcessSemaphore = DispatchSemaphore(value: 1)
     private let isUpdatingVariableSemaphore = DispatchSemaphore(value: 1)
     private var _isUpdating = false
@@ -41,10 +40,10 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         
         
         self.client.marketStream.marketDataStreamSubscriber = self
-        self.client.userDataStream.userDataStreamSubscriber = self
+//        self.client.userDataStream.userDataStreamSubscriber = self
         
         self.client.marketStream.subscribeToTickerStream()
-        self.client.userDataStream.subscribeUserDataStream()
+//        self.client.userDataStream.subscribeUserDataStream()
     }
     
     func updated(order: OrderExecutionReport) {
