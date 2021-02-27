@@ -52,12 +52,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;//Users/jonathanduss/Documents/Data Mining/Backups/btc-current/btc.tickers&quot;"
+            argument = "simulate --btc_usd -b 101 -c 10 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/Backups/btc-current/btc.tickers&quot;"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--btc_usd --simulate &quot;/Users/jonathanduss/Documents/Data Mining/Backups/btc-08-02-2021/merged.tickers&quot;"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

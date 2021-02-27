@@ -1,18 +1,17 @@
 import Foundation
 
 class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSubscriber {
-    
-    var client : ExchangeClient
-    
+
+    var client: ExchangeClient
     var profits: Double = 0
     var strategy: SimpleTraderStrategy
-    
-    private var decisionCount = 0
-    
+
+
     private let updateProcessSemaphore = DispatchSemaphore(value: 1)
     private let isUpdatingVariableSemaphore = DispatchSemaphore(value: 1)
+    private var decisionCount = 0
     private var _isUpdating = false
-    
+
     private var isUpdating: Bool {
         get {
             isUpdatingVariableSemaphore.wait()
@@ -26,38 +25,48 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
             isUpdatingVariableSemaphore.signal()
         }
     }
-    
-    init(client: ExchangeClient, initialBalance: Double, currentBalance: Double, maxOrderCount: Int) {
+
+    init(client: ExchangeClient, strategy: SimpleTraderStrategy) {
         self.client = client
-        
-        var config = TraderBTSStrategyConfiguration()
-        config.maxOrdersCount = maxOrderCount
-        
-        self.strategy = SimpleTraderBTSStrategy(exchange: client,
-                                                config: config,
-                                                initialBalance: initialBalance,
-                                                currentBalance: currentBalance)
-        
-        
+        self.strategy = strategy
+
         self.client.marketStream.marketDataStreamSubscriber = self
-//        self.client.userDataStream.userDataStreamSubscriber = self
-        
+        //        self.client.userDataStream.userDataStreamSubscriber = self
+
         self.client.marketStream.subscribeToTickerStream()
-//        self.client.userDataStream.subscribeUserDataStream()
+        //        self.client.userDataStream.subscribeUserDataStream()
+    }
+
+    // MARK: - Commands
+    // =================================================================
+    
+    func buyNow() {
+        strategy.buyNow()
     }
     
+    func sellAll(profits: Percent) {
+        strategy.sellAll(profit: Percent(2))
+    }
+    
+    func summary() {
+        strategy.summary()
+    }
+
+    // MARK: - Exchange events processing
+    // =================================================================
+
     func updated(order: OrderExecutionReport) {
         updateProcessSemaphore.wait()
         isUpdating = true
 
         strategy.update(report: order)
-        
+
         isUpdating = false
         updateProcessSemaphore.signal()
     }
-    
+
     func process(ticker: MarketTicker) {
-        
+
         if isUpdating {
             return
         }
@@ -66,21 +75,21 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         isUpdating = true
 
         decisionCount += 1
-        
+
         if decisionCount % 200 == 0 {
             sourcePrint("Decision for bid price \(ticker.bidPrice) / ask price \(ticker.askPrice)")
         }
-        
+
         strategy.updateBid(price: ticker.bidPrice)
         strategy.updateAsk(price: ticker.askPrice)
-        
+
         isUpdating = false
         updateProcessSemaphore.signal()
     }
-    
+
     func process(trade: MarketAggregatedTrade) {
-        
+
     }
-    
-    func process(depthUpdate: MarketDepth) { }
+
+    func process(depthUpdate: MarketDepth) {}
 }

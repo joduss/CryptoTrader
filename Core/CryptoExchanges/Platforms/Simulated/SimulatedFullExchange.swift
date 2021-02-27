@@ -292,7 +292,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 originalQty: quantity,
                 executedQty: quantity,
                 cummulativeQuoteQty: value,
-                status: .new,
+                status: .filled,
                 type: order.type,
                 side: order.side,
                 time: DateFactory.now
@@ -319,7 +319,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 originalQty: qty,
                 executedQty: qty,
                 cummulativeQuoteQty: value,
-                status: .new,
+                status: .filled,
                 type: order.type,
                 side: order.side,
                 time: DateFactory.now
@@ -332,7 +332,6 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         
         
         fatalError("Not handled")
-        
     }
     
 }

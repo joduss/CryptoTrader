@@ -7,7 +7,14 @@ struct ExchangeOrderUpdate {
 
 protocol SimpleTraderStrategy {
     
+    func buyNow()
+    
+    /// Put sell orders with a given profit in percent.
+    func sellAll(profit: Percent)
+
     func update(report: OrderExecutionReport)
     func updateAsk(price: Double)
     func updateBid(price: Double)
+    
+    func summary()
 }
