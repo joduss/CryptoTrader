@@ -232,6 +232,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         /// There are 2h of statistic availables
         /// We usually want to create order "STOP-LOSS BUY", which we update if the price continues to go down,
         /// at least if there is a clear downward trend.
+        guard price != self.currentAskPrice else { return }
+
 
         self.currentAskPrice = price
         marketAnalyzer.record(DatedPrice(price: price, date: DateFactory.now))
@@ -239,6 +241,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         if openBTSBuyOperation == nil && currentBalance < orderValue {
             return
         }
+        
+        // TODO: Special buy when there is a huge dip
 
         // Locking
         if locked {
@@ -265,93 +269,88 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             }
             return
         }
+        
+        
+        let closestAboveBuyPrice = self.closestAboveOrder(to: price)?.initialTrade.price
+        let closestBelowBuyPrice = self.closestBelowOrder(to: price)?.initialTrade.price
 
-        // Decide for a new buy prep
-        if let closestOrder = self.closestOrder(to: price) {
-
-            if price == closestOrder.initialTrade.price {
-                return
-            }
-
-            // If case of a decrease, it must be large enough to consider bying again
-            if price < closestOrder.initialTrade.price
-                && Percent(differenceOf: price, from: closestOrder.initialTrade.price)
-                    > config.minDistancePercentNegative
-            {
-                return
-            }
-
-            // Same when increasing, but less
-            if price > closestOrder.initialTrade.price
-                && Percent(differenceOf: price, from: closestOrder.initialTrade.price)
-                    < config.minDistancePercentPositive
-            {
-                return
-            }
-
-
-            guard let lastBuyOrderPrice = lastBuyPrice else {
-                sourcePrint(
-                    "DEBUG: This should be investigated: 'guard let lastBuyOrderPrice = lastBuyPrice!' was false"
-                )
-                return
-            }
-
-            if lastBuyOrderPrice < price {
-                // Compared to last buy, the price went quite up.
-                // We want to buy and see what will happen. Hopefully stil going up to we can sell at a even higher price
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) > config.buyNextBuyOrderPercent {
-                    updateBuyOperation()
-                    return
-                }
-            } else {
-                // Compared to last buy, the price went down.
-                if openBTSSellOperations.filter({
-                    $0.initialTrade.price > price && DateFactory.now - $0.initialTrade.date < TimeInterval.fromHours(2)
-                }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2)).isTrendDownwards(threshold: 0.2)
-                {
-                    // We pause for 2h or 3%
-                    self.locked = true
-                    return
-                }
-
-                if let lastOpenPrice = openBTSSellOperations.last?.initialTrade.price {
-                    if Percent(differenceOf: price, from: lastOpenPrice) < 2.0 {
-                        updateBuyOperation()
-                        return
-                    }
-                }
-
-                // Big drop in short time => we jump on it!
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) < Percent(-2)
-                    && DateFactory.now - lastBuyOrder!.initialTrade.date < TimeInterval.fromMinutes(5)
-                {
-                    updateBuyOperation()
-                    return
-                }
-                // Small slow decrease
-                if Percent(differenceOf: price, from: lastBuyOrderPrice) < Percent(-1)
-                    && DateFactory.now - lastBuyOrder!.initialTrade.date > TimeInterval.fromMinutes(60)
-                {
-                    updateBuyOperation()
-                    return
-                }
-
-                // We sold and the price went down. So we buy again
-                guard let lastClosedOrderPrice = lastClosedOperation?.initialTrade.price else { return }
-                guard let lastOpenedOrderPrice = lastBuyPrice else { return }
-
-                if price < lastClosedOrderPrice && lastOpenedOrderPrice > lastClosedOrderPrice {
-                    updateBuyOperation()
-                    return
-                }
-            }
-
+        if closestAboveBuyPrice == nil && closestBelowBuyPrice == nil {
             updateBuyOperation()
             return
         }
+        
+        // Check if the current price is not too close of another order
+        // made at a higher price
+        if let abovePrice = closestAboveBuyPrice,
+           Percent(differenceOf: price, from: abovePrice) > config.minDistancePercentNegative {
+            return
+        }
+        
+        // Check if the current price is not too close of another order made at a lower price
+        if let belowPrice = closestBelowBuyPrice,
+           Percent(differenceOf: price, from: belowPrice) < config.minDistancePercentPositive {
+            return
+        }
 
-        updateBuyOperation()
+        
+        if let belowPrice = closestBelowBuyPrice, closestAboveBuyPrice == nil {
+            // Compared to last buys, the price went quite up.
+            // We want to buy and see what will happen. Hopefully stil going up to we can sell at a even higher price
+            if Percent(differenceOf: price, from: belowPrice) > config.minDistancePercentPositive {
+                updateBuyOperation()
+                return
+            }
+        }
+        
+        
+        if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
+
+            // Compared to last buy, the price went down.
+            if openBTSSellOperations.filter({
+                $0.initialTrade.price > price && DateFactory.now - $0.initialTrade.date < TimeInterval.fromHours(2)
+            }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2)).isTrendDownwards(threshold: 0.2)
+            {
+                // We pause for 2h or 3%
+                self.locked = true
+                return
+            }
+            
+            if let lastOpenPrice = openBTSSellOperations.last?.initialTrade.price {
+                if Percent(differenceOf: price, from: lastOpenPrice) < 2.0 {
+                    updateBuyOperation()
+                    return
+                }
+            }
+            
+            // Big drop in short time => we jump on it!
+            if Percent(differenceOf: price, from: abovePrice) < Percent(-2)
+                && DateFactory.now - lastBuyOrder!.initialTrade.date < TimeInterval.fromMinutes(5)
+            {
+                updateBuyOperation()
+                return
+            }
+            // Small slow decrease
+            if Percent(differenceOf: price, from: abovePrice) < Percent(-1)
+                && DateFactory.now - lastBuyOrder!.initialTrade.date > TimeInterval.fromMinutes(60)
+            {
+                updateBuyOperation()
+                return
+            }
+            
+            // We sold and the price went down. So we buy again
+            guard let lastClosedOrderPrice = lastClosedOperation?.initialTrade.price else { return }
+            guard let lastOpenedOrderPrice = lastBuyPrice else { return }
+            
+            if price < lastClosedOrderPrice && lastOpenedOrderPrice > lastClosedOrderPrice {
+                updateBuyOperation()
+                return
+            }
+        }
+        
+        
+        // we can still be in the middle
+        
+        return
     }
 
     private func updateBuyOperation() {
@@ -410,7 +409,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                     )
                     self.currentBalance -= order.cummulativeQuoteQty
                     self.openBTSSellOperations.append(TraderBTSSellOperation(trade: trade))
-                    sourcePrint("Successfully bought \(order.originalQty)@\(order.price) (\(order.status)")
+                    sourcePrint("Successfully bought \(order.originalQty)@\(order.price) (\(order.status))")
                 }
                 semaphore.signal()
             }
@@ -426,6 +425,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
 
     func updateBid(price: Double) {
+        guard price != self.currentBidPrice else { return }
+        
         self.currentBidPrice = price
 
         for operation in openBTSSellOperations {
@@ -449,26 +450,20 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             // Otherwise, we don't update, the price isn't gone up enough for that.
             return
         }
-
-        saveState()
-
     }
 
     func createStopLoss(operation: TraderBTSSellOperation, price: Double) {
 
         // If the price is higher than the upper limit, we update the stop-loss sell price.
 
-        var lowLimitPercentDrop: Percent =
-            Percent(differenceOf: price, from: operation.initialTrade.price) - config.sellStopLossProfitPercent // config.sellLowerLimitDivisor
+        let stopLossPrice: Percent =
+            Percent(differenceOf: price, from: operation.initialTrade.price) - config.sellStopLossProfitPercent
 
-//        if lowLimitPercentDrop > config.sellStopLossProfitPercent {
-//            lowLimitPercentDrop = config.sellStopLossProfitPercent
-//        }
-        if lowLimitPercentDrop < config.sellMinProfitPercent {
+        if stopLossPrice < config.sellMinProfitPercent {
             return
         }
 
-        operation.stopLossPrice = price -% lowLimitPercentDrop
+        operation.stopLossPrice = price -% stopLossPrice
         operation.updateWhenAbovePrice = price +% config.sellUpdateStopLossProfitPercent
         self.saveState()
 
@@ -546,6 +541,46 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         return closest
     }
 
+    /// Returns the closest sell operation whose buy price is higher or equal than the current price.
+    private func closestAboveOrder(to price: Double) -> TraderBTSSellOperation? {
+        var diff = Double.greatestFiniteMagnitude
+        var closest: TraderBTSSellOperation?
+        
+        for otherOrder in self.openBTSSellOperations {
+            guard otherOrder.initialTrade.price >= price else { continue }
+            
+            let currentDiff = abs(otherOrder.initialTrade.price - price)
+            if currentDiff < diff {
+                diff = currentDiff
+                closest = otherOrder
+            }
+        }
+        
+        return closest
+    }
+    
+    /// Returns the closest sell operation whose buy price is lower or equal than the current price.
+    private func closestBelowOrder(to price: Double) -> TraderBTSSellOperation? {
+        var diff = Double.greatestFiniteMagnitude
+        var closest: TraderBTSSellOperation?
+        
+        for otherOrder in self.openBTSSellOperations {
+            guard otherOrder.initialTrade.price <= price else { continue }
+
+            let currentDiff = abs(otherOrder.initialTrade.price - price)
+            if currentDiff < diff {
+                diff = currentDiff
+                closest = otherOrder
+            }
+        }
+        
+        return closest
+    }
+    
+    
+    // MARK: - Information Display
+    // =================================================================
+    
     func summary() {
         let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1)).average()
         let coins: Double = openBTSSellOperations.reduce(
@@ -566,7 +601,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         print("\nExecuted operations.")
         print("\n----------------------")
         for closeOrder in self.closedBTSSellOperations {
-            print(closeOrder.description(currentPrice: currentPrice))
+            print(closeOrder.description)
             print("---")
         }
 

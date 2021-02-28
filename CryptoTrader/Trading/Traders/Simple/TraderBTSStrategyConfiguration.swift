@@ -14,9 +14,6 @@ struct TraderBTSStrategyConfiguration {
     /// Update the stop-loss order if the price goes lower than X% below the current price
     let buyUpdateStopLossPercent: Percent = 0.7
     
-    /// If the price goes up and up, then we might place another order to buy even more even thought we didn't
-    /// sell yet what we previously bought.
-    let buyNextBuyOrderPercent = 1.0
     
     // Selling
 
