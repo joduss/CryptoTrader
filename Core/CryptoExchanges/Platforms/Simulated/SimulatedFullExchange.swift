@@ -29,10 +29,12 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     func start() {
         DateFactory.simulated = true
 
-        for ticker in tickers {
-            currentTicker = ticker
-            onNewTicker(ticker)
-        }
+        self.tickers.withUnsafeBufferPointer({ unsafeTickers in
+            for ticker in unsafeTickers {
+                currentTicker = ticker
+                onNewTicker(ticker)
+            }
+        })
     }
 
     private func onNewTicker(_ ticker: MarketTicker) {
