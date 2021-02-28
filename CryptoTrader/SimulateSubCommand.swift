@@ -1,7 +1,6 @@
 import Foundation
 import ArgumentParser
 import JoLibrary
-import ZippyJSON
 
 extension TraderMain {
     

@@ -194,7 +194,6 @@
 		6B9F8F3B25E6E5DE0046FC39 /* TraderBTSSavedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9F8F3A25E6E5DE0046FC39 /* TraderBTSSavedState.swift */; };
 		6B9F8F5D25EA53320046FC39 /* SimulateSubCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9F8F5C25EA53320046FC39 /* SimulateSubCommand.swift */; };
 		6B9F8F6325EA53860046FC39 /* TradeSubCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9F8F6225EA53860046FC39 /* TradeSubCommand.swift */; };
-		6B9F8F8625EACDE00046FC39 /* ZippyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 6B9F8F8525EACDE00046FC39 /* ZippyJSON */; };
 		6B9F8F9025EB972D0046FC39 /* NumbersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9F8F8F25EB972D0046FC39 /* NumbersExtensions.swift */; };
 		6BA1C53925B4D6FA00ECEB5F /* KrakenTickerResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA1C53825B4D6FA00ECEB5F /* KrakenTickerResponse.swift */; };
 		6BA1C53D25B4D75300ECEB5F /* MixedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA1C53C25B4D75300ECEB5F /* MixedArray.swift */; };
@@ -417,7 +416,6 @@
 			files = (
 				6B8D17BE25B745360021B64E /* ArgumentParser in Frameworks */,
 				6B5600E225AE0D05002F8CE1 /* JoLibrary in Frameworks */,
-				6B9F8F8625EACDE00046FC39 /* ZippyJSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -877,7 +875,6 @@
 			packageProductDependencies = (
 				6B5600E125AE0D05002F8CE1 /* JoLibrary */,
 				6B8D17BD25B745360021B64E /* ArgumentParser */,
-				6B9F8F8525EACDE00046FC39 /* ZippyJSON */,
 			);
 			productName = Trader2;
 			productReference = 6B48DAD125A9F6BA00F2CD6D /* CryptoTrader */;
@@ -981,7 +978,6 @@
 			packageReferences = (
 				6B5600E025AE0D05002F8CE1 /* XCRemoteSwiftPackageReference "JoLibrary" */,
 				6B8D17BC25B745360021B64E /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
-				6B9F8F8425EACDE00046FC39 /* XCRemoteSwiftPackageReference "ZippyJSON" */,
 			);
 			productRefGroup = 6B48DAD225A9F6BA00F2CD6D /* Products */;
 			projectDirPath = "";
@@ -1610,14 +1606,6 @@
 				minimumVersion = 0.3.2;
 			};
 		};
-		6B9F8F8425EACDE00046FC39 /* XCRemoteSwiftPackageReference "ZippyJSON" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/michaeleisel/ZippyJSON";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.2;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1640,11 +1628,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6B8D17BC25B745360021B64E /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
 			productName = ArgumentParser;
-		};
-		6B9F8F8525EACDE00046FC39 /* ZippyJSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6B9F8F8425EACDE00046FC39 /* XCRemoteSwiftPackageReference "ZippyJSON" */;
-			productName = ZippyJSON;
 		};
 		6BD322F725CA075100FDDFD4 /* JoLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
