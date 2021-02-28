@@ -13,6 +13,9 @@ struct TraderBTSStrategyConfiguration {
     
     /// Update the stop-loss order if the price goes lower than X% below the current price
     let buyUpdateStopLossPercent: Percent = 0.7
+        
+    let minDistancePercentNegative: Percent = -1.3
+    let minDistancePercentPositive: Percent = 0.71
     
     
     // Selling
@@ -26,14 +29,11 @@ struct TraderBTSStrategyConfiguration {
     let sellUpdateStopLossProfitPercent: Percent = 0.35
     
     // For very small profits.
-    let sellLowerLimitDivisor = 4.0
+//    let sellLowerLimitDivisor = 4.0
     
     /// Minimum lower limit compared to initial price at which we sell.
     let sellMinProfitPercent: Percent = 0.25
     
     
-    // Defines
-    
-    let minDistancePercentNegative: Percent = -1.0
-    let minDistancePercentPositive: Percent = 0.7
+
 }
