@@ -1,6 +1,6 @@
 import Foundation
 
-final class MarketPerSecondHistory: MarketHistorySlice {
+final class MarketAggregatedHistory: MarketHistorySlice {
     
     private let intervalToKeep: TimeInterval
     
@@ -8,11 +8,13 @@ final class MarketPerSecondHistory: MarketHistorySlice {
     
     private var currentTrade: DatedPrice? = nil
     private var currentTradeAggregationCount = 0.0
+    private var aggregationPeriod: TimeInterval
     
-    init(intervalToKeep: TimeInterval) {
+    init(intervalToKeep: TimeInterval, aggregationPeriod: TimeInterval = 1) {
         self.intervalToKeep = intervalToKeep
+        self.aggregationPeriod = aggregationPeriod
         super.init(prices: ArraySlice<DatedPrice>())
-        self.prices.reserveCapacity(100000)
+        self.prices.reserveCapacity(1000000)
     }
     
     /// Add a record to the market history.
@@ -25,7 +27,7 @@ final class MarketPerSecondHistory: MarketHistorySlice {
             return
         }
         
-        if newTrade.date - currentTrade.date > 1 {
+        if newTrade.date - currentTrade.date > aggregationPeriod {
             prices.append(currentTrade)
             self.currentTrade = newTrade
             currentTradeAggregationCount = 1

@@ -33,7 +33,7 @@ final class SimulationTrader: ExchangeMarketDataStreamSubscriber {
     
 
     
-    let marketAnalyzer = MarketPerSecondHistory(intervalToKeep: TimeInterval.fromHours(2.01))
+    let marketAnalyzer = MarketAggregatedHistory(intervalToKeep: TimeInterval.fromHours(2.01))
     var api : ExchangeMarketDataStream
     
     var orderSize: Double = 25

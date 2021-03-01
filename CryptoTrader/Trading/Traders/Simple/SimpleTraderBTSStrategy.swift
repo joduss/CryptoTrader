@@ -5,8 +5,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     var saveEnabled = true
 
     private let config: TraderBTSStrategyConfiguration
-    private let marketAnalyzer: MarketPerSecondHistory = MarketPerSecondHistory(
-        intervalToKeep: TimeInterval.fromHours(6)
+    private let marketAnalyzer: MarketAggregatedHistory = MarketAggregatedHistory(
+        intervalToKeep: TimeInterval.fromHours(12), aggregationPeriod: TimeInterval.fromMinutes(1)
     )
     private let symbol: CryptoSymbol
 
