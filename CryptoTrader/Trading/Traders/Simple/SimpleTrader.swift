@@ -5,6 +5,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     var client: ExchangeClient
     var profits: Double = 0
     var strategy: SimpleTraderStrategy
+    var printCurrentPrice = true
 
 
     private let updateProcessSemaphore = DispatchSemaphore(value: 1)
@@ -76,7 +77,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
 
         decisionCount += 1
 
-        if decisionCount % 200 == 0 {
+        if printCurrentPrice && decisionCount % 200 == 0 {
             sourcePrint("Decision for bid price \(ticker.bidPrice) / ask price \(ticker.askPrice)")
         }
 
