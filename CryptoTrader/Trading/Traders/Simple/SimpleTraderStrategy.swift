@@ -16,5 +16,5 @@ protocol SimpleTraderStrategy {
     func updateAsk(price: Double)
     func updateBid(price: Double)
     
-    func summary()
+    func summary() -> String
 }
