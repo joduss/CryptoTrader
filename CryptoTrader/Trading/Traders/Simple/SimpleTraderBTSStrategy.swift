@@ -248,6 +248,19 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         }
         
         // TODO: Special buy when there is a huge dip
+        
+        // Try to check if creating a special stop loss sell is helpful.
+        if let lastClosedSell = self.lastClosedOperation,
+           let lastBuyOrder = self.lastBuyOrder,
+           lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
+           DateFactory.now - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
+        
+            if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
+                sourcePrint("Buying target price below last sell!")
+                buy(TraderBTSBuyOperation())
+                return
+            }
+        }
 
         // Locking
         if let locked = self.locked {
