@@ -242,6 +242,8 @@ extension MarketHistorySlice {
 
         if let endDate = endDate {
             let endIdx = findSortedIdx(dateAtMax: endDate)!
+            if endIdx <= startIdx { return MarketHistorySlice(prices: ArraySlice<DatedPrice>())}
+            
             return MarketHistorySlice(prices: self.prices[startIdx..<endIdx])
         }
         else {
