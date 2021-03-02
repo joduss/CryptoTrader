@@ -120,18 +120,35 @@ struct BinanceCreateOrderFullResponse: Decodable {
             orderPriceAvg = cummulativeQuoteQty / originalQty
         }
         
-        return CreatedOrder(
-            symbol: symbol,
-            platformOrderId: platformOrderId,
-            clientOrderId: clientOrderId,
-            price: orderPriceAvg,
-            originalQty: originalQty,
-            executedQty: executedQty,
-            cummulativeQuoteQty: cummulativeQuoteQty,
-            status: status,
-            type: type,
-            side: side,
-            time: time
-        )
+        if side == .buy {
+            return CreatedOrder(
+                symbol: symbol,
+                platformOrderId: platformOrderId,
+                clientOrderId: clientOrderId,
+                price: orderPriceAvg,
+                originalQty: originalQty,
+                executedQty: executedQty,
+                cummulativeQuoteQty: cummulativeQuoteQty +% 0.1, // Fee
+                status: status,
+                type: type,
+                side: side,
+                time: time
+            )
+        }
+        else {
+            return CreatedOrder(
+                symbol: symbol,
+                platformOrderId: platformOrderId,
+                clientOrderId: clientOrderId,
+                price: orderPriceAvg,
+                originalQty: originalQty,
+                executedQty: executedQty,
+                cummulativeQuoteQty: cummulativeQuoteQty -% Percent(0.1), // Fee
+                status: status,
+                type: type,
+                side: side,
+                time: time
+            )
+        }
     }
 }
