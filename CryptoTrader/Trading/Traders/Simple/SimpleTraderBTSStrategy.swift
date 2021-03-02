@@ -30,7 +30,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var orderValue: Double = 0
     private var exchange: ExchangeClient
 
-    private var locked = false
+    private var locked: Date? = nil
     
     private let saveStateLocation: String
     
@@ -250,13 +250,15 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         // TODO: Special buy when there is a huge dip
 
         // Locking
-        if locked {
+        if let locked = self.locked {
+            guard DateFactory.now - locked > TimeInterval.fromMinutes(5) else { return }
 
-            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(1)).isTrendDownwards(threshold: 0.2) {
+            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(6)).isTrendDownwards(threshold: 0.2) {
                 return
             }
 
-            locked = false
+            sourcePrint("Unlocking (price: \(price)")
+            self.locked = nil
         }
 
         // Buy prepared
@@ -309,14 +311,14 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         
         if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
-
             // Compared to last buy, the price went down.
             if openBTSSellOperations.filter({
-                $0.initialTrade.price > price && DateFactory.now - $0.initialTrade.date < TimeInterval.fromHours(2)
+                $0.initialTrade.price > price && DateFactory.now - $0.initialTrade.date < TimeInterval.fromHours(12)
             }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2)).isTrendDownwards(threshold: 0.2)
             {
                 // We pause for 2h or 3%
-                self.locked = true
+                sourcePrint("Locking (price: \(price)")
+                self.locked = DateFactory.now
                 return
             }
             
