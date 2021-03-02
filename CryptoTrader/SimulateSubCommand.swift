@@ -34,24 +34,22 @@ extension TraderMain {
 
 struct SimulateSubCommand {
     
-    private let exchange: SimulatedFullExchange!
-    private let trader: SimpleTrader!
-    
     let symbol: CryptoSymbol
     let initialBalance: Double
     let maxOperationCount: Int
     let saveStateLocation: String
+    
+    let tickers: [MarketTicker]
     
     
     internal init(symbol: CryptoSymbol, initialBalance: Double, maxOperationCount: Int, saveStateLocation: String, tickersLocation: String) throws {
         
         let reader = TextFileReader.openFile(at: tickersLocation)
         var idx = 0
-        let keepEveryNTicker = 5
+        let keepEveryNTicker = 10
         
-        let jsonDecoder = JSONDecoder()
-        var tickers = [MarketTicker]()
-        tickers.reserveCapacity(30000000)
+        var tickersRead = [MarketTicker]()
+        tickersRead.reserveCapacity(50000000)
         
         while true {
             
@@ -82,26 +80,128 @@ struct SimulateSubCommand {
             }
             
             tickers.append(ticker)
+            tickersRead.append(ticker)
         }
+        
+        self.tickers = tickersRead
         
         self.symbol = symbol
         self.initialBalance = initialBalance
         self.maxOperationCount = maxOperationCount
         self.saveStateLocation = saveStateLocation
         
-        exchange = SimulatedFullExchange(symbol: symbol, tickers: tickers)
-        let config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
+        
+        test()
+        return
+        
+//        var shouldContinue = true
+//
+//        repeat {
+//
+//
+//            let exchange = SimulatedFullExchange(symbol: symbol, tickers: tickersRead)
+//            var config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
+//            let strategy = SimpleTraderBTSStrategy(exchange: exchange,
+//                                                   config: config,
+//                                                   initialBalance: initialBalance,
+//                                                   currentBalance: initialBalance,
+//                                                   saveStateLocation: saveStateLocation)
+//            strategy.saveEnabled = false
+//            let trader = SimpleTrader(client: exchange, strategy: strategy)
+//            trader.printCurrentPrice = false
+//
+//            print("################################################################")
+//            print("----------------------------------------------------------------")
+//            print("ANOTHER ROUND OF TEST")
+//            print("----------------------------------------------------------------")
+//            print("----------------------------------------------------------------")
+//
+//            exchange.start()
+//
+//            print("Configuration used: \(config)")
+//            strategy.summary()
+//
+////            print("Continue?")
+////            let a = readLine()
+////            print(a)
+//        } while(shouldContinue)
+    }
+    
+    let testSema = DispatchSemaphore(value: 1)
+    
+    private func test() {
+        
+        var results: [(Double, String)] = []
+        
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 12
+        
+        for maxOrder in [10, 15] {
+            for buyStopLossPercent in [0.1, 0.23, 0.5, 0.7, 1] {
+                for sellStopLossProfitPercent in [0.1, 0.3, 0.5, 0.75, 1] {
+                    for minDistancePercentNegative in [-1.5, -1.2, -0.8, -0.5] {
+                        for minDistancePercentPositive in [0.1, 0.25, 0.5, 0.75, 1] {
+                            for nextBuyTargetPercent in [0.1, 0.25, 0.5] {
+                                for nextBuyTargetExpiration in [30, 60, 120] {
+                                    var config = TraderBTSStrategyConfiguration()
+                                    config.maxOrdersCount = maxOrder
+                                    config.buyStopLossPercent = Percent(buyStopLossPercent)
+                                    config.sellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
+                                    config.minSellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
+                                    config.minDistancePercentPositive = Percent(minDistancePercentPositive)
+                                    config.minDistancePercentNegative = Percent(minDistancePercentNegative)
+                                    config.nextBuyTargetPercent = Percent(nextBuyTargetPercent)
+                                    config.nextBuyTargetExpiration = TimeInterval.fromMinutes(Double(nextBuyTargetExpiration))
+                                                                        
+                                    queue.addOperation {
+                                        let simulationResults = simulate(config: config)
+                                        
+                                        testSema.wait()
+                                        results.append(simulationResults)
+                                        print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                        testSema.signal()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        queue.progress.totalUnitCount = Int64(queue.operationCount)
+        
+//        results.map({r in "########################################" + r.1 + "\(r.0)\n\n\n---------------------------------------------------------------------------"}).joined(separator: "\n").data(using: .utf8)?.write(to: URL(fileURLWithPath: "/Users/jonathanduss/Downloads/2/a4.txt"))
+        
+        queue.waitUntilAllOperationsAreFinished()
+        print(results)
+    }
+    
+    private func simulate(config: TraderBTSStrategyConfiguration) -> (Double, String) {
+        let exchange = SimulatedFullExchange(symbol: symbol, tickers: self.tickers)
         let strategy = SimpleTraderBTSStrategy(exchange: exchange,
                                                config: config,
                                                initialBalance: initialBalance,
                                                currentBalance: initialBalance,
                                                saveStateLocation: saveStateLocation)
         strategy.saveEnabled = false
-        trader = SimpleTrader(client: exchange, strategy: strategy)
-        exchange.start()
+        let trader = SimpleTrader(client: exchange, strategy: strategy)
+        trader.printCurrentPrice = false
         
-        strategy.summary()
+        exchange.start()
+                
+        let description =
+            """
+            CONFIG: \(config)
+
+            \(strategy.summary())
+            """
+        
+        return (strategy.profits, description)
     }
+    
+    
+    
     
     //"{"symbol":"BTCUSDT","id":8611636536,"date":634547549.01567698,"bidQuantity":186.18478599999997,"askPrice":47650.879999999997,"bidPrice":47650.870000000003,"askQuantity":2.9338730000000006}"
     static func parse(line: String) -> MarketTicker {
