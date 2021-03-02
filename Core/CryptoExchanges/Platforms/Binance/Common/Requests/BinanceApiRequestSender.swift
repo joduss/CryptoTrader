@@ -33,6 +33,7 @@ class BinanceApiRequestSender {
         URLSession(configuration: URLSessionConfiguration.ephemeral).dataTask(with: urlRequest) {
             data, response, error in
             if let error = error {
+                sourcePrint("Request error: \(error)")
                 completion(Result.failure(ExchangePlatformError.error(error: error)))
                 return
             }
