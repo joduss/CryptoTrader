@@ -165,7 +165,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 lastExecutedPrice: price,
                 commissionAmount: Percent(0.1) * qty * price,
                 cumulativeQuoteAssetQuantity: (qty * price) -% Percent(0.1),
-                lastQuoteAssetExecutedQuantity: qty * price -% Percent(1 - 0.1)
+                lastQuoteAssetExecutedQuantity: qty * price -% Percent(0.1)
             )
 
             userDataStreamSubscriber?.updated(order: report)
@@ -284,7 +284,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             }
             
             let price = order.side == .buy ? currentTicker.askPrice : currentTicker.bidPrice
-            let value = quantity * price
+            var value = quantity * price
+            value = order.side == .buy ? value +% Percent(0.1) : value -% Percent(0.1)
             
             let createdOrder = CreatedOrder(
                 symbol: order.symbol,
@@ -311,8 +312,10 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             }
             
             let price = order.side == .buy ? currentTicker.askPrice : currentTicker.bidPrice
-            let qty = (value / price) -% Percent(0.1)
+            let qty = (value / price)
             
+            
+
             let createdOrder = CreatedOrder(
                 symbol: order.symbol,
                 platformOrderId: exchangeOrderId,
@@ -320,7 +323,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 price: price,
                 originalQty: qty,
                 executedQty: qty,
-                cummulativeQuoteQty: value,
+                cummulativeQuoteQty: order.side == .buy ? value +% Percent(0.1) : value -% Percent(0.1),
                 status: .filled,
                 type: order.type,
                 side: order.side,
