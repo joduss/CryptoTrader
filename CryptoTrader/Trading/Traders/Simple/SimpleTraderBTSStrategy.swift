@@ -475,15 +475,22 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     func createStopLoss(operation: TraderBTSSellOperation, price: Double) {
 
         // If the price is higher than the upper limit, we update the stop-loss sell price.
-
-        let stopLossPrice: Percent =
+        var stopLossPricePercent: Percent =
             Percent(differenceOf: price, from: operation.initialTrade.price) - config.sellStopLossProfitPercent
 
-        if stopLossPrice < config.sellMinProfitPercent {
-            return
+        var stopLossProfit = config.sellStopLossProfitPercent
+        
+        
+        if stopLossPricePercent < config.sellMinProfitPercent {
+            stopLossPricePercent = Percent(differenceOf: price, from: operation.initialTrade.price) - config.minSellStopLossProfitPercent
+            stopLossProfit = config.minSellStopLossProfitPercent
+            
+            if stopLossPricePercent < config.sellMinProfitPercent {
+                return
+            }
         }
 
-        operation.stopLossPrice = price -% stopLossPrice
+        operation.stopLossPrice = price -% stopLossProfit
         operation.updateWhenAbovePrice = price +% config.sellUpdateStopLossProfitPercent
         self.saveState()
 
