@@ -215,31 +215,36 @@ public struct MarketDepth: Codable {
     }
     
     func adaptivePriceRound(_ priceToRound: Double) -> Double {
-                
-        guard currentPrice != 0 else { return priceToRound}
+        
+        guard currentPrice != 0 else { return priceToRound }
         
         let rangeVeryPrecise = currentPrice / 250 // 120
         let rangePrecise = currentPrice / 100 // 300
         let rangeLessPrecise = currentPrice / 20 // 1500
         let rangeNotPrecise = currentPrice / 5 // 6000
         
+        let significantDigits = 5.0
+        let numberOrder = floor(log10(currentPrice))
+        var orderCorrected = Double(pow(10, 1 + numberOrder - significantDigits))
+        orderCorrected = orderCorrected * currentPrice / pow(10,numberOrder)
+        
         if priceToRound >= currentPrice - rangeVeryPrecise && priceToRound <= currentPrice + rangeVeryPrecise {
-            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 1.0)
+            return roundPrice(priceToRound, roundBase: orderCorrected * 1.0)
         }
         else if priceToRound >= currentPrice - rangePrecise && priceToRound <= currentPrice + rangePrecise {
-            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 5.0)
+            return roundPrice(priceToRound, roundBase: orderCorrected * 5.0)
         }
         else if priceToRound >= currentPrice - rangeLessPrecise && priceToRound <= currentPrice + rangeLessPrecise {
-            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 25.0)
+            return roundPrice(priceToRound, roundBase: orderCorrected * 25.0)
         }
         else if priceToRound >= currentPrice - rangeNotPrecise && priceToRound <= currentPrice + rangeNotPrecise {
-            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 50.0)
+            return roundPrice(priceToRound, roundBase: orderCorrected * 50.0)
         }
         else {
-            return roundPrice(priceToRound, roundBase: round(currentPrice / 10000.0) * 150.0)
+            return roundPrice(priceToRound, roundBase: orderCorrected * 150.0)
         }
     }
-
+    
     /// Round a price to a certain base. If base is 15, then it will ve rounded to a multiple of 15.
     func roundPrice(_ number: Double, roundBase: Double) -> Double {
         return round(number / roundBase) * roundBase
