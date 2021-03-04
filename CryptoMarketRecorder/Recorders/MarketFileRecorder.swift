@@ -43,7 +43,7 @@ final class MarketFileRecorder: MarketRecorder {
         tradesCache.reserveCapacity(savingFrequency)
         depthsCache.reserveCapacity(savingFrequency)
         
-        self.marketStream.subscriber = self
+        self.marketStream.marketDataStreamSubscriber = self
     }
     
     // MARK: Configuration of the recorder
