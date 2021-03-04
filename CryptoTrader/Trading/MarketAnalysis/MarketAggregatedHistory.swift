@@ -14,7 +14,7 @@ final class MarketAggregatedHistory: MarketHistorySlice {
         self.intervalToKeep = intervalToKeep
         self.aggregationPeriod = aggregationPeriod
         super.init(prices: ArraySlice<DatedPrice>())
-        self.prices.reserveCapacity(1000000)
+        self.prices.reserveCapacity(10000000)
     }
     
     /// Add a record to the market history.
@@ -46,24 +46,28 @@ final class MarketAggregatedHistory: MarketHistorySlice {
                     date: currentTrade.date)
             currentTradeAggregationCount += 1
             self.currentTrade = secondAggregatedTrade
-            self.prices.removeLast()
-            self.prices.append(secondAggregatedTrade)
+            self.prices[self.prices.endIndex - 1] = secondAggregatedTrade
         }
     }
     
     /// Remove too old data.
     private func cleanup() {
-        for index in 0..<prices.endIndex {
-            let price = prices[index]
+        self.prices.withUnsafeBufferPointer({
+            unsafePrices in
             
-            if (DateFactory.now - price.date > intervalToKeep) {
-                continue
+            var idx = 0
+
+            for price in unsafePrices {
+                idx += 1
+                if (prices.last!.date - price.date > intervalToKeep) {
+                    continue
+                }
+                
+                if idx == 0 { return }
+                
+                self.prices.removeSubrange(0..<idx)
+                return
             }
-            
-            if index == 0 { return }
-            
-            self.prices.removeSubrange(0..<index)            
-            return
-        }
+        })
     }
 }
