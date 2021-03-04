@@ -7,6 +7,6 @@ class TraderBTSBuyOperation: CustomStringConvertible {
     var updateWhenBelowPrice: Double = 0
     
     var description: String {
-        return "BuyOperation \(uuid). Will buy when price > \(stopLossPrice), update when price < updateWhenBelowPrice"
+        return "BuyOperation \(uuid). Will buy when price > \(stopLossPrice.format(decimals: 3)), update when price < \(updateWhenBelowPrice)"
     }
 }

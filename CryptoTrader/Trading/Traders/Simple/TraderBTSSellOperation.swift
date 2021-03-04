@@ -52,12 +52,18 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
                     "Open SellOperation \(uuid) since \(openDateFormatted). "
                     + "Value: original = \(originalValue.format(decimals: 3)), current = \(currentValue.format(decimals: 3)) (\(diff.format(decimals: 3))%). "
                     + "(\(initialTrade.price.format(decimals: 1)) -> \(currentPrice.format(decimals: 1)))"
+                    + sellStrategyInfo()
             case .partiallyFilled:
-                return "Partial-Fillet SellOperation \(uuid) since \(openDateFormatted)."
+                return "Partial-Filled SellOperation \(uuid) since \(openDateFormatted)."
+                
             case .filled:
                 let diff = Percent(differenceOf: closingTrade!.value, from: initialTrade.value).percentage.format(decimals: 3)
-                var closeDateFormatted = closeDate != nil ? "\(df.format(date: closeDate!))" : "?"
-                return "Filled SellOperation \(uuid) the \(closeDateFormatted). Value: original = \(initialTrade.value.format(decimals: 3)), current = \(closingTrade!.value.format(decimals: 3)) (\(diff)%). (\(initialTrade.price.format(decimals: 2)) -> \(currentPrice.format(decimals: 2)))"
+                let originalValue = initialTrade.value.format(decimals: 3)
+                let closeValue = closingTrade!.value.format(decimals: 3)
+                let initialPrice = initialTrade.price.format(decimals: 2)
+                let closeDateFormatted = closeDate != nil ? "\(df.format(date: closeDate!))" : "?"
+                return "Filled SellOperation \(uuid) the \(closeDateFormatted). Value: original = \(originalValue), current = \(closeValue) (\(diff)%). (\(initialPrice) -> \(currentPrice.format(decimals: 2)))"
+                
             case .cancelled:
                 return "Cancelled SellOperation \(uuid)."
             case .rejected:
@@ -65,5 +71,13 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
             case .expired:
                 return "Expired SellOperation \(uuid)."
         }
+    }
+    
+    private func sellStrategyInfo() -> String {
+        guard stopLossPrice != 0 else {
+            return ""
+        }
+        
+        return "\n Will sell if price < \(stopLossPrice), update if price > \(updateWhenAbovePrice)"
     }
 }

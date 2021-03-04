@@ -2,23 +2,31 @@ import Foundation
 
 class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
+
+    // MARK: Configuration
+    // -------------------------------
     var saveEnabled = true
 
+    private let saveStateLocation: String
+
+    private let exchange: ExchangeClient
+
     private let config: TraderBTSStrategyConfiguration
-    private let marketAnalyzer: MarketAggregatedHistory = MarketAggregatedHistory(
-        intervalToKeep: TimeInterval.fromHours(12), aggregationPeriod: TimeInterval.fromMinutes(1)
-    )
+    private let marketAnalyzer: MarketAggregatedHistory
     private let symbol: CryptoSymbol
 
+    // MARK: State
+    // -------------------------------
+    
+    var startDate: Date = DateFactory.now
+    
     private var initialBalance: Double
 
     private var currentBalance: Double {
-        didSet {
-            sourcePrint("Current Balance: \(currentBalance)")
-        }
+        didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
     }
 
-    private var profits: Double = 0
+    private(set) var profits: Double = 0
 
     private var currentBidPrice: Double = 0
     private var currentAskPrice: Double = 0
@@ -28,15 +36,12 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var closedBTSSellOperations: [TraderBTSSellOperation] = []
 
     private var orderValue: Double = 0
-    private var exchange: ExchangeClient
 
     private var locked: Date? = nil
-    
-    private let saveStateLocation: String
-    
-    private var firstTickerDate: Date!
 
-
+    // MARK: Computed properties
+    // -------------------------------
+    
     private var lastBuyPrice: Double? {
         return lastBuyOrder?.initialTrade.price
     }
@@ -49,10 +54,19 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         return closedBTSSellOperations.last
     }
 
+    
+    // MARK: Serialization keys.
+    // -------------------------------
+    
     enum CodingKeys: CodingKey {
         case savedState
     }
 
+    // ================================================================
+    // MARK: - Life Cycle
+    // ================================================================
+
+    /// Constructor
     init(
         exchange: ExchangeClient,
         config: TraderBTSStrategyConfiguration,
@@ -68,6 +82,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.saveStateLocation = saveStateLocation
         self.currentBalance = currentBalance
         
+        self.marketAnalyzer =
+            MarketAggregatedHistory(intervalToKeep: TimeInterval.fromHours(12), aggregationPeriod: TimeInterval.fromMinutes(1))
+        
         self.restore()
 
         // Balance update. (Might be more, might be less)
@@ -82,6 +99,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.currentBalance = self.currentBalance + balanceChange
         self.orderValue = self.orderValue + balanceChange / Double(config.maxOrdersCount)
     }
+    
     
     // ================================================================
     // MARK: - Commands
@@ -247,9 +265,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // ================================================================
 
     func updateAsk(price: Double) {
-        if firstTickerDate == nil {
-            firstTickerDate = DateFactory.now
-        }
         /// There are always sufficient found here!
         /// There are 2h of statistic availables
         /// We usually want to create order "STOP-LOSS BUY", which we update if the price continues to go down,
@@ -394,7 +409,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         guard let buyOperation = self.openBTSBuyOperation else {
             self.openBTSBuyOperation = TraderBTSBuyOperation()
             updateBuyOperation()
-            saveState()
             return
         }
 
@@ -405,7 +419,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         buyOperation.updateWhenBelowPrice = updatePrice
 
         sourcePrint(
-            "Updated buy operation \(buyOperation.uuid). Will buy if price > \(buyOperation.stopLossPrice) /update SLP if price < \(buyOperation.updateWhenBelowPrice)."
+            "Updated buy operation \(buyOperation.uuid). Will buy if price > \(buyOperation.stopLossPrice.format(decimals: 3)) / update SLP if price < \(buyOperation.updateWhenBelowPrice.format(decimals: 3))."
         )
         saveState()
     }
@@ -452,8 +466,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             }
         )
 
-        saveState()
         semaphore.wait()
+        saveState()
     }
 
 
@@ -469,6 +483,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         for operation in openBTSSellOperations {
             update(operation: operation, price: price)
         }
+        saveState()
     }
 
     private func update(operation: TraderBTSSellOperation, price: Double) {
@@ -509,12 +524,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         operation.stopLossPrice = price -% stopLossProfit
         operation.updateWhenAbovePrice = price +% config.sellUpdateStopLossProfitPercent
-        self.saveState()
 
         sourcePrint(
             "Updated sell operation \(operation.uuid). Will sell if price < \(operation.stopLossPrice) /update SLP if price > \(operation.updateWhenAbovePrice)."
         )
-
     }
 
     func sell(operation: TraderBTSSellOperation) {
@@ -625,6 +638,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: - Information Display
     // =================================================================
     
+    @discardableResult
     func summary() -> String {
         let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1)).average()
         let coins: Double = openBTSSellOperations.reduce(
@@ -634,17 +648,20 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         var summaryString = ""
 
-        summaryString += "===================================\n"
+        summaryString += "==========================================\n"
         summaryString += "Trading history\n"
-        summaryString += "===================================\n"
+        summaryString += "==========================================\n"
 
+        summaryString += "\nOpen buy operation\n"
+        summaryString += "\n----------------------\n"
+        
         if let openBuy = self.openBTSBuyOperation {
-            summaryString += "\nOpen buy operation\n"
-            summaryString += "\n----------------------\n"
             summaryString += openBuy.description + "\n"
         }
+        
+        summaryString += "\nLocked? \(String(describing: locked))\n"
 
-        summaryString += "\nExecuted operations.\n"
+        summaryString += "\n\nExecuted operations.\n"
         summaryString += "\n----------------------\n"
         for closeOrder in self.closedBTSSellOperations {
             summaryString += closeOrder.description + "\n"
@@ -665,17 +682,19 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         let profitPerDay = (profits / (runDuration / 3600 / 24))
         let profitPerDayPercent = (profitPercent / (runDuration / 3600 / 24))
 
-        summaryString += "===================================\n"
+        summaryString += "\n==========================================\n"
         summaryString += "Summary\n"
-        summaryString += "===================================\n\n"
+        summaryString += "==========================================\n\n"
 
-        summaryString += "Duration: \(runDuration / 3600 / 24) days \n\n\n"
-        summaryString += "Current balance: \(currentBalance.format(decimals: 2))\n"
+        summaryString += "Order value: \(orderValue.format(decimals: 2))\n"
+        summaryString += "Current balance: \(currentBalance.format(decimals: 2))\n\n"
         summaryString += "Coins: \(coins) @ \(currentPrice.format(decimals: 2))\n"
+
+        summaryString += "Duration: \((runDuration / 3600 / 24).format(decimals: 2)) days \n\n"
         summaryString += "Profits: \(profits.format(decimals: 4)) (\(profitPercent.format(decimals: 4)) %) / Per day: \(profitPerDay.format(decimals: 4)) (\(profitPerDayPercent.format(decimals: 4))%)\n"
 
 
-        summaryString += "Total assets value: \((coins * currentPrice + currentBalance).format(decimals: 2)) / Initial value: \(initialBalance)\n"
+        summaryString += "Total assets value: \((coins * currentPrice + currentBalance).format(decimals: 2)) / Initial value: \(initialBalance.format(decimals: 2))\n"
         
         print(summaryString)
         return summaryString
