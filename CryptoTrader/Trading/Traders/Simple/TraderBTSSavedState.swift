@@ -7,4 +7,5 @@ struct TraderBTSSavedState: Codable {
     var initialBalance: Double
     var orderValue: Double
     var profits: Double
+    var startDate: Date
 }

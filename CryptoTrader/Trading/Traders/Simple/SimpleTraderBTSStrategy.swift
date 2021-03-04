@@ -63,12 +63,24 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.config = config
         self.exchange = exchange
         self.symbol = exchange.symbol
-        self.currentBalance = currentBalance
         self.initialBalance = initialBalance
         self.orderValue = initialBalance / Double(config.maxOrdersCount)
         self.saveStateLocation = saveStateLocation
+        self.currentBalance = currentBalance
         
         self.restore()
+
+        // Balance update. (Might be more, might be less)
+        guard initialBalance != self.initialBalance else { return }
+        let balanceChange = initialBalance - self.initialBalance
+        
+        guard currentBalance + balanceChange >= 0 else {
+            fatalError("The balance cannot be decreased: the current balance would be negative.")
+        }
+        
+        self.initialBalance = initialBalance
+        self.currentBalance = self.currentBalance + balanceChange
+        self.orderValue = self.orderValue + balanceChange / Double(config.maxOrdersCount)
     }
     
     // ================================================================
@@ -92,7 +104,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                                    qty: sellOperation.initialTrade.quantity,
                                    price: targetPrice,
                                    id: TraderBTSIdGenerator(id: "sell-all",
-                                                            date: DateFactory.now,
+                                                            date: currentDate,
                                                             action: "sell",
                                                             price: targetPrice)
                                     .generate()),
@@ -121,7 +133,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 currentBalance: currentBalance,
                 initialBalance: initialBalance,
                 orderValue: orderValue,
-                profits: profits
+                profits: profits,
+                startDate: startDate
             )
             
             let data = try JSONEncoder().encode(state)
@@ -133,6 +146,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     func restore() {
+        sourcePrint("Loading saved state")
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: saveStateLocation))
             let state = try JSONDecoder().decode(TraderBTSSavedState.self, from: data)
@@ -143,9 +157,12 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             initialBalance = state.initialBalance
             orderValue = state.orderValue
             profits = state.profits
+            startDate = state.startDate
         } catch {
             sourcePrint("Failed to restore the state: \(error)")
         }
+        sourcePrint("Loaded saved state")
+        summary()
     }
 
     // ================================================================
