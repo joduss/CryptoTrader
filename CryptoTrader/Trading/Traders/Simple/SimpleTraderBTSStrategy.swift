@@ -19,6 +19,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // -------------------------------
     
     var startDate: Date = DateFactory.now
+    var currentDate: Date = DateFactory.now
     
     private var initialBalance: Double
 
@@ -273,7 +274,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
 
         self.currentAskPrice = price
-        marketAnalyzer.record(DatedPrice(price: price, date: DateFactory.now))
+        marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
 
         if openBTSBuyOperation == nil && currentBalance < orderValue {
             return
@@ -285,7 +286,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         if let lastClosedSell = self.lastClosedOperation,
            let lastBuyOrder = self.lastBuyOrder,
            lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
-           DateFactory.now - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
+           currentDate - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
         
             if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
                 sourcePrint("Buying target price below last sell!")
@@ -296,9 +297,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         // Locking
         if let locked = self.locked {
-            guard DateFactory.now - locked > TimeInterval.fromMinutes(5) else { return }
+            guard currentDate - locked > TimeInterval.fromMinutes(5) else { return }
 
-            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(6)).isTrendDownwards(threshold: 0.2) {
+            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(6), now: currentDate).isTrendDownwards(threshold: 0.2) {
                 return
             }
 
@@ -354,16 +355,17 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             }
         }
         
-        
+        // TODO: check diff with and without
+ //       if let abovePrice = closestAboveBuyPrice {
         if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
             // Compared to last buy, the price went down.
             if openBTSSellOperations.filter({
-                $0.initialTrade.price > price && DateFactory.now - $0.initialTrade.date < TimeInterval.fromHours(12)
-            }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2)).isTrendDownwards(threshold: 0.2)
+                $0.initialTrade.price > price && currentDate - $0.initialTrade.date < TimeInterval.fromHours(12)
+            }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2), now: currentDate).isTrendDownwards(threshold: 0.2)
             {
                 // We pause for 2h or 3%
                 sourcePrint("Locking (price: \(price)")
-                self.locked = DateFactory.now
+                self.locked = currentDate
                 return
             }
             
@@ -376,14 +378,14 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             
             // Big drop in short time => we jump on it!
             if Percent(differenceOf: price, from: abovePrice) < Percent(-2)
-                && DateFactory.now - lastBuyOrder!.initialTrade.date < TimeInterval.fromMinutes(5)
+                && currentDate - lastBuyOrder!.initialTrade.date < TimeInterval.fromMinutes(5)
             {
                 updateBuyOperation()
                 return
             }
             // Small slow decrease
             if Percent(differenceOf: price, from: abovePrice) < Percent(-1)
-                && DateFactory.now - lastBuyOrder!.initialTrade.date > TimeInterval.fromMinutes(60)
+                && currentDate - lastBuyOrder!.initialTrade.date > TimeInterval.fromMinutes(60)
             {
                 updateBuyOperation()
                 return
@@ -427,7 +429,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private func buy(_ operation: TraderBTSBuyOperation) {
         let idGenerator = TraderBTSIdGenerator(
             id: operation.uuid,
-            date: DateFactory.now,
+            date: currentDate,
             action: "BUY",
             price: currentAskPrice
         )
@@ -533,7 +535,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     func sell(operation: TraderBTSSellOperation) {
         let orderId = TraderBTSIdGenerator(
             id: operation.uuid,
-            date: DateFactory.now,
+            date: currentDate,
             action: "SELL",
             price: currentBidPrice
         )
@@ -640,7 +642,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
     @discardableResult
     func summary() -> String {
-        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1)).average()
+        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), now: currentDate).average()
         let coins: Double = openBTSSellOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.initialTrade.quantity) }
@@ -677,7 +679,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             summaryString += "---\n"
         }
 
-        let runDuration: TimeInterval = DateFactory.now - firstTickerDate
+        let runDuration: TimeInterval = currentDate - startDate
         let profitPercent = Percent(ratioOf: profits, to: initialBalance).percentage
         let profitPerDay = (profits / (runDuration / 3600 / 24))
         let profitPerDayPercent = (profitPercent / (runDuration / 3600 / 24))

@@ -21,11 +21,11 @@ open class MarketHistorySlice {
     }
     
     /// Returns true if there is history in the past in a time interval from now.
-    func hasRecordFromAtLeastPastInterval(_ interval: TimeInterval) -> Bool {
-        guard let firstRecord = prices.first else { return false }
-        
-        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
-    }
+//    func hasRecordFromAtLeastPastInterval(_ interval: TimeInterval, now: Date) -> Bool {
+//        guard let firstRecord = prices.first else { return false }
+//        
+//        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
+//    }
     
     public func average() -> Double {
         computeBasic()
@@ -230,8 +230,8 @@ open class MarketHistorySlice {
 extension MarketHistorySlice {
     
     /// Returns a market history up to a given point back in the past.
-    func prices(last interval: TimeInterval) -> MarketHistorySlice {
-        return pricesInInterval(beginDate: DateFactory.now.advanced(by: -interval))
+    func prices(last interval: TimeInterval, now: Date?) -> MarketHistorySlice {
+        return pricesInInterval(beginDate: (now ?? DateFactory.now).advanced(by: -interval))
     }
     
     /// Returns a market history from a given date to the end or to a specific date.

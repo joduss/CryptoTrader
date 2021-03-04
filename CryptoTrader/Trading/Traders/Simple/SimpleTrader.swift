@@ -81,6 +81,8 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
             sourcePrint("Decision for bid price \(ticker.bidPrice) / ask price \(ticker.askPrice)")
         }
 
+        (strategy as? SimpleTraderBTSStrategy)?.currentDate = ticker.date
+
         strategy.updateBid(price: ticker.bidPrice)
         strategy.updateAsk(price: ticker.askPrice)
 
