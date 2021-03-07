@@ -24,10 +24,18 @@ extension TraderMain {
         @Argument
         var tickersLocation: String
         
+        @Flag(help: "Run a grid search to find best parameters")
+        var gridSearch: Bool = false
+        
         // MARK: Command line main.
         // ------------------------------
         func run() throws {
-            let _ = try SimulateSubCommand(symbol: symbol, initialBalance: initialBalance, maxOperationCount: maxOperationCount, saveStateLocation: saveStateLocation, tickersLocation: tickersLocation)
+            let _ = try SimulateSubCommand(symbol: symbol,
+                                           initialBalance: initialBalance,
+                                           maxOperationCount: maxOperationCount,
+                                           saveStateLocation: saveStateLocation,
+                                           tickersLocation: tickersLocation,
+                                           gridSearch: gridSearch)
         }
     }
 }
@@ -42,7 +50,7 @@ struct SimulateSubCommand {
     let tickers: [MarketTicker]
     
     
-    internal init(symbol: CryptoSymbol, initialBalance: Double, maxOperationCount: Int, saveStateLocation: String, tickersLocation: String) throws {
+    internal init(symbol: CryptoSymbol, initialBalance: Double, maxOperationCount: Int, saveStateLocation: String, tickersLocation: String, gridSearch: Bool) throws {
         
         let reader = TextFileReader.openFile(at: tickersLocation)
         var idx = 0
@@ -90,41 +98,18 @@ struct SimulateSubCommand {
         self.maxOperationCount = maxOperationCount
         self.saveStateLocation = saveStateLocation
         
+        if gridSearch {
+            self.gridSearch()
+            return
+        }
         
-        test()
+        simulate()
         return
+    }
+    
+    private func simulate() {
+        sourcePriceHidden = false
         
-//        var shouldContinue = true
-//
-//        repeat {
-//
-//
-//            let exchange = SimulatedFullExchange(symbol: symbol, tickers: tickersRead)
-//            var config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
-//            let strategy = SimpleTraderBTSStrategy(exchange: exchange,
-//                                                   config: config,
-//                                                   initialBalance: initialBalance,
-//                                                   currentBalance: initialBalance,
-//                                                   saveStateLocation: saveStateLocation)
-//            strategy.saveEnabled = false
-//            let trader = SimpleTrader(client: exchange, strategy: strategy)
-//            trader.printCurrentPrice = false
-//
-//            print("################################################################")
-//            print("----------------------------------------------------------------")
-//            print("ANOTHER ROUND OF TEST")
-//            print("----------------------------------------------------------------")
-//            print("----------------------------------------------------------------")
-//
-//            exchange.start()
-//
-//            print("Configuration used: \(config)")
-//            strategy.summary()
-//
-////            print("Continue?")
-////            let a = readLine()
-////            print(a)
-//        } while(shouldContinue)
         var config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
         let dateFactory = DateFactory()
         printDateFactory = dateFactory
@@ -140,8 +125,9 @@ struct SimulateSubCommand {
     
     let testSema = DispatchSemaphore(value: 1)
     
-    private func test() {
-        
+    private func gridSearch() {
+        sourcePriceHidden = true
+
         var results: [(Double, String)] = []
         
         let queue = OperationQueue()
