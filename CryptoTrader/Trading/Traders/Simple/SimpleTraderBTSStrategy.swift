@@ -268,6 +268,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
     // MARK: Decision about buying
     // ================================================================
+    
+    private var lastDip: Date? = nil
 
     func updateAsk(price: Double) {
         /// There are always sufficient found here!
@@ -279,12 +281,20 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         self.currentAskPrice = price
         marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
+        
+        // RULE 1: Special buy when there is a huge dip
+        if price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(20), before: currentDate - 10).average() -% 3,
+           currentBalance >= orderValue,
+           let lastDip = self.lastDip,
+           currentDate - lastDip > TimeInterval.fromMinutes(30){
+            self.lastDip = currentDate
+            sourcePrint("Special buy preparation of a big drop")
+            updateBuyOperation()
+        }
 
-        if openBTSBuyOperation == nil && currentBalance < orderValue {
+        if openBTSBuyOperation == nil && currentBalance < 2 * orderValue {
             return
         }
-        
-        // TODO: Special buy when there is a huge dip
         
         // Try to check if creating a special stop loss sell is helpful.
         if let lastClosedSell = self.lastClosedOperation,
