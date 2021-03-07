@@ -311,9 +311,11 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         // Locking
         if let locked = self.locked {
-            guard currentDate - locked > TimeInterval.fromMinutes(5) else { return }
+            guard currentDate - locked > config.lockStrictInterval else { return }
 
-            if self.marketAnalyzer.prices(last: TimeInterval.fromHours(6), now: currentDate).isTrendDownwards(threshold: 0.2) {
+            if self.marketAnalyzer
+                .prices(last: config.unlockCheckTrendInterval, before: currentDate)
+                .isTrendDownwards(threshold: config.unlockTrendThreshold) {
                 return
             }
 
@@ -372,12 +374,16 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         // TODO: check diff with and without
  //       if let abovePrice = closestAboveBuyPrice {
         if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
+            let lastLoosingTrades = openBTSSellOperations.filter({
+                op in
+                op.initialTrade.price > price && currentDate - op.initialTrade.date < config.lock2LossesInLast
+            })
+            
+            let trendDownwards =  marketAnalyzer.prices(last: config.lockCheckTrendInterval,
+                                                        before: currentDate).isTrendDownwards(threshold: config.lockTrendThreshold)
+            
             // Compared to last buy, the price went down.
-            if openBTSSellOperations.filter({
-                $0.initialTrade.price > price && currentDate - $0.initialTrade.date < TimeInterval.fromHours(12)
-            }).count >= 2 && marketAnalyzer.prices(last: TimeInterval.fromHours(2), now: currentDate).isTrendDownwards(threshold: 0.2)
-            {
-                // We pause for 2h or 3%
+            if lastLoosingTrades.count >= 2 && trendDownwards {
                 sourcePrint("Locking (price: \(price)")
                 self.locked = currentDate
                 return

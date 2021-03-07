@@ -21,6 +21,13 @@ struct TraderBTSStrategyConfiguration {
     var nextBuyTargetExpiration: TimeInterval = TimeInterval.fromMinutes(60)
     
     
+    var lockStrictInterval: TimeInterval = 10.0 * 60.0
+    var lockCheckTrendInterval: TimeInterval = 6 * 60 * 60.0
+    var lockTrendThreshold: Percent = -0.2
+    var lock2LossesInLast: TimeInterval = TimeInterval.fromHours(24)
+    var unlockTrendThreshold: Percent = 0.1
+    var unlockCheckTrendInterval: TimeInterval = 2 * 60 * 60.0
+    
     // Selling
 
     /// The price increase(in % compared to current one) at which a stop-loss is created to
