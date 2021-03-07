@@ -13,7 +13,7 @@ final class MarketAggregatedHistory: MarketHistorySlice {
     init(intervalToKeep: TimeInterval, aggregationPeriod: TimeInterval = 1) {
         self.intervalToKeep = intervalToKeep
         self.aggregationPeriod = aggregationPeriod
-        super.init(prices: ArraySlice<DatedPrice>())
+        super.init(prices: ContiguousArray<DatedPrice>()[0..<0])
         self.prices.reserveCapacity(10000000)
     }
     

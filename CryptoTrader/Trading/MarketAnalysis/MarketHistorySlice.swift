@@ -27,24 +27,24 @@ open class MarketHistorySlice {
 //        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
 //    }
     
-    public func average() -> Double {
+    final public func average() -> Double {
         computeBasic()
         return self.averagePrice
     }
     
-    public func maxPrice() -> Double {
+    final public func maxPrice() -> Double {
         computeBasic()
         return self.max
     }
     
-    public func minPrice() -> Double {
+    final public func minPrice() -> Double {
         computeBasic()
         return self.min
     }
 
     /// Computes the slope between the beginning of the market history slice and the end, by averaging the first, respectively last
     /// samples withing a range of size 'averageInterval' at the beginning, respectivelly end of the market history slice.
-    func slope() -> Double {
+    final func slope() -> Double {
         
         guard let firstTrade = prices.first, let lastTrade = prices.last else {
             return 0
@@ -86,7 +86,7 @@ open class MarketHistorySlice {
 //    }
     
     /// Threshold: Percent of change in price to consider a difference of price as a negative trend.
-    func isTrendDownwards(threshold: Percent = 0) -> Bool {
+    final func isTrendDownwards(threshold: Percent = 0) -> Bool {
         guard let firstTrade = prices.first, let lastTrade = prices.last else {
             return false
         }
@@ -108,8 +108,8 @@ open class MarketHistorySlice {
 //        let durationAToB = totalTimeInterval - 1.5 * intervalSlotDuration
         
 //        let slopeAtoB = Percent(Percent(differenceOf: beforeLastPartIntervalAvg, from: firstPartIntervalAvg).percentage / durationAToB)
-        let slopeBtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: beforeLastPartIntervalAvg).percentage / intervalSlotDuration)
-        let slopeAtoC = Percent(Percent(differenceOf: lastPartIntervalAvg, from: firstPartIntervalAvg).percentage / 3 * intervalSlots)
+        let slopeBtoC = Percent(differenceOf: lastPartIntervalAvg, from: beforeLastPartIntervalAvg)
+        let slopeAtoC = Percent(differenceOf: lastPartIntervalAvg, from: firstPartIntervalAvg)
         
         if slopeAtoC > threshold {
             return false
@@ -244,13 +244,21 @@ extension MarketHistorySlice {
     }
     
     /// Returns a market history from a given date to the end or to a specific date.
-    func pricesInInterval(beginDate: Date, endDate: Date? = nil) -> MarketHistorySlice {
+    final func pricesInInterval(beginDate: Date, endDate: Date? = nil) -> MarketHistorySlice {
         
-        guard self.prices.count > 0 else { return MarketHistorySlice(prices: ArraySlice()) }
-        let startIdx = findSortedIdx(dateAtLeast: beginDate)!
+        guard self.prices.count > 0 else {
+            return MarketHistorySlice(prices: ArraySlice())
+        }
+        
+        guard let startIdx = findSortedIdx(dateAtLeast: beginDate) else {
+            return MarketHistorySlice(prices: ArraySlice<DatedPrice>())
+
+        }
 
         if let endDate = endDate {
-            let endIdx = findSortedIdx(dateAtMax: endDate)!
+            guard let endIdx = findSortedIdx(dateAtMax: endDate) else {
+                return MarketHistorySlice(prices: ArraySlice<DatedPrice>())
+            }
             if endIdx <= startIdx { return MarketHistorySlice(prices: ArraySlice<DatedPrice>())}
             
             return MarketHistorySlice(prices: self.prices[startIdx..<endIdx])
@@ -262,7 +270,7 @@ extension MarketHistorySlice {
     
     /// Find the index of the largest date smaller or equal than a given date in a sorted array.
     /// Uses the binary search algorithm.
-    func findSortedIdx(dateAtMax date: Date) -> Int? {
+    final func findSortedIdx(dateAtMax date: Date) -> Int? {
         guard prices.count > 0 else { return nil }
         
         if prices.first!.date > date {
@@ -305,7 +313,7 @@ extension MarketHistorySlice {
 
     /// Find the index of the largest date smaller or equal than a given date in a sorted array.
     /// Uses the binary search algorithm.
-    func findSortedIdx(dateAtLeast date: Date) -> Int? {
+    final func findSortedIdx(dateAtLeast date: Date) -> Int? {
         guard prices.count > 0 else { return nil }
         
         if prices.first!.date >= date {
