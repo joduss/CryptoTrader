@@ -7,8 +7,8 @@ struct TraderBTSTrade: Codable {
     var value: Double
     var date: Date
     
-    init(price: Double, quantity: Double, value: Double) {
-        self.date = DateFactory.now
+    init(price: Double, quantity: Double, value: Double, now: Date) {
+        self.date = now
         self.price = price
         self.quantity = quantity
         self.value = value

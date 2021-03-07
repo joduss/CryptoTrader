@@ -47,13 +47,16 @@ struct TradeSubCommand {
         self.maxOperationCount = maxOperationCount
         self.saveStateLocation = saveStateLocation
         
+        let dateFactory = DateFactory()
+        
         exchange = BinanceClient(symbol: symbol, config: BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey))
         let config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
         let strategy = SimpleTraderBTSStrategy(exchange: exchange,
                                                config: config,
                                                initialBalance: initialBalance,
                                                currentBalance: initialBalance,
-                                               saveStateLocation: saveStateLocation)
+                                               saveStateLocation: saveStateLocation,
+                                               dateFactory: dateFactory)
         trader = SimpleTrader(client: exchange, strategy: strategy)
         
         self.readUserInput()

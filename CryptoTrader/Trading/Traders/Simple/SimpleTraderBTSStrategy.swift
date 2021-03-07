@@ -13,13 +13,14 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
     private let config: TraderBTSStrategyConfiguration
     private let marketAnalyzer: MarketAggregatedHistory
+    
     private let symbol: CryptoSymbol
 
     // MARK: State
     // -------------------------------
-    
-    var startDate: Date = DateFactory.now
-    var currentDate: Date = DateFactory.now
+    private let dateFactory: DateFactory
+    private(set) var startDate: Date
+    var currentDate: Date { return dateFactory.now }
     
     private var initialBalance: Double
 
@@ -73,7 +74,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         config: TraderBTSStrategyConfiguration,
         initialBalance: Double,
         currentBalance: Double,
-        saveStateLocation: String
+        saveStateLocation: String,
+        dateFactory: DateFactory? = nil
     ) {
         self.config = config
         self.exchange = exchange
@@ -82,6 +84,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.orderValue = initialBalance / Double(config.maxOrdersCount)
         self.saveStateLocation = saveStateLocation
         self.currentBalance = currentBalance
+        self.dateFactory = dateFactory ?? DateFactory.init()
+        self.startDate = self.dateFactory.now
         
         self.marketAnalyzer =
             MarketAggregatedHistory(intervalToKeep: TimeInterval.fromHours(12), aggregationPeriod: TimeInterval.fromMinutes(1))
@@ -458,10 +462,11 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                     let trade = TraderBTSTrade(
                         price: order.price,
                         quantity: order.originalQty,
-                        value: order.cummulativeQuoteQty
+                        value: order.cummulativeQuoteQty,
+                        now: self.currentDate
                     )
                     self.currentBalance -= order.cummulativeQuoteQty
-                    self.openBTSSellOperations.append(TraderBTSSellOperation(trade: trade))
+                    self.openBTSSellOperations.append(TraderBTSSellOperation(trade: trade, now: self.currentDate))
                     sourcePrint("Successfully bought \(order.originalQty)@\(order.price) (\(order.status))")
                 }
                 semaphore.signal()
@@ -564,7 +569,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                         with: TraderBTSTrade(
                             price: order.price,
                             quantity: order.originalQty,
-                            value: order.cummulativeQuoteQty
+                            value: order.cummulativeQuoteQty,
+                            now: self.currentDate
                         )
                     )
                     sourcePrint("Sold the operation \(operation.description)")
@@ -642,7 +648,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
     @discardableResult
     func summary() -> String {
-        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), now: currentDate).average()
+        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), before: currentDate).average()
         let coins: Double = openBTSSellOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.initialTrade.quantity) }

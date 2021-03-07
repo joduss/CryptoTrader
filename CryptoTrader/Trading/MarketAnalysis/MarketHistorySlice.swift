@@ -230,8 +230,17 @@ open class MarketHistorySlice {
 extension MarketHistorySlice {
     
     /// Returns a market history up to a given point back in the past.
-    func prices(last interval: TimeInterval, now: Date?) -> MarketHistorySlice {
-        return pricesInInterval(beginDate: (now ?? DateFactory.now).advanced(by: -interval))
+    final func prices(last interval: TimeInterval, before date: Date) -> MarketHistorySlice {
+        guard let lastDate = self.prices.last?.date else {
+            return MarketHistorySlice(prices: ArraySlice<DatedPrice>())
+        }
+        
+        if date >= lastDate {
+            return pricesInInterval(beginDate: (date).advanced(by: -interval))
+        }
+        else {
+            return pricesInInterval(beginDate: (date).advanced(by: -interval), endDate: date)
+        }
     }
     
     /// Returns a market history from a given date to the end or to a specific date.

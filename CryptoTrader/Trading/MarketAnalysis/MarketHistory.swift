@@ -27,16 +27,16 @@ final class MarketHistory: MarketHistorySlice {
         
         if lastCleanup % 500 == 0 {
             lastCleanup = 0
-            cleanup()
+            cleanup(now: trade.date)
         }
     }
     
     /// Remove too old data.
-    private func cleanup() {
+    private func cleanup(now: Date) {
         for index in 0..<prices.endIndex {
             let price = prices[index]
             
-            if (DateFactory.now - price.date > TimeInterval.fromHours(1.01)) {
+            if (now - price.date > TimeInterval.fromHours(1.01)) {
                 continue
             }
             

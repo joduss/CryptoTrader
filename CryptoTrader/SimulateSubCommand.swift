@@ -125,6 +125,17 @@ struct SimulateSubCommand {
 ////            let a = readLine()
 ////            print(a)
 //        } while(shouldContinue)
+        var config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
+        let dateFactory = DateFactory()
+        printDateFactory = dateFactory
+        dateFactory.now = self.tickers.first!.date
+        simulate(config: config, dateFactory: dateFactory, printPrice: true)
+        
+        var rerun = false
+        
+        if rerun {
+            simulate()
+        }
     }
     
     let testSema = DispatchSemaphore(value: 1)
@@ -177,16 +188,17 @@ struct SimulateSubCommand {
         print(results)
     }
     
-    private func simulate(config: TraderBTSStrategyConfiguration) -> (Double, String) {
-        let exchange = SimulatedFullExchange(symbol: symbol, tickers: self.tickers)
+    private func simulate(config: TraderBTSStrategyConfiguration, dateFactory: DateFactory, printPrice: Bool = false) -> (Double, String) {
+        let exchange = SimulatedFullExchange(symbol: symbol, tickers: self.tickers, dateFactory: dateFactory)
         let strategy = SimpleTraderBTSStrategy(exchange: exchange,
                                                config: config,
                                                initialBalance: initialBalance,
                                                currentBalance: initialBalance,
-                                               saveStateLocation: saveStateLocation)
+                                               saveStateLocation: saveStateLocation,
+                                               dateFactory: dateFactory)
         strategy.saveEnabled = false
         let trader = SimpleTrader(client: exchange, strategy: strategy)
-        trader.printCurrentPrice = false
+        trader.printCurrentPrice = printPrice
         
         exchange.start()
                 

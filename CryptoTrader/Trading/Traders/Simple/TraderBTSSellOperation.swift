@@ -19,8 +19,8 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
     private(set) var closingTrade: TraderBTSTrade?
     
     
-    init(trade: TraderBTSTrade) {
-        openDate = DateFactory.now
+    init(trade: TraderBTSTrade, now: Date) {
+        openDate = now
         uuid = UUID().uuidString.truncate(length: 5)
         self.initialTrade = trade
     }
@@ -30,7 +30,7 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
         closingTrade = order
         
         profits = order.value - initialTrade.value
-        closeDate = DateFactory.now
+        closeDate = order.date
     }
     
     var description: String {

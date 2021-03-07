@@ -25,15 +25,20 @@ class OutputDateFormatter {
     }
 }
 
+var sourcePriceHidden = false
+var printDateFactory: DateFactory?
 
 /// Prints as if it was a log: [Date] [Class name] Message
 func sourcePrint(_ message: String, _ source: String = #file) {
-    let prefix = "[\(OutputDateFormatter.instance.format(date: DateFactory.now))] [\(source.fileName())] "
+    
+    guard sourcePriceHidden == false else { return }
+    
+    let prefix = "[\(OutputDateFormatter.instance.format(date: printDateFactory?.now ?? Date()))] [\(source.fileName())] "
     print("\(prefix)\(formatMessage(message, prefix: prefix))")
 }
 
 func sourceReplacablePrint(_ message: String, _ source: String = #file) {
-    print("\u{1B}[2K\u{1B}7[\(OutputDateFormatter.instance.format(date: DateFactory.now))] [\(source.fileName())] \(message) \u{1B}8", terminator: "")
+    print("\u{1B}[2K\u{1B}7[\(OutputDateFormatter.instance.format(date: printDateFactory?.now ?? Date()))] [\(source.fileName())] \(message) \u{1B}8", terminator: "")
     fflush(stdout)
 }
 

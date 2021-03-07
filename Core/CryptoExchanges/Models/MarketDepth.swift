@@ -45,7 +45,7 @@ public struct MarketDepthBackup: Codable {
 public struct MarketDepth: Codable {
     
     public private(set) var id: Int
-    public private(set) var date = DateFactory.now
+    public private(set) var date = Date()
     public private(set) var bids: [Double : Double] = [:]
     public private(set) var asks: [Double : Double] = [:]
     

@@ -9,14 +9,16 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     var userDataStream: ExchangeUserDataStream { return self }
     var trading: ExchangeSpotTrading { return self }
 
-    private var currentTicker: MarketTicker
     private let tickers: [MarketTicker]
+    private let dateFactory: DateFactory
+    private var currentTicker: MarketTicker
     private var exchangeOrderId = 1
     private var group = DispatchGroup()
 
-    init(symbol: CryptoSymbol, tickers: [MarketTicker]) {
+    init(symbol: CryptoSymbol, tickers: [MarketTicker], dateFactory: DateFactory) {
         self.tickers = tickers
         self.symbol = symbol
+        self.dateFactory = dateFactory
         currentTicker = tickers.first!
     }
 
@@ -27,7 +29,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     private var orderRequests: [TradeOrderRequest] = []
 
     func start() {
-        DateFactory.simulated = true
+        dateFactory.simulated = true
 
         self.tickers.withUnsafeBufferPointer({ unsafeTickers in
             for ticker in unsafeTickers {
@@ -38,7 +40,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     }
 
     private func onNewTicker(_ ticker: MarketTicker) {
-        DateFactory.now = ticker.date
+        dateFactory.now = ticker.date
         self.executeOrders(ticker)
         self.marketDataStreamSubscriber?.process(ticker: ticker)
     }
@@ -89,7 +91,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             let qty = order.quantity ?? order.value! / price
 
             let report = OrderExecutionReport(
-                orderCreationTime: DateFactory.now,
+                orderCreationTime: dateFactory.now,
                 symbol: symbol,
                 clientOrderId: order.id,
                 side: order.side,
@@ -152,7 +154,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             }
 
             let report = OrderExecutionReport(
-                orderCreationTime: DateFactory.now,
+                orderCreationTime: dateFactory.now,
                 symbol: symbol,
                 clientOrderId: order.id,
                 side: order.side,
@@ -230,8 +232,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 status: .new,
                 type: order.type,
                 side: order.side,
-                time: DateFactory.now,
-                updateTime: DateFactory.now,
+                time: dateFactory.now,
+                updateTime: dateFactory.now,
                 originalQuoteQty: 0
             )
         })
@@ -263,7 +265,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 status: .new,
                 type: order.type,
                 side: order.side,
-                time: DateFactory.now
+                time: dateFactory.now
             )
             
             completion(.success(createdOrder))
@@ -298,7 +300,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 status: .filled,
                 type: order.type,
                 side: order.side,
-                time: DateFactory.now
+                time: dateFactory.now
             )
             
             sourcePrint("Created order \(createdOrder)")
@@ -327,7 +329,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 status: .filled,
                 type: order.type,
                 side: order.side,
-                time: DateFactory.now
+                time: dateFactory.now
             )
             
             sourcePrint("Created order \(createdOrder)")

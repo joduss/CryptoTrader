@@ -13,11 +13,11 @@ import Foundation
 /// The mutable date returned by 'now' is to be set anywhere and does not change automatically.
 class DateFactory {
     
-    private static var nowDate: Date?
+    private var nowDate: Date?
     
-    static var simulated = false
+    var simulated = false
     
-    static var now: Date {
+    var now: Date {
         get {
             return simulated ? (nowDate ?? Date()) : Date()
         }
@@ -25,5 +25,5 @@ class DateFactory {
             simulated = true
             nowDate = newValue
         }
-    }
+    } 
 }
