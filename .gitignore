@@ -90,3 +90,4 @@ fastlane/test_output
 iOSInjectionProject/
 CryptoMLTrader/venv
 Common/Market/TradingPlatforms/Binance/BinanceApiKey.swift
+CryptoMLTraderTrainer/venv
