@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		6B0B412525D1CE9500ADE7D2 /* BinanceUserDataStreamListenKeyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0B412425D1CE9500ADE7D2 /* BinanceUserDataStreamListenKeyResponse.swift */; };
 		6B0B412625D1CE9500ADE7D2 /* BinanceUserDataStreamListenKeyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0B412425D1CE9500ADE7D2 /* BinanceUserDataStreamListenKeyResponse.swift */; };
+		6B0C755A25F941D9003329DD /* TraderBTSStrategyConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0C755925F941D9003329DD /* TraderBTSStrategyConfig.swift */; };
+		6B0C756025F941F8003329DD /* TraderBTSStrategyConfigICX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0C755F25F941F8003329DD /* TraderBTSStrategyConfigICX.swift */; };
+		6B0C756625F94216003329DD /* TraderBTSStrategyConfigBTC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0C756525F94215003329DD /* TraderBTSStrategyConfigBTC.swift */; };
 		6B1373C125DAD8A20061CBBE /* BinanceCancelOrderRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1373C025DAD8A20061CBBE /* BinanceCancelOrderRequest.swift */; };
 		6B1373C225DAD8A20061CBBE /* BinanceCancelOrderRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1373C025DAD8A20061CBBE /* BinanceCancelOrderRequest.swift */; };
 		6B1373C325DAD8A20061CBBE /* BinanceCancelOrderRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1373C025DAD8A20061CBBE /* BinanceCancelOrderRequest.swift */; };
@@ -211,7 +214,6 @@
 		6BCA377A25C5D30400B58E3C /* FileMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA377925C5D30400B58E3C /* FileMerger.swift */; };
 		6BCCFBB225E0377A0098E769 /* TraderBTSBuyOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBB125E0377A0098E769 /* TraderBTSBuyOperation.swift */; };
 		6BCCFBB825E037890098E769 /* TraderBTSSellOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */; };
-		6BCCFBD625E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */; };
 		6BCCFBE625E108E30098E769 /* TraderBTSTrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */; };
 		6BD2A46925D6F1770035073B /* BinanceUserDataStreamExecutionOrderResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2BF71A25CF6DD400C82350 /* BinanceUserDataStreamExecutionOrderResponse.swift */; };
 		6BD3CE7225D46B4F00524386 /* BinanceApiRequestSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD3CE7125D46B4F00524386 /* BinanceApiRequestSender.swift */; };
@@ -287,6 +289,9 @@
 
 /* Begin PBXFileReference section */
 		6B0B412425D1CE9500ADE7D2 /* BinanceUserDataStreamListenKeyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceUserDataStreamListenKeyResponse.swift; sourceTree = "<group>"; };
+		6B0C755925F941D9003329DD /* TraderBTSStrategyConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSStrategyConfig.swift; sourceTree = "<group>"; };
+		6B0C755F25F941F8003329DD /* TraderBTSStrategyConfigICX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSStrategyConfigICX.swift; sourceTree = "<group>"; };
+		6B0C756525F94215003329DD /* TraderBTSStrategyConfigBTC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSStrategyConfigBTC.swift; sourceTree = "<group>"; };
 		6B1373C025DAD8A20061CBBE /* BinanceCancelOrderRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceCancelOrderRequest.swift; sourceTree = "<group>"; };
 		6B1373D025DAD8D20061CBBE /* BinanceCancelOrderResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceCancelOrderResponse.swift; sourceTree = "<group>"; };
 		6B1373D825DAE0F70061CBBE /* HttpMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpMethod.swift; sourceTree = "<group>"; };
@@ -368,7 +373,6 @@
 		6BCA377925C5D30400B58E3C /* FileMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileMerger.swift; sourceTree = "<group>"; };
 		6BCCFBB125E0377A0098E769 /* TraderBTSBuyOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSBuyOperation.swift; sourceTree = "<group>"; };
 		6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSSellOperation.swift; sourceTree = "<group>"; };
-		6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSStrategyConfiguration.swift; sourceTree = "<group>"; };
 		6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraderBTSTrade.swift; sourceTree = "<group>"; };
 		6BD3CE7125D46B4F00524386 /* BinanceApiRequestSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceApiRequestSender.swift; sourceTree = "<group>"; };
 		6BD3CE8E25D4755700524386 /* BinanceUserDataListenKeyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceUserDataListenKeyRequest.swift; sourceTree = "<group>"; };
@@ -427,6 +431,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B0C755725F940A4003329DD /* Strategies */ = {
+			isa = PBXGroup;
+			children = (
+				6B0C755825F940B3003329DD /* Configurations */,
+			);
+			path = Strategies;
+			sourceTree = "<group>";
+		};
+		6B0C755825F940B3003329DD /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				6B0C755925F941D9003329DD /* TraderBTSStrategyConfig.swift */,
+				6B0C755F25F941F8003329DD /* TraderBTSStrategyConfigICX.swift */,
+				6B0C756525F94215003329DD /* TraderBTSStrategyConfigBTC.swift */,
+			);
+			path = Configurations;
+			sourceTree = "<group>";
+		};
 		6B1373F025DAF6EC0061CBBE /* Simple */ = {
 			isa = PBXGroup;
 			children = (
@@ -437,7 +459,6 @@
 				6B598DD625E4337C00D483F4 /* TraderBTSIdGenerator.swift */,
 				6B9F8F3A25E6E5DE0046FC39 /* TraderBTSSavedState.swift */,
 				6BCCFBB725E037890098E769 /* TraderBTSSellOperation.swift */,
-				6BCCFBD525E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift */,
 				6BCCFBE525E108E30098E769 /* TraderBTSTrade.swift */,
 			);
 			path = Simple;
@@ -981,7 +1002,6 @@
 				6B56641A25D971B800177B33 /* TradingApiOrder.swift in Sources */,
 				6BA6B49925D081D900D53521 /* BinanceApiUrls.swift in Sources */,
 				6BCCFBB225E0377A0098E769 /* TraderBTSBuyOperation.swift in Sources */,
-				6BCCFBD625E03D7A0098E769 /* TraderBTSStrategyConfiguration.swift in Sources */,
 				6BA1C53925B4D6FA00ECEB5F /* KrakenTickerResponse.swift in Sources */,
 				6BAC335A25E448640066D080 /* CreatedOrder.swift in Sources */,
 				6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */,
@@ -1001,6 +1021,7 @@
 				6B1373E125DAE11A0061CBBE /* BinanceRequestSecurity.swift in Sources */,
 				6BE656A025C08C59001AAF59 /* Percent.swift in Sources */,
 				6B56644225D980CE00177B33 /* BinanceOrderTypeConverter.swift in Sources */,
+				6B0C756625F94216003329DD /* TraderBTSStrategyConfigBTC.swift in Sources */,
 				6B9F8F6325EA53860046FC39 /* TradeSubCommand.swift in Sources */,
 				6B20106825D327B1000124D8 /* ExchangeUserDataStream.swift in Sources */,
 				6B9D04A625B7885100EC53E1 /* BinanceAggregatedTradeResponse.swift in Sources */,
@@ -1020,6 +1041,7 @@
 				6B9F8F3B25E6E5DE0046FC39 /* TraderBTSSavedState.swift in Sources */,
 				6B1373F625DAF6FA0061CBBE /* SimpleTraderBTSStrategy.swift in Sources */,
 				6B52312025D073E600F97959 /* OrderExecutionType.swift in Sources */,
+				6B0C755A25F941D9003329DD /* TraderBTSStrategyConfig.swift in Sources */,
 				6B5C9E3125E1AE2700D6471C /* DatedPrice.swift in Sources */,
 				6B13741E25DAFBD20061CBBE /* SimpleTrader.swift in Sources */,
 				6BD3CE8F25D4755700524386 /* BinanceUserDataListenKeyRequest.swift in Sources */,
@@ -1049,6 +1071,7 @@
 				6BBD82AF25AF753500734704 /* MarketHistorySlice.swift in Sources */,
 				6B1373D125DAD8D20061CBBE /* BinanceCancelOrderResponse.swift in Sources */,
 				6B56646725D98A6300177B33 /* BinanceOrderSideConverter.swift in Sources */,
+				6B0C756025F941F8003329DD /* TraderBTSStrategyConfigICX.swift in Sources */,
 				6B1373D925DAE0F70061CBBE /* HttpMethod.swift in Sources */,
 				6B8D17C125B756AB0021B64E /* IgnoreAsNil.swift in Sources */,
 				6B7116F525BB78B000D34447 /* BinanceTickerResponse.swift in Sources */,

@@ -50,7 +50,22 @@ struct TradeSubCommand {
         let dateFactory = DateFactory()
         
         exchange = BinanceClient(symbol: symbol, config: BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey))
-        let config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
+        
+        var config: TraderBTSStrategyConfig!
+        
+        switch symbol {
+            case .btc_usd:
+                config = TraderBTSStrategyConfigBTC()
+                break
+            case .eth_usd:
+                fatalError("Not config for ETH-USD")
+            case .icx_usd:
+                config = TraderBTSStrategyConfigICX()
+        }
+        
+        config.maxOrdersCount = maxOperationCount
+        
+        
         let strategy = SimpleTraderBTSStrategy(exchange: exchange,
                                                config: config,
                                                initialBalance: initialBalance,

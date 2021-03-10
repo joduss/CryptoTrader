@@ -11,7 +11,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
     private let exchange: ExchangeClient
 
-    private let config: TraderBTSStrategyConfiguration
+    private let config: TraderBTSStrategyConfig
     private let marketAnalyzer: MarketAggregatedHistory
     
     private let symbol: CryptoSymbol
@@ -71,7 +71,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     /// Constructor
     init(
         exchange: ExchangeClient,
-        config: TraderBTSStrategyConfiguration,
+        config: TraderBTSStrategyConfig,
         initialBalance: Double,
         currentBalance: Double,
         saveStateLocation: String,

@@ -110,7 +110,21 @@ struct SimulateSubCommand {
     private func simulate() {
         sourcePriceHidden = false
         
-        var config = TraderBTSStrategyConfiguration(maxOrdersCount: maxOperationCount)
+        var config: TraderBTSStrategyConfig!
+        
+        switch symbol {
+            case .btc_usd:
+                config = TraderBTSStrategyConfigBTC()
+                break
+            case .eth_usd:
+                fatalError("Not config for ETH-USD")
+            case .icx_usd:
+                config = TraderBTSStrategyConfigICX()
+        }
+        
+        config.maxOrdersCount = maxOperationCount
+        
+        
         let dateFactory = DateFactory()
         printDateFactory = dateFactory
         dateFactory.now = self.tickers.first!.date
@@ -174,7 +188,7 @@ struct SimulateSubCommand {
         print(results)
     }
     
-    private func simulate(config: TraderBTSStrategyConfiguration, dateFactory: DateFactory, printPrice: Bool = false) -> (Double, String) {
+    private func simulate(config: TraderBTSStrategyConfig, dateFactory: DateFactory, printPrice: Bool = false) -> (Double, String) {
         let exchange = SimulatedFullExchange(symbol: symbol, tickers: self.tickers, dateFactory: dateFactory)
         let strategy = SimpleTraderBTSStrategy(exchange: exchange,
                                                config: config,
