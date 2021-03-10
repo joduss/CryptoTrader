@@ -112,7 +112,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     
     func buyNow() {
         if currentBalance > orderValue {
-            buy(TraderBTSBuyOperation())
+            buy(TraderBTSBuyOperation(currentPrice: currentAskPrice, config: config))
         }
     }
     
@@ -120,7 +120,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         for sellOperation in openBTSSellOperations {
             let targetPrice = sellOperation.initialTrade.price +% profit
             
-            exchange.trading
+            exchange
+                .trading
                 .send(order:
                         TradeOrderRequest
                         .limitSell(symbol: symbol,
@@ -265,7 +266,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // ================================================================
 
 
-    // MARK: Decision about buying
+    // MARK: Decision about BUY
     // ================================================================
     
     private var lastDip: Date? = nil
@@ -295,7 +296,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             return
         }
         
-        // Try to check if creating a special stop loss sell is helpful.
+        // After selling, by allow a very close below buy
         if let lastClosedSell = self.lastClosedOperation,
            let lastBuyOrder = self.lastBuyOrder,
            lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
@@ -303,7 +304,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
             if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
                 sourcePrint("Buying target price below last sell!")
-                buy(TraderBTSBuyOperation())
+                openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice -% 0.2,
+                                                          stopLossPercent: 0.2,
+                                                          updateWhenBelowPricePercent: config.buyUpdateStopLossPercent)
                 return
             }
         }
@@ -428,23 +431,19 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
     private func updateBuyOperation() {
         guard let buyOperation = self.openBTSBuyOperation else {
-            self.openBTSBuyOperation = TraderBTSBuyOperation()
+            self.openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice, config: config)
             updateBuyOperation()
             return
         }
-
-        let buyPrice = currentBidPrice +% config.buyStopLossPercent
-        let updatePrice = currentBidPrice -% config.buyUpdateStopLossPercent
-
-        buyOperation.stopLossPrice = buyPrice
-        buyOperation.updateWhenBelowPrice = updatePrice
-
+        
+        buyOperation.updateStopLoss(newPrice: currentAskPrice)
         sourcePrint(
             "Updated buy operation \(buyOperation.uuid). Will buy if price > \(buyOperation.stopLossPrice.format(decimals: 3)) / update SLP if price < \(buyOperation.updateWhenBelowPrice.format(decimals: 3))."
         )
         saveState()
     }
-
+    
+    /// Send a buy order to the exchange platform for the given operation.
     private func buy(_ operation: TraderBTSBuyOperation) {
         let idGenerator = TraderBTSIdGenerator(
             id: operation.uuid,
