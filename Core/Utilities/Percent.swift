@@ -6,7 +6,7 @@ infix operator -% : AdditionPrecedence
 infix operator +% : AdditionPrecedence
 
 
-struct Percent: Comparable {
+struct Percent: Comparable, CustomStringConvertible {
 
     /// The percentage.
     var percentage: Double
@@ -70,6 +70,10 @@ struct Percent: Comparable {
     
     static func /(lhs: Percent, rhs: Double) -> Percent {
         Percent(lhs.percentage / rhs)
+    }
+    
+    var description: String {
+        return "\(percentage.format(decimals: 4))%"
     }
 }
 
