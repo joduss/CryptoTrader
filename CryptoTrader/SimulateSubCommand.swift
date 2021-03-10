@@ -145,32 +145,66 @@ struct SimulateSubCommand {
         var results: [(Double, String)] = []
         
         let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 12
+        let group = DispatchGroup()
         
-        for maxOrder in [10, 15] {
-            for buyStopLossPercent in [0.1, 0.23, 0.5, 0.7, 1] {
-                for sellStopLossProfitPercent in [0.1, 0.3, 0.5, 0.75, 1] {
-                    for minDistancePercentNegative in [-1.5, -1.2, -0.8, -0.5] {
-                        for minDistancePercentPositive in [0.1, 0.25, 0.5, 0.75, 1] {
-                            for nextBuyTargetPercent in [0.1, 0.25, 0.5] {
-                                for nextBuyTargetExpiration in [30, 60, 120] {
-                                    var config = TraderBTSStrategyConfiguration()
-                                    config.maxOrdersCount = maxOrder
-                                    config.buyStopLossPercent = Percent(buyStopLossPercent)
-                                    config.sellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
-                                    config.minSellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
-                                    config.minDistancePercentPositive = Percent(minDistancePercentPositive)
-                                    config.minDistancePercentNegative = Percent(minDistancePercentNegative)
-                                    config.nextBuyTargetPercent = Percent(nextBuyTargetPercent)
-                                    config.nextBuyTargetExpiration = TimeInterval.fromMinutes(Double(nextBuyTargetExpiration))
-                                                                        
-                                    queue.addOperation {
-                                        let simulationResults = simulate(config: config)
-                                        
-                                        testSema.wait()
-                                        results.append(simulationResults)
-                                        print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
-                                        testSema.signal()
+        var res = [String]()
+        var operationCount = 0
+        
+        for maxOrder in [12] {
+            for buyStopLossPercent in [0.25] {
+                for sellStopLossProfitPercent in [0.75] {
+                    for minDistancePercentNegative in [-0.15] {
+                        for minDistancePercentPositive in [0.3] {
+                            for nextBuyTargetPercent in [0.1] {
+                                for nextBuyTargetExpiration in [120.0] {
+                                    for lockTrendThreshold in [1.5, 1, 0.7, -0.2] {
+                                        for unlockTrendThreshold in [0.3] {
+                                            for lock2LossesInLast in [4.0, 8, 12, 16, 24] {
+                                                for unlockCheckTrendInterval in [12.0] {
+                                                    for lockCheckTrendInterval in [6.0, 12, 24] {
+                                                        for lockStrictInterval in [5.0, 15, 30, 60] {
+                                                            
+                                                            operationCount += 1
+                                                            queue.progress.totalUnitCount = Int64(operationCount)
+                                                            
+                                                            group.enter()
+                                                            
+                                                            var config = TraderBTSStrategyConfigBTC() // Not important, we set each value.
+                                                            config.maxOrdersCount = maxOrder
+                                                            config.buyStopLossPercent = Percent(buyStopLossPercent)
+                                                            config.sellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
+                                                            config.minSellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
+                                                            config.minDistancePercentPositive = Percent(minDistancePercentPositive)
+                                                            config.minDistancePercentNegative = Percent(minDistancePercentNegative)
+                                                            config.nextBuyTargetPercent = Percent(nextBuyTargetPercent)
+                                                            config.nextBuyTargetExpiration = TimeInterval.fromMinutes(Double(nextBuyTargetExpiration))
+                                                            config.unlockTrendThreshold = Percent(unlockTrendThreshold)
+                                                            config.lockTrendThreshold = Percent(lockTrendThreshold)
+                                                            config.lock2LossesInLast = TimeInterval.fromHours(lock2LossesInLast)
+                                                            config.unlockCheckTrendInterval = TimeInterval.fromHours(unlockCheckTrendInterval)
+                                                            config.lockCheckTrendInterval = TimeInterval.fromHours(lockCheckTrendInterval)
+                                                            config.lockStrictInterval = TimeInterval.fromMinutes(lockStrictInterval)
+                                                            
+                                                            queue.addOperation {
+                                                                let dateFactory = DateFactory()
+                                                                dateFactory.now = self.tickers.first!.date
+                                                                
+                                                                let simulationResults = simulate(config: config, dateFactory: dateFactory)
+                                                                
+                                                                testSema.wait()
+                                                                results.append(simulationResults)
+                                                                print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                                                
+                                                                res.append("\(minDistancePercentNegative), \(minDistancePercentPositive), \(buyStopLossPercent), \(sellStopLossProfitPercent), \(lockTrendThreshold), \(unlockTrendThreshold) \(lock2LossesInLast), \(unlockCheckTrendInterval), \(lockCheckTrendInterval),\(lockStrictInterval),\(nextBuyTargetPercent),\(simulationResults.0)")
+                                                                
+                                                                testSema.signal()
+                                                                group.leave()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -179,13 +213,24 @@ struct SimulateSubCommand {
                 }
             }
         }
-        
-        queue.progress.totalUnitCount = Int64(queue.operationCount)
-        
-//        results.map({r in "########################################" + r.1 + "\(r.0)\n\n\n---------------------------------------------------------------------------"}).joined(separator: "\n").data(using: .utf8)?.write(to: URL(fileURLWithPath: "/Users/jonathanduss/Downloads/2/a4.txt"))
+            
+        queue.maxConcurrentOperationCount = 4
         
         queue.waitUntilAllOperationsAreFinished()
-        print(results)
+        group.wait()
+        print(res)
+
+        
+        try! results.map(
+            { r in
+                "########################################\n"
+                    + "Result\n"
+                    + "########################################\n\n"
+                    + "Profits => \(r.0)\n\n"
+                    + r.1
+            })
+            .joined(separator: "\n")
+            .data(using: .utf8)!.write(to: URL(fileURLWithPath: "/Users/jonathanduss/Downloads/a10.txt"))
     }
     
     private func simulate(config: TraderBTSStrategyConfig, dateFactory: DateFactory, printPrice: Bool = false) -> (Double, String) {
@@ -226,7 +271,6 @@ struct SimulateSubCommand {
         var askQuantity: Double!
         
         var elementIdx = 0
-//        var charIdx = 0
         var accumulated = ""
         var accumulating = false
                 
