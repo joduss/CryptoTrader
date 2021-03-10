@@ -206,7 +206,7 @@ struct SimulateSubCommand {
             """
             CONFIG: \(config)
 
-            \(strategy.summary())
+            \(strategy.summary(shouldPrint: printPrice))
             """
         
         return (strategy.profits, description)

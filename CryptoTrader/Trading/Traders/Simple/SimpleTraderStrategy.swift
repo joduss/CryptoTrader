@@ -17,5 +17,5 @@ protocol SimpleTraderStrategy {
     func updateBid(price: Double)
     
     @discardableResult
-    func summary() -> String
+    func summary(shouldPrint: Bool) -> String
 }

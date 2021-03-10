@@ -49,8 +49,8 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         strategy.sellAll(profit: Percent(2))
     }
     
-    func summary() {
-        strategy.summary()
+    func summary(shouldPrint: Bool) {
+        strategy.summary(shouldPrint: shouldPrint)
     }
 
     // MARK: - Exchange events processing

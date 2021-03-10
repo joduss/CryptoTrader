@@ -185,7 +185,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             sourcePrint("Failed to restore the state: \(error)")
         }
         sourcePrint("Loaded saved state")
-        summary()
     }
 
     // ================================================================
@@ -509,6 +508,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         saveState()
     }
 
+    
     private func update(operation: TraderBTSSellOperation, price: Double) {
 
         // If the operation has not sell order associated, we
@@ -659,11 +659,13 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     
+    
+    
     // MARK: - Information Display
     // =================================================================
     
     @discardableResult
-    func summary() -> String {
+    func summary(shouldPrint: Bool = true) -> String {
         let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), before: currentDate).average()
         let coins: Double = openBTSSellOperations.reduce(
             0.0,
@@ -720,7 +722,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         summaryString += "Total assets value: \((coins * currentPrice + currentBalance).format(decimals: 2)) / Initial value: \(initialBalance.format(decimals: 2))\n"
         
-        print(summaryString)
+        if shouldPrint {
+            print(summaryString)
+        }
+        
         return summaryString
     }
 

@@ -110,7 +110,7 @@ struct TradeSubCommand {
         }
         
         if input.starts(with: "summary") {
-            trader.summary()
+            trader.summary(shouldPrint: true)
             return
         }
         
