@@ -283,10 +283,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
         
         // RULE 1: Special buy when there is a huge dip
-        if price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(20), before: currentDate - 10).average() -% 3,
-           currentBalance >= orderValue,
-           let lastDip = self.lastDip,
-           currentDate - lastDip > TimeInterval.fromMinutes(30){
+        if price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent,
+           currentBalance >= orderValue {
             self.lastDip = currentDate
             sourcePrint("Special buy preparation of a big drop")
             updateBuyOperation()
@@ -405,6 +403,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 updateBuyOperation()
                 return
             }
+            
             // Small slow decrease
             if Percent(differenceOf: price, from: abovePrice) < Percent(-1)
                 && currentDate - lastBuyOrder!.initialTrade.date > TimeInterval.fromMinutes(60)
