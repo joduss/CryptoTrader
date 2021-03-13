@@ -142,8 +142,22 @@ open class MarketHistorySlice {
         var max = 0.0
         var total = 0.0
         
-        self.prices.withUnsafeBufferPointer({ array in
-            for price in array {
+
+        if self.prices.count > 2000000 {
+            self.prices.withUnsafeBufferPointer({ array in
+                for price in array {
+                    if (price.price < min) {
+                        min = price.price
+                    }
+                    if (price.price > max) {
+                        max = price.price
+                    }
+                    total += price.price
+                }
+            })
+        }
+        else {
+            for price in self.prices {
                 if (price.price < min) {
                     min = price.price
                 }
@@ -152,8 +166,9 @@ open class MarketHistorySlice {
                 }
                 total += price.price
             }
-        })
-                    
+        }
+        
+        
         self.min = min
         self.max = max
         self.averagePrice = total / Double(self.prices.count)

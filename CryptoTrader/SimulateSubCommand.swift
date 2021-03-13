@@ -47,7 +47,7 @@ struct SimulateSubCommand {
     let maxOperationCount: Int
     let saveStateLocation: String
     
-    let tickers: [MarketTicker]
+    let tickers: ContiguousArray<MarketTicker>
     
     
     internal init(symbol: CryptoSymbol, initialBalance: Double, maxOperationCount: Int, saveStateLocation: String, tickersLocation: String, gridSearch: Bool) throws {
@@ -56,7 +56,7 @@ struct SimulateSubCommand {
         var idx = 0
         let keepEveryNTicker = 10
         
-        var tickersRead = [MarketTicker]()
+        var tickersRead = ContiguousArray<MarketTicker>()
         tickersRead.reserveCapacity(50000000)
         
         while true {

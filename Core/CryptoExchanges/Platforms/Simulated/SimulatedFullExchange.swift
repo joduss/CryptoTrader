@@ -9,13 +9,13 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     var userDataStream: ExchangeUserDataStream { return self }
     var trading: ExchangeSpotTrading { return self }
 
-    private let tickers: [MarketTicker]
+    private let tickers: ContiguousArray<MarketTicker>
     private let dateFactory: DateFactory
     private var currentTicker: MarketTicker
     private var exchangeOrderId = 1
     private var group = DispatchGroup()
 
-    init(symbol: CryptoSymbol, tickers: [MarketTicker], dateFactory: DateFactory) {
+    init(symbol: CryptoSymbol, tickers: ContiguousArray<MarketTicker>, dateFactory: DateFactory) {
         self.tickers = tickers
         self.symbol = symbol
         self.dateFactory = dateFactory
