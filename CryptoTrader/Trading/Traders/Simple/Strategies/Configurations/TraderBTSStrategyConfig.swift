@@ -22,6 +22,12 @@ protocol TraderBTSStrategyConfig {
     var nextBuyTargetPercent: Percent { get set }
     var nextBuyTargetExpiration: TimeInterval { get set }
     
+    /// Consider a dip when the price goes below in less than X minutes
+    var dipDropThresholdPercent: Percent { get set }
+    
+    /// If the price dive by dipBelowPercent
+    var dipDropThresholdTime: TimeInterval { get set }
+
     
     var lockStrictInterval: TimeInterval { get set }
     var lockCheckTrendInterval: TimeInterval { get set }

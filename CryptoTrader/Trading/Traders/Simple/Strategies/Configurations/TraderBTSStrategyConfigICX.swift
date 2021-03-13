@@ -20,6 +20,12 @@ struct TraderBTSStrategyConfigICX: TraderBTSStrategyConfig {
     var nextBuyTargetPercent: Percent = 0.1
     var nextBuyTargetExpiration: TimeInterval = TimeInterval.fromMinutes(120)
     
+    /// Consider a dip when the price goes below in less than X minutes
+    var dipDropThresholdPercent: Percent = 3
+    
+    /// If the price dive by dipBelowPercent
+    var dipDropThresholdTime: TimeInterval = TimeInterval.fromMinutes(10)
+    
     
     var lockStrictInterval: TimeInterval = TimeInterval.fromMinutes(10)
     var lockCheckTrendInterval: TimeInterval = TimeInterval.fromHours(6)
@@ -32,7 +38,7 @@ struct TraderBTSStrategyConfigICX: TraderBTSStrategyConfig {
     // MARK: SELL rules
     
     var sellStopLossProfitPercent: Percent = 0.75
-    var minSellStopLossProfitPercent: Percent = 1
+    var minSellStopLossProfitPercent: Percent = 0.75
     
     /// Price increase (in % of the existing current price) at which the stop-loss profit
     /// price is updated.

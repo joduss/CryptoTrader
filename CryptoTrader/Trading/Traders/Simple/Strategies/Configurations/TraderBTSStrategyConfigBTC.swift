@@ -5,7 +5,7 @@ struct TraderBTSStrategyConfigBTC: TraderBTSStrategyConfig {
     
     // MARK: General
     
-    var maxOrdersCount: Int = 10
+    var maxOrdersCount: Int = 15
     
     
     // MARK: Buy rules
@@ -16,27 +16,32 @@ struct TraderBTSStrategyConfigBTC: TraderBTSStrategyConfig {
     /// Update the stop-loss order if the price goes lower than X% below the current price
     var buyUpdateStopLossPercent: Percent = 0.01
     
-    var minDistancePercentNegative: Percent = -0.15
+    var minDistancePercentNegative: Percent = -0.5
     var minDistancePercentPositive: Percent = 0.3
     
-    var nextBuyTargetPercent: Percent = 0.1
+    var nextBuyTargetPercent: Percent = 0.05 // Negative
     var nextBuyTargetExpiration: TimeInterval = TimeInterval.fromMinutes(120)
     
+    /// Consider a dip when the price goes below in less than X minutes
+    var dipDropThresholdPercent: Percent = 3
+    
+    /// If the price dive by dipBelowPercent
+    var dipDropThresholdTime: TimeInterval = TimeInterval.fromMinutes(15)
     
     var lockStrictInterval: TimeInterval = TimeInterval.fromMinutes(30)
     var lockCheckTrendInterval: TimeInterval = TimeInterval.fromHours(12)
-    var lockTrendThreshold: Percent = 0.7
-    var lock2LossesInLast: TimeInterval = TimeInterval.fromHours(16)
+    var lockTrendThreshold: Percent = 0.0
+    var lock2LossesInLast: TimeInterval = TimeInterval.fromHours(1)
     var unlockTrendThreshold: Percent = 0.3
-    var unlockCheckTrendInterval: TimeInterval = TimeInterval.fromMinutes(12)
+    var unlockCheckTrendInterval: TimeInterval = TimeInterval.fromHours(12)
     
     
     // MARK: SELL rules
     
-    var sellStopLossProfitPercent: Percent = 0.75
-    var minSellStopLossProfitPercent: Percent = 1
+    var sellStopLossProfitPercent: Percent = 0.6
+    var minSellStopLossProfitPercent: Percent = 0.6
     
     var sellUpdateStopLossProfitPercent: Percent = 0.01
     
-    var sellMinProfitPercent: Percent = 0.35
+    var sellMinProfitPercent: Percent = 0.45
 }
