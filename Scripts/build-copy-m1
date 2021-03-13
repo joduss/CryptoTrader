@@ -1,0 +1,13 @@
+PROJ_ROOT=/Users/jonathanduss/Downloads/Trader2
+
+ARCHIVE_PATH=$PROJ_ROOT/archive
+
+
+xcodebuild -project $PROJ_ROOT/CryptoTrader.xcodeproj -scheme "Trader - Release" -archivePath $ARCHIVE_PATH archive
+
+ssh admin@192.168.1.50 "rm /Users/admin/Desktop/CryptoTrader"
+scp $PROJ_ROOT/archive.xcarchive/Products/usr/local/bin/CryptoTrader admin@192.168.1.50:/Users/admin/Desktop/CryptoTrader
+
+ssh admin@192.168.1.50 "/Users/admin/Desktop/CryptoTrader simulate --btc_usd --grid-search -b 1 -c 1 a.json /Users/admin/Desktop/btc.tickers"
+
+scp admin@192.168.1.50:/Users/admin/Desktop/parameters.csv ~/Downloads
