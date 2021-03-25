@@ -93,3 +93,5 @@ Common/Market/TradingPlatforms/Binance/BinanceApiKey.swift
 CryptoMLTraderTrainer/venv
 CryptoMLTraderTrainer/input
 CryptoMLTraderTrainer/CryptoMLTraderTrainer/input
+archive.xcarchive
+build.xcarchive
