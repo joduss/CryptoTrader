@@ -87,8 +87,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.dateFactory = dateFactory ?? DateFactory.init()
         self.startDate = self.dateFactory.now
         
+        let maxInterval = max(config.lockCheckTrendInterval, config.unlockCheckTrendInterval)
+        
         self.marketAnalyzer =
-            MarketAggregatedHistory(intervalToKeep: TimeInterval.fromHours(12), aggregationPeriod: TimeInterval.fromMinutes(1))
+            MarketAggregatedHistory(intervalToKeep: maxInterval, aggregationPeriod: TimeInterval.fromMinutes(1))
         
         self.restore()
 
@@ -282,8 +284,12 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.currentAskPrice = price
         marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
         
+        let closestAboveBuyPrice = self.closestAboveOrder(to: price)?.initialTrade.price
+        let closestBelowBuyPrice = self.closestBelowOrder(to: price)?.initialTrade.price
+        
         // RULE 1: Special buy when there is a huge dip
-        if price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent,
+        if  let closestAbove = closestAboveBuyPrice, Percent(differenceOf: price, from: closestAbove) < config.minDistancePercentNegative,
+            price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent,
            currentBalance >= orderValue {
             self.lastDip = currentDate
             sourcePrint("Special buy preparation of a big drop")
@@ -295,19 +301,20 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         }
         
         // After selling, by allow a very close below buy
-        if let lastClosedSell = self.lastClosedOperation,
-           let lastBuyOrder = self.lastBuyOrder,
-           lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
-           currentDate - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
-        
-            if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
-                sourcePrint("Buying target price below last sell!")
-                openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice -% 0.2,
-                                                          stopLossPercent: 0.2,
-                                                          updateWhenBelowPricePercent: config.buyUpdateStopLossPercent)
-                return
-            }
-        }
+//        if openBTSBuyOperation == nil,
+//           let lastClosedSell = self.lastClosedOperation,
+//           let lastBuyOrder = self.lastBuyOrder,
+//           lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
+//           currentDate - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
+//        
+//            if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
+//                sourcePrint("Buying target price below last sell!")
+//                openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice -% 0.2,
+//                                                          stopLossPercent: 0.2,
+//                                                          updateWhenBelowPricePercent: config.buyUpdateStopLossPercent)
+//                return
+//            }
+//        }
 
         // Locking
         if let locked = self.locked {
@@ -339,9 +346,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             return
         }
         
-        
-        let closestAboveBuyPrice = self.closestAboveOrder(to: price)?.initialTrade.price
-        let closestBelowBuyPrice = self.closestBelowOrder(to: price)?.initialTrade.price
 
         if closestAboveBuyPrice == nil && closestBelowBuyPrice == nil {
             updateBuyOperation()
@@ -379,11 +383,15 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 op.initialTrade.price > price && currentDate - op.initialTrade.date < config.lock2LossesInLast
             })
             
-            let trendDownwards =  marketAnalyzer.prices(last: config.lockCheckTrendInterval,
-                                                        before: currentDate).isTrendDownwards(threshold: config.lockTrendThreshold)
+            let trendDownwards = {
+                () in  return self.marketAnalyzer
+                    .prices(last: self.config.lockCheckTrendInterval,
+                            before: self.currentDate)
+                    .isTrendDownwards(threshold: self.config.lockTrendThreshold)
+            }
             
             // Compared to last buy, the price went down.
-            if lastLoosingTrades.count >= 2 && trendDownwards {
+            if lastLoosingTrades.count >= 2 && trendDownwards() {
                 sourcePrint("Locking (price: \(price)")
                 self.locked = currentDate
                 return
@@ -515,7 +523,16 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         if operation.stopLossPrice == 0 {
             createStopLoss(operation: operation, price: price)
         } else if price <= operation.stopLossPrice {
+            // We check in case there was a problem and the price is much lower than the stoploss
+            // and selling would lead to a loss.
+            if Percent(differenceOf: price, from: operation.stopLossPrice) > config.sellMinProfitPercent {
+                operation.stopLossPrice = 0
+                operation.updateWhenAbovePrice = 0
+                return
+            }
+            
             sell(operation: operation)
+            
         } else if price > operation.updateWhenAbovePrice {
             createStopLoss(operation: operation, price: price)
         }
