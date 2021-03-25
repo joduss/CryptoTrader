@@ -269,6 +269,8 @@ class SimulateSubCommand {
         
         queue.maxConcurrentOperationCount = 4
         
+        print("Total operations: \(queue.operationCount)")
+        
         queue.waitUntilAllOperationsAreFinished()
         group.wait()
         print(parametersAndProfits)

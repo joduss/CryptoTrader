@@ -82,12 +82,12 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
     
     private func marketPairSymbol(_ symbol: CryptoSymbol) -> String {
         switch symbol {
-        case .btc_usd:
-            return "btcusdt"
-        case .eth_usd:
-            return "ethusdt"
-        case .icx_usd:
-            return "icxusdt"
+            case .btc_usd:
+                return "btcusdt"
+            case .eth_usd:
+                return "ethusdt"
+            case .icx_usd:
+                return "icxusdt"
         }
     }
     

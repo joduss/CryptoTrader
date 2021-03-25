@@ -16,12 +16,12 @@ public class BinanceApiFragment {
     
     func stringify(symbol: CryptoSymbol) -> String {
         switch symbol {
-        case .btc_usd:
-            return "btcusdt"
-        case .eth_usd:
-            return "ethusdt"
-        case .icx_usd:
-            return "icxusdt"
+            case .btc_usd:
+                return "btcusdt"
+            case .eth_usd:
+                return "ethusdt"
+            case .icx_usd:
+                return "icxusdt"
         }
     }
 }

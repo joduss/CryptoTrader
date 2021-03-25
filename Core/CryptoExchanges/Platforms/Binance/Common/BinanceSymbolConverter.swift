@@ -17,12 +17,12 @@ struct BinanceSymbolConverter {
     
     static func convert(_ symbol: CryptoSymbol) -> String {
         switch symbol {
-        case .btc_usd:
-            return "BTCUSDT"
-        case .eth_usd:
-            return "ETHUSDT"
-        case .icx_usd:
-            return "ICXUSDT"
+            case .btc_usd:
+                return "BTCUSDT"
+            case .eth_usd:
+                return "ETHUSDT"
+            case .icx_usd:
+                return "ICXUSDT"
         }
     }
 }
