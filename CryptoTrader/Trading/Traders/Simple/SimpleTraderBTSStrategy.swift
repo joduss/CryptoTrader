@@ -104,7 +104,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         self.initialBalance = initialBalance
         self.currentBalance = self.currentBalance + balanceChange
-        self.orderValue = self.orderValue + balanceChange / Double(config.maxOrdersCount)
+        self.orderValue = self.currentBalance / Double(config.maxOrdersCount - openBTSSellOperations.count)
     }
     
     
