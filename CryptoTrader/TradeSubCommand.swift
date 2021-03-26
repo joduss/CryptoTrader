@@ -58,7 +58,7 @@ struct TradeSubCommand {
                 config = TraderBTSStrategyConfigBTC()
                 break
             case .eth_usd:
-                fatalError("Not config for ETH-USD")
+                config = TraderBTSStrategyConfigETH()
             case .icx_usd:
                 config = TraderBTSStrategyConfigICX()
         }

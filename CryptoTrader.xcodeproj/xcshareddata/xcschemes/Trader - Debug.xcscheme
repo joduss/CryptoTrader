@@ -52,7 +52,19 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "simulate --btc_usd -b 101 -c 10 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/Backups/btc-current/btc.tickers&quot;"
+            argument = "simulate --grid-search --btc_usd -b 152 -c 15 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --eth_usd -b 152 -c 15 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --eth_usd -b 152 -c 15 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/eth.tickers&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --grid-search --eth_usd -b 152 -c 15 &quot;/Users/jonathanduss/Desktop/backup&quot; &quot;/Users/jonathanduss/Documents/Data Mining/eth.tickers&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

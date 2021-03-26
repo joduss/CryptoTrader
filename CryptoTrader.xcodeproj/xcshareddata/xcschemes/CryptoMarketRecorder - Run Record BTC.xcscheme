@@ -52,7 +52,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "record --btc_usd ~/Desktop/record-test test-market"
+            argument = "record --icx_usd ~/Desktop/record-test test-market"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

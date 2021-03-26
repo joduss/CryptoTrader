@@ -54,7 +54,7 @@ class SimulateSubCommand {
         
         let reader = TextFileReader.openFile(at: tickersLocation)
         var idx = 0
-        let keepEveryNTicker = 10
+        let keepEveryNTicker = 15
         
         var tickersRead = ContiguousArray<MarketTicker>()
         tickersRead.reserveCapacity(50000000)
@@ -68,27 +68,39 @@ class SimulateSubCommand {
             idx += 1
             
             if (idx % 1000000 == 0) { print(idx) }
-            if idx < 26000000 { continue }
-//            if idx > 5000000 { break }
+//            if idx < 26000000 { continue }
+//            if idx > 1000000 { break }
             if (idx % keepEveryNTicker != 0) { continue }
 
             let ticker = SimulateSubCommand.parse(line: line)
             
+//            let startDate: Date = Date(timeIntervalSinceReferenceDate: 635846400) // begining of last week
+////            let startDate: Date = Date(timeIntervalSinceReferenceDate: 636156000) // samedi soir
+//            let endDate: Date = Date()
+//
+//
+//            if ticker.date < startDate {
+//                continue
+//            }
+//
+//            if ticker.date > endDate {
+//                break
+//            }
             
-            let startDate: Date = Date(timeIntervalSinceReferenceDate: 635846400)
-            let endDate: Date = Date()
-                
-            
-            if ticker.date < startDate {
-                continue
-            }
-            
-            if ticker.date > endDate {
-                break
-            }
-            
-            tickers.append(ticker)
             tickersRead.append(ticker)
+        }
+        
+        let time = tickersRead.last!.date
+        let addTime = TimeInterval.fromMilliseconds(300)
+        let tickersReadReversed = Array(tickersRead.reversed())
+        
+        var i = 0
+        let tickersCount = tickersRead.count
+        while(i < tickersCount) {
+            var ticker = tickersReadReversed[i]
+            ticker.date = time + addTime * Double(i)
+            tickersRead.append(ticker)
+            i += 1
         }
         
         self.tickers = tickersRead
@@ -117,7 +129,7 @@ class SimulateSubCommand {
                 config = TraderBTSStrategyConfigBTC()
                 break
             case .eth_usd:
-                fatalError("Not config for ETH-USD")
+                config = TraderBTSStrategyConfigETH()
             case .icx_usd:
                 config = TraderBTSStrategyConfigICX()
         }
@@ -166,95 +178,111 @@ class SimulateSubCommand {
                                         + "unlockCheckTrendInterval,"
                                         + "lockCheckTrendInterval,"
                                         + "lockStrictInterval,"
-                                        + "nextBuyTargetPercent,"
                                         + "dipDropThresholdTime,"
                                         + "dipDropThresholdPercent,"
                                         + "sellMinProfitPercent,"
                                         + "minSellStopLossProfitPercent,"
                                         + "simulationResults")
-        for maxOrder in [15] {
-            for buyStopLossPercent in [0.25] {
-                for sellStopLossProfitPercent in [0, 0.2, 0.4, 0.6] { //0.6
-                    for minDistancePercentNegative in [-0.5] {
-                        for minDistancePercentPositive in [0.3] {
-                            for nextBuyTargetPercent in [0.05, 0.15] {
-                                for nextBuyTargetExpiration in [120.0] { // minutes
-                                    for lockTrendThreshold in [0.0] {
-                                        for unlockTrendThreshold in [0, 0.3] {
-                                            for lock2LossesInLast in [1.0] { // hours
-                                                for unlockCheckTrendInterval in [12.0] {
-                                                    for lockCheckTrendInterval in [12.0] { // hours
-                                                        for lockStrictInterval in [30.0] {// minutes
-                                                            for dipDropThresholdPercent in [2.0] {
-                                                                for dipDropThresholdTime in [15.0] {
-                                                                    for sellMinProfitPercent in [0.21, 0.25, 0.3, 0.38, 0.45] {
-                                                                        for minSellStopLossProfitPercent in [0.1, 0.15, 0.25, 0.3, 0.35, 0.47, 0.6] {
-                                                                            operationCount += 1
-                                                                            queue.progress.totalUnitCount = Int64(operationCount)
-                                                                            
-                                                                            group.enter()
-                                                                            
-                                                                            var config = TraderBTSStrategyConfigBTC() // Not important, we set each value.
-                                                                            config.maxOrdersCount = maxOrder
-                                                                            config.buyStopLossPercent = Percent(buyStopLossPercent)
-                                                                            config.sellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
-                                                                            config.minSellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
-                                                                            config.minDistancePercentPositive = Percent(minDistancePercentPositive)
-                                                                            config.minDistancePercentNegative = Percent(minDistancePercentNegative)
-                                                                            config.nextBuyTargetPercent = Percent(nextBuyTargetPercent)
-                                                                            config.nextBuyTargetExpiration = TimeInterval.fromMinutes(Double(nextBuyTargetExpiration))
-                                                                            config.unlockTrendThreshold = Percent(unlockTrendThreshold)
-                                                                            config.lockTrendThreshold = Percent(lockTrendThreshold)
-                                                                            config.lock2LossesInLast = TimeInterval.fromHours(lock2LossesInLast)
-                                                                            config.unlockCheckTrendInterval = TimeInterval.fromHours(unlockCheckTrendInterval)
-                                                                            config.lockCheckTrendInterval = TimeInterval.fromHours(lockCheckTrendInterval)
-                                                                            config.lockStrictInterval = TimeInterval.fromMinutes(lockStrictInterval)
-                                                                            config.dipDropThresholdTime = TimeInterval.fromMinutes(dipDropThresholdTime)
-                                                                            config.dipDropThresholdPercent = Percent(dipDropThresholdPercent)
-                                                                            config.sellMinProfitPercent = Percent(sellMinProfitPercent)
-                                                                            config.minSellStopLossProfitPercent = Percent(minSellStopLossProfitPercent)
-                                                                            
-                                                                            queue.addOperation {
-                                                                                let dateFactory = DateFactory()
-                                                                                dateFactory.now = self.tickers.first!.date
-                                                                                
-                                                                                let simulationResults = self.simulate(config: config, dateFactory: dateFactory)
-                                                                                
-                                                                                self.testSema.wait()
-                                                                                results.append(simulationResults)
-                                                                                print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
-                                                                                
-                                                                                let parameters: String =
-                                                                                    "\(maxOrder),"
-                                                                                    + "\(minDistancePercentNegative),"
-                                                                                    + "\(minDistancePercentPositive),"
-                                                                                    + "\(buyStopLossPercent),"
-                                                                                    + "\(sellStopLossProfitPercent),"
-                                                                                    + "\(lockTrendThreshold),"
-                                                                                    + "\(unlockTrendThreshold),"
-                                                                                    + "\(lock2LossesInLast),"
-                                                                                    + "\(unlockCheckTrendInterval),"
-                                                                                    + "\(lockCheckTrendInterval),"
-                                                                                    + "\(lockStrictInterval),"
-                                                                                    + "\(nextBuyTargetPercent),"
-                                                                                    + "\(dipDropThresholdTime),"
-                                                                                    + "\(dipDropThresholdPercent),"
-                                                                                    + "\(sellMinProfitPercent),"
-                                                                                    + "\(minSellStopLossProfitPercent),"
-                                                                                    + "\(simulationResults.0)"
-                                                                                
-                                                                                parametersAndProfits.append(parameters)
-                                                                                
-                                                                                self.testSema.signal()
-                                                                                group.leave()
-                                                                            }
-                                                                        }
+        
+        
+        // BTC
+        for maxOrder in [18] { // 18
+            for buyStopLossPercent in [0.8] { // 0.8
+                for sellStopLossProfitPercent in [0.5] { // 0.5
+                    for minDistancePercentNegative in [-0.2] { // -0.2
+                        for minDistancePercentPositive in [0.4] { // 0.4
+                            for lockTrendThreshold in [0.0] { // 0
+                                for unlockTrendThreshold in [0.0] { // 0
+                                    for lock2LossesInLast in [16.0] { // 12 hours
+                                        for unlockCheckTrendInterval in [6.0] { // 6 (very clear)
+                                            for lockCheckTrendInterval in [1.0] { // 1 (very clear)
+                                                for lockStrictInterval in [180.0] {// minutes // 180
+                                                    for dipDropThresholdPercent in [1.5] { // 1.5
+                                                        for dipDropThresholdTime in [45.0] { // 45
+                                                            for sellMinProfitPercent in [0.9] { // 0.9
+                                                                for minSellStopLossProfitPercent in [sellStopLossProfitPercent] {
+                                                                    
+                                                                    // ETH
+                                                                    //        for maxOrder in [15] {
+                                                                    //            for buyStopLossPercent in [0.8] { // 0.8
+                                                                    //                for sellStopLossProfitPercent in [0.6] { // 0.25
+                                                                    //                    for minDistancePercentNegative in [-0.2, -0.4, -0.6, -1] { // -0.2
+                                                                    //                        for minDistancePercentPositive in [0.2, 0.4, 0.6, 1] { //0.6
+                                                                    //                            for nextBuyTargetPercent in [0.5] { // 0.1
+                                                                    //                                for nextBuyTargetExpiration in [15.0] { // minutes // 30 (tester encore 15, 30, 60, 90, 120
+                                                                    //                                    for lockTrendThreshold in [0.0] { // 0
+                                                                    //                                        for unlockTrendThreshold in [0.0] { // 0
+                                                                    //                                            for lock2LossesInLast in [12.0] { // 12 hours
+                                                                    //                                                for unlockCheckTrendInterval in [3.0] { // 3
+                                                                    //                                                    for lockCheckTrendInterval in [8.0] { // hours // 8
+                                                                    //                                                        for lockStrictInterval in [180.0] {// minutes // 180
+                                                                    //                                                            for dipDropThresholdPercent in [1.5] { // 1.5
+                                                                    //                                                                for dipDropThresholdTime in [30.0] { // 30
+                                                                    //                                                                    for sellMinProfitPercent in [0.4, 0.9] {
+                                                                    //                                                                        for minSellStopLossProfitPercent in [sellStopLossProfitPercent] {
+                                                                    
+                                                                    operationCount += 1
+                                                                    queue.progress.totalUnitCount = Int64(operationCount)
+                                                                    
+                                                                    group.enter()
+                                                                    
+                                                                    var config = TraderBTSStrategyConfigBTC() // Not important, we set each value.
+                                                                    config.maxOrdersCount = maxOrder
+                                                                    config.buyStopLossPercent = Percent(buyStopLossPercent)
+                                                                    config.minDistancePercentPositive = Percent(minDistancePercentPositive)
+                                                                    config.minDistancePercentNegative = Percent(minDistancePercentNegative)
+                                                                    
+                                                                    config.unlockTrendThreshold = Percent(unlockTrendThreshold)
+                                                                    config.lockTrendThreshold = Percent(lockTrendThreshold)
+                                                                    config.lock2LossesInLast = TimeInterval.fromHours(lock2LossesInLast)
+                                                                    config.unlockCheckTrendInterval = TimeInterval.fromHours(unlockCheckTrendInterval)
+                                                                    config.lockCheckTrendInterval = TimeInterval.fromHours(lockCheckTrendInterval)
+                                                                    config.lockStrictInterval = TimeInterval.fromMinutes(lockStrictInterval)
+                                                                    config.dipDropThresholdTime = TimeInterval.fromMinutes(dipDropThresholdTime)
+                                                                    config.dipDropThresholdPercent = Percent(dipDropThresholdPercent)
+                                                                    
+                                                                    config.sellStopLossProfitPercent = Percent(sellStopLossProfitPercent)
+                                                                    config.sellMinProfitPercent = Percent(sellMinProfitPercent)
+                                                                    config.minSellStopLossProfitPercent = Percent(minSellStopLossProfitPercent)
+                                                                    
+                                                                    queue.addOperation {
+                                                                        let dateFactory = DateFactory()
+                                                                        dateFactory.now = self.tickers.first!.date
+                                                                        
+                                                                        let simulationResults = self.simulate(config: config, dateFactory: dateFactory)
+                                                                        
+                                                                        self.testSema.wait()
+                                                                        results.append(simulationResults)
+                                                                        print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                                                        
+                                                                        let parameters: String =
+                                                                            "\(maxOrder),"
+                                                                            + "\(minDistancePercentNegative),"
+                                                                            + "\(minDistancePercentPositive),"
+                                                                            + "\(buyStopLossPercent),"
+                                                                            + "\(sellStopLossProfitPercent),"
+                                                                            + "\(lockTrendThreshold),"
+                                                                            + "\(unlockTrendThreshold),"
+                                                                            + "\(lock2LossesInLast),"
+                                                                            + "\(unlockCheckTrendInterval),"
+                                                                            + "\(lockCheckTrendInterval),"
+                                                                            + "\(lockStrictInterval),"
+                                                                            + "\(dipDropThresholdTime),"
+                                                                            + "\(dipDropThresholdPercent),"
+                                                                            + "\(sellMinProfitPercent),"
+                                                                            + "\(minSellStopLossProfitPercent),"
+                                                                            + "\(simulationResults.0)"
+                                                                        
+                                                                        parametersAndProfits.append(parameters)
+                                                                        
+                                                                        self.testSema.signal()
+                                                                        group.leave()
                                                                     }
                                                                 }
                                                             }
-                                                            
                                                         }
                                                     }
+                                                    
                                                 }
                                             }
                                         }

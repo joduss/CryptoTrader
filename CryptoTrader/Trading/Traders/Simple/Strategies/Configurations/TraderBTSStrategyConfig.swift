@@ -19,9 +19,6 @@ protocol TraderBTSStrategyConfig {
     var minDistancePercentNegative: Percent { get set }
     var minDistancePercentPositive: Percent { get set }
     
-    var nextBuyTargetPercent: Percent { get set }
-    var nextBuyTargetExpiration: TimeInterval { get set }
-    
     /// Consider a dip when the price goes below in less than X minutes
     var dipDropThresholdPercent: Percent { get set }
     
