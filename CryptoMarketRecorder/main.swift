@@ -11,7 +11,8 @@ struct CryptoMarketRecorder: ParsableCommand {
     static let configuration = CommandConfiguration(
         subcommands: [
             Record.self,
-            Merge.self
+            Merge.self,
+            Transform.self
         ]
     )
 }
@@ -116,3 +117,34 @@ extension CryptoMarketRecorder {
     }
 }
 
+extension CryptoMarketRecorder {
+    
+    struct Transform: ParsableCommand {
+        
+        static var configuration = CommandConfiguration(abstract: "Transforming market data to ohlc in a csv.")
+        
+        @Argument(help: "Files where to save data.")
+        var ohlcOutputFile: String
+        
+        @Option(name: [.customShort("t"), .long])
+        var tradeCsvFile: String
+        
+        @Option(name: [.customShort("i"), .long], help: "What the OHLC interval. Default 60 seconds")
+        var interval: TimeInterval = 60
+        
+        mutating func run() throws {
+            print("Merge done")
+
+            let tradeCsv = self.tradeCsvFile.expandedPath()
+            let resultingFile = ohlcOutputFile.expandedPath()
+            
+            let transformer = MarketOHLCDataTransformer(tradesFile: tradeCsv)
+            
+            FileManager.default.createFile(atPath: resultingFile, contents: nil, attributes: nil)
+            try transformer.transform(outputFileHandle: FileHandle(forWritingAtPath: resultingFile)!,
+                                  interval: TimeInterval.fromMinutes(1))
+            
+            print("Merge done")
+        }
+    }
+}
