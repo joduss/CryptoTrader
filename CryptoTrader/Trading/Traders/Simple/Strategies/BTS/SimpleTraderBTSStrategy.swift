@@ -172,6 +172,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     func restore() {
+        guard saveEnabled else { return }
+
         sourcePrint("Loading saved state")
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: saveStateLocation))
@@ -299,24 +301,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         if openBTSBuyOperation == nil && currentBalance < 2 * orderValue {
             return
         }
-        
-        // After selling, by allow a very close below buy
-//        if openBTSBuyOperation == nil,
-//           let lastClosedSell = self.lastClosedOperation,
-//           let lastBuyOrder = self.lastBuyOrder,
-//           lastBuyOrder.initialTrade.date < lastClosedSell.closingTrade!.date,
-//           currentDate - lastClosedSell.closingTrade!.date < config.nextBuyTargetExpiration {
-//        
-//            if lastClosedSell.closingTrade!.price -% config.nextBuyTargetPercent > price {
-//                sourcePrint("Buying target price below last sell!")
-//                openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice -% 0.2,
-//                                                          stopLossPercent: 0.2,
-//                                                          updateWhenBelowPricePercent: config.buyUpdateStopLossPercent)
-//                return
-//            }
-//        }
+
 
         // Locking
+        // ---------
         if let locked = self.locked {
             guard currentDate - locked > config.lockStrictInterval else { return }
 
