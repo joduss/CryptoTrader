@@ -9,7 +9,8 @@ struct TraderMain: ParsableCommand {
     static let configuration = CommandConfiguration(
         subcommands: [
             Trade.self,
-            Simulate.self
+            Simulate.self,
+            GridSearch.self
         ]
     )
 }

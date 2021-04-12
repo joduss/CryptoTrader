@@ -1,7 +1,7 @@
 import Foundation
 import tulipindicators
 
-class SimpleTraderBTSMACDStrategy: SimpleTraderStrategy {
+class TraderMACDStrategy: SimpleTraderStrategy {
     
     
     // MARK: Configuration
@@ -157,7 +157,7 @@ class SimpleTraderBTSMACDStrategy: SimpleTraderStrategy {
         guard saveEnabled else { return }
 
         do {
-            let state = SimpleTraderBTCMACDStrategySavedState(
+            let state = TraderMACDStrategySavedState(
                 openOperations: openOperations,
                 closeOperations: closedOperations,
                 currentBalance: currentBalance,
@@ -179,7 +179,7 @@ class SimpleTraderBTSMACDStrategy: SimpleTraderStrategy {
         sourcePrint("Loading saved state")
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: saveStateLocation))
-            let state = try JSONDecoder().decode(SimpleTraderBTCMACDStrategySavedState.self, from: data)
+            let state = try JSONDecoder().decode(TraderMACDStrategySavedState.self, from: data)
 
             openOperations = state.openOperations
             closedOperations = state.closeOperations

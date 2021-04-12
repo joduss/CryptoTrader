@@ -1,6 +1,6 @@
 import Foundation
 
-struct SimpleTraderBTCMACDStrategySavedState: Codable {
+struct TraderMACDStrategySavedState: Codable {
     
     var openOperations: [MacdOperation]
     var closeOperations: [MacdOperation]

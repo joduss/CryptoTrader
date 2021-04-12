@@ -4,6 +4,8 @@ import ArgumentParser
 
 extension TraderMain {
     
+
+    
     struct Trade: ParsableCommand {
         
         // MARK: Command line options, arguments, etc
@@ -15,7 +17,7 @@ extension TraderMain {
         @Option(name: .customShort("b"), help: "Initial balance available for trading.")
         var initialBalance: Double
         
-        @Option(name: .customShort("c"), help: "Number of operation that can be open.")
+        @Option(name: .customShort("c"), help: "Number of operations that can be open.")
         var maxOperationCount: Int
         
         @Argument
