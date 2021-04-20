@@ -5,7 +5,6 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     var client: ExchangeClient
     var profits: Double = 0
     var strategy: SimpleTraderStrategy
-    var printCurrentPrice = true
     var printDecisionFrequency = 200
 
 
@@ -82,8 +81,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
             sourcePrint("Decision for bid price \(ticker.bidPrice) / ask price \(ticker.askPrice)")
         }
 
-        strategy.updateBid(price: ticker.bidPrice)
-        strategy.updateAsk(price: ticker.askPrice)
+        strategy.updateTicker(bid: ticker.bidPrice, ask: ticker.askPrice)
 
         isUpdating = false
         updateProcessSemaphore.signal()

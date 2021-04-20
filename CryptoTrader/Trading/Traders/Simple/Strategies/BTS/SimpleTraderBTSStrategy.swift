@@ -269,13 +269,20 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: - Decisions
     // ================================================================
 
+    func updateTicker(bid: Double, ask: Double) {
+        updateBid(price: bid)
+        updateAsk(price: ask)
+    }
+    
 
     // MARK: Decision about BUY
     // ================================================================
     
     private var lastDip: Date? = nil
+    
 
-    func updateAsk(price: Double) {
+    private func updateAsk(price: Double) {
+                
         /// There are always sufficient found here!
         /// There are 2h of statistic availables
         /// We usually want to create order "STOP-LOSS BUY", which we update if the price continues to go down,
