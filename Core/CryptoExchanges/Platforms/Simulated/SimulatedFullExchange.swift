@@ -8,6 +8,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     var marketStream: ExchangeMarketDataStream { return self }
     var userDataStream: ExchangeUserDataStream { return self }
     var trading: ExchangeSpotTrading { return self }
+    
+    var feeRate = Percent(0.1)
 
     private let tickers: ContiguousArray<MarketTicker>
     private let dateFactory: DateFactory
@@ -20,6 +22,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         self.symbol = symbol
         self.dateFactory = dateFactory
         currentTicker = tickers.first!
+        
+        dateFactory.now = currentTicker.date
     }
 
     // ================================================================
@@ -102,9 +106,9 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 lastExecutedQuantity: qty,
                 cumulativeFilledQuantity: qty,
                 lastExecutedPrice: price,
-                commissionAmount: Percent(0.1) * qty * price,
-                cumulativeQuoteAssetQuantity: qty * price -% Percent(0.1),
-                lastQuoteAssetExecutedQuantity: qty * price -% Percent(0.1)
+                commissionAmount: feeRate * qty * price,
+                cumulativeQuoteAssetQuantity: qty * price -% feeRate,
+                lastQuoteAssetExecutedQuantity: qty * price -% feeRate
             )
 
             userDataStreamSubscriber?.updated(order: report)
@@ -166,8 +170,8 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 cumulativeFilledQuantity: qty,
                 lastExecutedPrice: price,
                 commissionAmount: Percent(0.1) * qty * price,
-                cumulativeQuoteAssetQuantity: (qty * price) -% Percent(0.1),
-                lastQuoteAssetExecutedQuantity: qty * price -% Percent(0.1)
+                cumulativeQuoteAssetQuantity: (qty * price) -% feeRate,
+                lastQuoteAssetExecutedQuantity: qty * price -% feeRate
             )
 
             userDataStreamSubscriber?.updated(order: report)
@@ -254,25 +258,26 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         exchangeOrderId += 1
         
         if order.type != .market {
-            let createdOrder = CreatedOrder(
-                symbol: order.symbol,
-                platformOrderId: exchangeOrderId,
-                clientOrderId: order.id,
-                price: order.price ?? 0,
-                originalQty: order.quantity ?? 0,
-                executedQty: 0,
-                cummulativeQuoteQty: order.value ?? 0,
-                status: .new,
-                type: order.type,
-                side: order.side,
-                time: dateFactory.now
-            )
-            
-            completion(.success(createdOrder))
-            
-            orderRequests.append(order)
-            sourcePrint("Created order \(order)")
-            return
+            fatalError("To be reviewed.")
+//            let createdOrder = CreatedOrder(
+//                symbol: order.symbol,
+//                platformOrderId: exchangeOrderId,
+//                clientOrderId: order.id,
+//                price: order.price ?? 0,
+//                originalQty: order.quantity ?? 0,
+//                executedQty: 0,
+//                cummulativeQuoteQty: order.value ?? 0,
+//                status: .new,
+//                type: order.type,
+//                side: order.side,
+//                time: dateFactory.now
+//            )
+//
+//            completion(.success(createdOrder))
+//
+//            orderRequests.append(order)
+//            sourcePrint("Created order \(order)")
+//            return
         }
 
 
@@ -323,9 +328,9 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 platformOrderId: exchangeOrderId,
                 clientOrderId: order.id,
                 price: price,
-                originalQty: qty,
-                executedQty: qty,
-                cummulativeQuoteQty: order.side == .buy ? value +% Percent(0.1) : value -% Percent(0.1),
+                originalQty: order.side == .buy ? qty -% feeRate : qty,
+                executedQty:  order.side == .buy ? qty -% feeRate : qty,
+                cummulativeQuoteQty: order.side == .buy ? value : value -% Percent(0.1),
                 status: .filled,
                 type: order.type,
                 side: order.side,
