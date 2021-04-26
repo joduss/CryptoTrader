@@ -2,12 +2,6 @@ import Foundation
 import ArgumentParser
 import JoLibrary
 
-enum TradingStrategy : String, EnumerableFlag {
-    case macd = "macd"
-    case bts = "bts"
-}
-
-
 extension TraderMain {
     
     struct Simulate: ParsableCommand {
@@ -19,10 +13,7 @@ extension TraderMain {
         var symbol: CryptoSymbol = .btc_usd
         
         @Option(name: .customShort("b"), help: "Initial balance available for trading.")
-        var initialBalance: Double
-        
-        @Option(name: .customShort("c"), help: "Number of operation that can be open.")
-        var maxOperationCount: Int
+        var initialBalance: Double = 200
         
         @Option(name: .customShort("s"), help: "Start from")
         var startIdx: Int?
@@ -45,7 +36,6 @@ extension TraderMain {
             print(self)
             let simulation = try SimulateSubCommandExecution(symbol: symbol,
                                            initialBalance: initialBalance,
-                                           maxOperationCount: maxOperationCount,
                                            tickersLocation: tickersLocation,
                                            tickersStartIdx: startIdx,
                                            tickersEndIdx: endIdx)

@@ -205,6 +205,7 @@
 		6BAC336625E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
 		6BAC336725E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
 		6BAC336825E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
+		6BADC4CC2636C83900872AE4 /* TradingStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BADC4CB2636C83900872AE4 /* TradingStrategy.swift */; };
 		6BB907C72627750F00B162CD /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907C62627750F00B162CD /* Queue.swift */; };
 		6BB907D02628038400B162CD /* MacdIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907CF2628038400B162CD /* MacdIndicator.swift */; };
 		6BB907D12628038400B162CD /* MacdIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907CF2628038400B162CD /* MacdIndicator.swift */; };
@@ -370,6 +371,7 @@
 		6BAC334D25E440AE0066D080 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		6BAC335925E448640066D080 /* CreatedOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatedOrder.swift; sourceTree = "<group>"; };
 		6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceCreateOrderFullResponse.swift; sourceTree = "<group>"; };
+		6BADC4CB2636C83900872AE4 /* TradingStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradingStrategy.swift; sourceTree = "<group>"; };
 		6BB907C62627750F00B162CD /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
 		6BB907CF2628038400B162CD /* MacdIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacdIndicator.swift; sourceTree = "<group>"; };
 		6BBD82AE25AF753500734704 /* MarketHistorySlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketHistorySlice.swift; sourceTree = "<group>"; };
@@ -528,6 +530,7 @@
 				6B48DAD425A9F6BA00F2CD6D /* main.swift */,
 				6B9F8F5C25EA53320046FC39 /* SimulateSubCommand.swift */,
 				6B9F8F6225EA53860046FC39 /* TradeSubCommand.swift */,
+				6BADC4CB2636C83900872AE4 /* TradingStrategy.swift */,
 			);
 			path = CryptoTrader;
 			sourceTree = "<group>";

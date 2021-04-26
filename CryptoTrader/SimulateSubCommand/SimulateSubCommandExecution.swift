@@ -5,20 +5,17 @@ class SimulateSubCommandExecution {
     
     let symbol: CryptoSymbol
     var initialBalance: Double
-    let maxOrderCount: Int
     var tickers: ContiguousArray<MarketTicker> = ContiguousArray<MarketTicker>()
     
     let dateFactory = DateFactory()
     
     internal init(symbol: CryptoSymbol,
                   initialBalance: Double,
-                  maxOperationCount: Int,
                   tickersLocation: String,
                   tickersStartIdx: Int? = nil,
                   tickersEndIdx: Int? = nil) throws {
         self.symbol = symbol
         self.initialBalance = initialBalance
-        self.maxOrderCount = maxOperationCount
         
         let startIdx = tickersStartIdx ?? 0
         let endIdx = tickersEndIdx ?? Int.max
@@ -40,15 +37,14 @@ class SimulateSubCommandExecution {
     
     /// Returns (profits, summary)
     func executeMacd(printPrice: Bool = true, config: TraderMacdStrategyConfig? = nil) -> (Double, String) {
-        var config = config ?? TraderMacdStrategyConfig()
-        config.maxOrdersCount = maxOrderCount
+        let config = config ?? TraderMacdStrategyConfig()
         
         let simulation = TradingSimulation(symbol: symbol,
                                            simulatedExchange: createSimulatedExchange(),
                                            dateFactory: dateFactory,
                                            initialBalance: initialBalance)
         
-        return simulation.simulate(config: config, printPrice: printPrice)
+        return simulation.simulate(config: config)
     }
     
     /// Returns (profits, summary)
@@ -67,14 +63,13 @@ class SimulateSubCommandExecution {
             }
         }
         
-        config.maxOrdersCount = maxOrderCount
         
         let simulation = TradingSimulation(symbol: symbol,
                                            simulatedExchange: createSimulatedExchange(),
                                            dateFactory: dateFactory,
                                            initialBalance: initialBalance)
                 
-        return simulation.simulate(config: config, printPrice: printPrice)
+        return simulation.simulate(config: config)
     }
     
     private func createSimulatedExchange() -> SimulatedFullExchange {

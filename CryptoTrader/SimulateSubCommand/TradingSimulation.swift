@@ -8,6 +8,8 @@ class TradingSimulation {
     let dateFactory: DateFactory
     let initialBalance: Double
     
+    var shouldPrint = true
+    
     
     init(symbol: CryptoSymbol, simulatedExchange: SimulatedFullExchange, dateFactory: DateFactory, initialBalance: Double) {
         self.symbol = symbol
@@ -16,7 +18,7 @@ class TradingSimulation {
         self.initialBalance = initialBalance
     }
     
-    func simulate(config: TraderBTSStrategyConfig, printPrice: Bool = false) -> (Double, String) {
+    func simulate(config: TraderBTSStrategyConfig) -> (Double, String) {
         
         let strategy = SimpleTraderBTSStrategy(exchange: simulatedExchange,
                                                config: config,
@@ -26,7 +28,6 @@ class TradingSimulation {
                                                dateFactory: dateFactory)
         strategy.saveEnabled = false
         let trader = SimpleTrader(client: simulatedExchange, strategy: strategy)
-        trader.printCurrentPrice = printPrice
         
         simulatedExchange.start()
         
@@ -34,13 +35,13 @@ class TradingSimulation {
             """
             CONFIG: \(config)
 
-            \(strategy.summary(shouldPrint: printPrice))
+            \(strategy.summary(shouldPrint: shouldPrint))
             """
         
         return (strategy.profits, description)
     }
     
-    func simulate(config: TraderMacdStrategyConfig, printPrice: Bool = false) -> (Double, String) {
+    func simulate(config: TraderMacdStrategyConfig) -> (Double, String) {
         let strategy = TraderMACDStrategy(exchange: simulatedExchange,
                                                    config: config,
                                                    initialBalance: initialBalance,
@@ -49,7 +50,6 @@ class TradingSimulation {
                                                    dateFactory: dateFactory)
         strategy.saveEnabled = false
         let trader = SimpleTrader(client: simulatedExchange, strategy: strategy)
-        trader.printCurrentPrice = printPrice
         
         simulatedExchange.start()
         
@@ -57,7 +57,7 @@ class TradingSimulation {
             """
             CONFIG: \(config)
 
-            \(strategy.summary(shouldPrint: printPrice))
+            \(strategy.summary())
             """
         
         return (strategy.profits, description)

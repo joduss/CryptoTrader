@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6B56635E25D94AF200177B33"
-               BuildableName = "libCryptoTraderLib.dylib"
-               BlueprintName = "CryptoTraderLib"
+               BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
+               BuildableName = "CryptoTrader"
+               BlueprintName = "CryptoTrader"
                ReferencedContainer = "container:CryptoTrader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -40,6 +40,30 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
+            BuildableName = "CryptoTrader"
+            BlueprintName = "CryptoTrader"
+            ReferencedContainer = "container:CryptoTrader.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "simulate --btc_usd --bts -s 20000000 &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --btc_usd --macd &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --btc_usd --macd -e 20000000 &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -47,15 +71,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6B56635E25D94AF200177B33"
-            BuildableName = "libCryptoTraderLib.dylib"
-            BlueprintName = "CryptoTraderLib"
+            BlueprintIdentifier = "6B48DAD025A9F6BA00F2CD6D"
+            BuildableName = "CryptoTrader"
+            BlueprintName = "CryptoTrader"
             ReferencedContainer = "container:CryptoTrader.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
