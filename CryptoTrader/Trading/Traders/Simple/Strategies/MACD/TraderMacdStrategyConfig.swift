@@ -4,30 +4,33 @@ import Foundation
 
 struct TraderMacdStrategyConfig {
     
-    var maxOrdersCount: Int = 10
+    var maxOrdersCount: Int = 5
 
-    var macdPeriod: Int = 5 // In minutes
+    var macdPeriod: Int = 25 // In minutes
     
-    
+    // Number of periods for short
     var macdShort: Int {
-        return macdPeriod * 12
+        return 8
     }
     
+    // Number of periods for long
     var macdLong: Int {
-        return macdPeriod * 26
+        return 17
     }
     
+    // Number of periods for signal
     var macdSignal: Int {
-        return macdPeriod * 9
+        return 9
     }
     
-    var minDistancePercentBelow: Percent = -1
-    var minDistancePercentAbove: Percent = 0.4
+    /// Min distance between the order above and a new order
+    var minDistancePercentBelow: Percent? = -0.75
     
-    var delayAfterOperation: TimeInterval = 600
+    /// Min distance between the order below and a new order
+    var minDistancePercentAbove: Percent? = 1.0
     
     
-    var minProfitsPercent: Percent = 0.25
     
-//    var stopLoss
+    var minProfitsPercent: Percent = 0.8
+    var stopLossPercent: Percent = -1000
 }

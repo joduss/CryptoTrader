@@ -1,6 +1,13 @@
 import Foundation
 import tulipindicators
 
+
+fileprivate enum MACDState {
+    case unknown
+    case above
+    case below
+}
+
 class TraderMACDStrategy: SimpleTraderStrategy {
     
     
@@ -13,7 +20,6 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     private let exchange: ExchangeClient
     
     private let config: TraderMacdStrategyConfig
-    private let marketAnalyzer: MarketAggregatedHistory
     
     private let symbol: CryptoSymbol
     
@@ -31,16 +37,27 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     
     private(set) var profits: Double = 0
     
+    private var orderValue: Double = 0
+
     private var currentBidPrice: Double = 0
     private var currentAskPrice: Double = 0
     
     private var openOperations: [MacdOperation] = []
     private var closedOperations: [MacdOperation] = []
     
-    private var orderValue: Double = 0
     
-    private var locked: Date? = nil
+    private var macdState = MACDState.unknown
+
+    private var queue = Queue<Double>()
     
+//    private let marketStatistic: MarketAggregatedHistory
+    private let macdIndicator: MacdIndicator
+    
+    private var csvLine: TraderMACDStrategyCSVLine
+    private var csvInitialized = false
+    
+    
+
     
     // MARK: Computed properties
     // -------------------------------
@@ -53,8 +70,11 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         return openOperations.last
     }
     
-    private var lastClosedOperation: MacdOperation? {
-        return closedOperations.last
+    private var lastOperationDate: Date {
+        return
+            self.openOperations.last?.openDate ??
+            self.closedOperations.last?.closeDate ??
+            Date(timeIntervalSince1970: 0)
     }
     
     
@@ -88,10 +108,21 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         self.dateFactory = dateFactory ?? DateFactory.init()
         self.startDate = self.dateFactory.now
         
-        let maxInterval = config.macdLong
-        
-        self.marketAnalyzer =
-            MarketAggregatedHistory(intervalToKeep: TimeInterval(maxInterval * 2), aggregationPeriod: TimeInterval.fromMinutes(1))
+//        self.marketStatistic = MarketAggregatedHistory(intervalToKeep: TimeInterval.fromMinutes(config.macdLong * config.macdPeriod),
+//                                                       aggregationPeriod: TimeInterval.fromMinutes(1))
+        self.macdIndicator = MacdIndicator(shortPeriod: config.macdShort, longPeriod: config.macdLong, signalPeriod: config.macdSignal)
+                
+        queue.reserveCapacity(config.macdLong)
+//        queue.limitSize = config.macdLong * 2
+        queue.limitSize = config.macdLong * 2
+
+        FileManager.default.createFile(atPath: "/Users/jonathanduss/Desktop/macd-buy-analysis.csv", contents: nil, attributes: nil)
+        csvLine = TraderMACDStrategyCSVLine(file: FileHandle(forWritingAtPath: "/Users/jonathanduss/Desktop/macd-buy-analysis.csv")!,
+                                            date: Date(),
+                                            bidPrice: 0,
+                                            buy: nil,
+                                            sell: nil)
+        csvLine.writeHeader()
         
         self.restore()
         
@@ -122,31 +153,6 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     
     func sellAll(profit: Percent) {
         print("Not supported")
-
-//        for sellOperation in openOperations {
-//            let targetPrice = sellOperation.initialTrade.price +% profit
-//
-//            exchange
-//                .trading
-//                .send(order:
-//                        TradeOrderRequest
-//                        .limitSell(symbol: symbol,
-//                                   qty: sellOperation.initialTrade.quantity,
-//                                   price: targetPrice,
-//                                   id: TraderBTSIdGenerator(id: "sell-all",
-//                                                            date: currentDate,
-//                                                            action: "sell",
-//                                                            price: targetPrice)
-//                                    .generate()),
-//                      completion: { result in
-//                        switch result {
-//                            case let .failure(error):
-//                                sourcePrint("Failed to create a limit sell. \(error)")
-//                            default:
-//                                break
-//                        }
-//                      })
-//        }
     }
     
     // ================================================================
@@ -205,73 +211,96 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     // MARK: - Decisions
     // ================================================================
     
+    private var nextSellDecisionAfter = Date(timeIntervalSince1970: 0)
+
+    func updateTicker(bid: Double, ask: Double) {
+        
+        if currentDate > Date(timeIntervalSince1970: 1613025960) {
+            var a = 10
+        }
+        
+        if (csvInitialized) {
+            csvLine.write()
+        }
+        csvInitialized = true
+        
+        csvLine.date = currentDate
+        csvLine.bidPrice = bid
+        
+        self.currentBidPrice = bid
+        enqueueBid(bid)
+//        marketStatistic.record(DatedPrice(price: bid, date: currentDate))
+//        marketStatistic.cleanup()
+        
+
+        
+        stopLoss(bidPrice: bid)
+        
+        if macdState == .above,
+           let closedOpPriceBelow = closestBelowOrder(to: bid)?.openPrice,
+           Percent(differenceOf: closedOpPriceBelow, from: bid) > config.minProfitsPercent {
+            buy()
+            return
+        }
+        
+        guard nextSellDecisionAfter < currentDate else { return }
+        nextSellDecisionAfter = currentDate + TimeInterval.fromMinutes(15)
+        
+        let macd = macdIndicator.compute(on: queue.toArray())
+        csvLine.macd = macd.macdLine.last!
+        csvLine.signal = macd.signalLine.last!
+        
+        if macd.macdLine.last! > macd.signalLine.last!, macdState == .below { //}, mcadSignal < -20 else {
+            updateAsk(price: ask, macd: macd)
+            macdState = .above
+        } else if macd.macdLine.last! < macd.signalLine.last!, macdState == .above {
+            updateBid(price: bid, macd: macd)
+            macdState = .below
+        } else if macdState == .unknown {
+            macdState = macd.macdLine.last! < macd.signalLine.last! ? .below : .above
+        }
+    }
+    
     
     // MARK: Decision about BUY
     // ================================================================
-    
-    private var lastDip: Date? = nil
-    
-    private var macdStatistic: MACDResult!
-    
+            
     /// Called on second
-    func updateAsk(price: Double) {
+    func updateAsk(price: Double, macd: Macd) {
+        self.currentAskPrice = price
+        
         /// There are always sufficient found here!
         /// There are 2h of statistic availables
         /// We usually want to create order "STOP-LOSS BUY", which we update if the price continues to go down,
         /// at least if there is a clear downward trend.
-        guard price != self.currentAskPrice else { return }
-        guard marketAnalyzer.prices.count > Int(config.macdLong) else { return }
+        guard openOperations.count < config.maxOrdersCount else { return }
         
+        guard queue.toArray().count == queue.limitSize else { return }
         
-        self.currentAskPrice = price
-                
-        if let closestAbovePrice = self.closestAboveOrder(to: price)?.openPrice,
-           Percent(differenceOf: price, from: closestAbovePrice) > config.minDistancePercentBelow {
+//        var stochRsiValue = stochrsi(queue.toArray(), period: 128)
+        
+//        guard stochRsiValue.1.last! < 0.6 else { return }
+        
+        // Min distance below
+        guard !isTooClose(price: price) else {
             return
         }
         
-        if let closestBelowPrice = self.closestBelowOrder(to: price)?.openPrice {
-            
-            let lastLossesCount = self.openOperations.filter({op in op.openPrice > price}).count
-            var minDist = config.minDistancePercentAbove
-
-            if lastLossesCount > config.maxOrdersCount {
-                minDist = Percent(config.minDistancePercentAbove.percentage * Double(lastLossesCount) / 4)
-            }
-            
-            if Percent(differenceOf: price, from: closestBelowPrice) < minDist {
-                return
-            }
-        }
-        
-        guard let mcadValue = macdStatistic.macd.last else { return }
-        guard let mcadSignal = macdStatistic.signal.last else { return }
-        
-        if mcadValue < mcadSignal { return }
+        let mcadValue = macd.macdLine.last!
+        let mcadSignal = macd.signalLine.last!
                 
         if buy() {
             sourcePrint("Bought @ \(price) because macd / signal => \(mcadValue) / \(mcadSignal)")
         }
     }
     
+
+    
     /// Send a buy order to the exchange platform for the given operation.
+    @discardableResult
     private func buy() -> Bool {
         
         if orderValue > currentBalance {
-                        
-//            let maxOp = openOperations.max(by: {$0.openPrice <= $1.openPrice})!
-//            
-//            let (replacingOp, loss) = maxOp.replace(time: dateFactory.now,
-//                                                    price: currentAskPrice,
-//                                                    quantity: maxOp.quantity,
-//                                                    cost: maxOp.quantity * currentAskPrice)
-//            
-//            profits += loss
-//
-//            openOperations.remove(maxOp)
-//            openOperations.append(replacingOp)
-//            sourcePrint("Replaced op. Loss: \(loss) \(Percent(maxOp.openCost / maxOp.quantity * currentAskPrice))%")
-//            
             return false
         }
                 
@@ -312,7 +341,9 @@ class TraderMACDStrategy: SimpleTraderStrategy {
                         
                         self.currentBalance -= order.cummulativeQuoteQty
 
-                        sourcePrint("Successfully bought \(order.originalQty)@\(order.price) (\(order.status))")
+                        sourcePrint("Successfully bought \(order.originalQty) @ \(order.price) (\(order.status))")
+                        
+                        self.csvLine.buy = order.price
                 }
                 semaphore.signal()
             }
@@ -324,29 +355,42 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         return true
     }
     
+    private func isTooClose(price: Double) -> Bool {
+        if let aboveOperation = openOperations.filter({$0.openPrice > price}).min(by: {$0.openPrice < $1.openPrice}) {
+            return Percent(differenceOf: price, from: aboveOperation.openPrice) > config.minDistancePercentBelow ?? 0
+        }
+        
+        if let belowOperation = openOperations.filter({$0.openPrice < price}).max(by: {$0.openPrice < $1.openPrice}) {
+            return Percent(differenceOf: price, from: belowOperation.openPrice) < config.minDistancePercentAbove ?? 0
+        }
+        
+        return false
+    }
+    
+    
     
     // MARK: Decisiong about selling
     // =================================================================
     
+    func stopLoss(bidPrice: Double) {
+        // Need a STOP LOSS
+        if let op = openOperations.first, Percent(differenceOf: bidPrice, from: op.openPrice) < config.stopLossPercent {
+            sell(operation: op)
+            saveState()
+            return
+        }
+    }
+    
     /// Called first.
-    func updateBid(price: Double) {
+    func updateBid(price: Double, macd: Macd) {
         
-        marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
-
-        guard price != self.currentBidPrice else { return }
-        guard marketAnalyzer.prices.count > Int(config.macdLong) else { return }
-        
-        self.currentBidPrice = price
-        let (_, macdStatisticUpdate)
-            = macd(Array<Double>(marketAnalyzer.prices.map({$0.price})), short: config.macdShort, long: config.macdLong, signal: config.macdSignal)
-        
-        self.macdStatistic = macdStatisticUpdate
-        
-        
-        guard let mcadValue = macdStatistic.macd.last else { return }
-        guard let mcadSignal = macdStatistic.signal.last else { return }
+        guard let mcadValue = macd.macdLine.last,
+              let mcadSignal = macd.signalLine.last else {
+            return
+        }
         
         guard mcadValue < mcadSignal else { return }
+        
 
         
         for operation in openOperations {
@@ -357,6 +401,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         }
         saveState()
     }
+    
 
     
     func sell(operation: MacdOperation) {
@@ -397,6 +442,9 @@ class TraderMACDStrategy: SimpleTraderStrategy {
                         self.orderValue += operation.profits! / Double(self.config.maxOrdersCount)
                         self.currentBalance += order.cummulativeQuoteQty
                         self.profits += operation.profits!
+                        
+                        self.csvLine.sell = order.price
+
                 }
                 semaphore.signal()
             }
@@ -444,7 +492,21 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         return closest
     }
     
+    // MARK: - Queue
+    // =================================================================
+
+    private var lastPeriodStart: Date = Date(timeIntervalSince1970: 0)
     
+    func enqueueBid(_ bidPrice: Double) {
+        
+        if currentDate - lastPeriodStart > TimeInterval(config.macdPeriod * 60) {
+            lastPeriodStart = currentDate
+            queue.enqueue(bidPrice)
+        }
+        else {
+            queue.replaceLast(bidPrice)
+        }
+    }
     
     
     // MARK: - Information Display
@@ -452,7 +514,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     
     @discardableResult
     func summary(shouldPrint: Bool = true) -> String {
-        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), before: currentDate).average()
+        let currentPrice = currentBidPrice
         let coins: Double = openOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.quantity) }
@@ -506,6 +568,13 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         
         return summaryString
     }
+    
+//    private func aggregateStatistics() -> [Double] {
+//        self.marketStatistic
+//            .aggregateClose(by: TimeInterval.fromMinutes(config.macdPeriod), from: currentDate)
+//            .prices
+//            .map({$0.price})
+//    }
     
     // MARK: - Utilities
     
