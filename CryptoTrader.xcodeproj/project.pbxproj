@@ -203,6 +203,9 @@
 		6BAC336625E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
 		6BAC336725E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
 		6BAC336825E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */; };
+		6BB907D02628038400B162CD /* MacdIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907CF2628038400B162CD /* MacdIndicator.swift */; };
+		6BB907D12628038400B162CD /* MacdIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907CF2628038400B162CD /* MacdIndicator.swift */; };
+		6BB907D22628038400B162CD /* MacdIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB907CF2628038400B162CD /* MacdIndicator.swift */; };
 		6BBD82AF25AF753500734704 /* MarketHistorySlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD82AE25AF753500734704 /* MarketHistorySlice.swift */; };
 		6BBF4F5425ACDC9B002D245C /* BinanceMarketStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F5325ACDC9B002D245C /* BinanceMarketStream.swift */; };
 		6BBF4F6325AD80C4002D245C /* CleanPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBF4F6225AD80C4002D245C /* CleanPrint.swift */; };
@@ -219,7 +222,10 @@
 		6BD3CE9F25D4814400524386 /* BinanceEmptyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD3CE9E25D4814400524386 /* BinanceEmptyResponse.swift */; };
 		6BD639BE25D93C73003D96A4 /* BinanceTrading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD639BD25D93C73003D96A4 /* BinanceTrading.swift */; };
 		6BD8667F262AE47F00C5985C /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD8667E262AE47E00C5985C /* Math.swift */; };
+		6BD86685262AE78B00C5985C /* EMAIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD86684262AE78B00C5985C /* EMAIndicator.swift */; };
 		6BD8668B262AE94100C5985C /* ArrayMathExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD8668A262AE94100C5985C /* ArrayMathExtensions.swift */; };
+		6BD86691262AF48000C5985C /* TechnicalIndicatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD86690262AF48000C5985C /* TechnicalIndicatorTests.swift */; };
+		6BD8669E262AF4ED00C5985C /* EMAIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD86684262AE78B00C5985C /* EMAIndicator.swift */; };
 		6BE656A025C08C59001AAF59 /* Percent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6569F25C08C59001AAF59 /* Percent.swift */; };
 		6BE656AA25C09627001AAF59 /* PercentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE656A925C09627001AAF59 /* PercentTests.swift */; };
 		6BE9523625D3AF7F00A71861 /* BinanceApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE9523525D3AF7F00A71861 /* BinanceApiRequest.swift */; };
@@ -360,6 +366,7 @@
 		6BAC334D25E440AE0066D080 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		6BAC335925E448640066D080 /* CreatedOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatedOrder.swift; sourceTree = "<group>"; };
 		6BAC336525E448DC0066D080 /* BinanceCreateOrderFullResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceCreateOrderFullResponse.swift; sourceTree = "<group>"; };
+		6BB907CF2628038400B162CD /* MacdIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacdIndicator.swift; sourceTree = "<group>"; };
 		6BBD82AE25AF753500734704 /* MarketHistorySlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketHistorySlice.swift; sourceTree = "<group>"; };
 		6BBF4F5325ACDC9B002D245C /* BinanceMarketStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceMarketStream.swift; sourceTree = "<group>"; };
 		6BBF4F5C25AD7E8F002D245C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -376,7 +383,9 @@
 		6BD3CE9E25D4814400524386 /* BinanceEmptyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceEmptyResponse.swift; sourceTree = "<group>"; };
 		6BD639BD25D93C73003D96A4 /* BinanceTrading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinanceTrading.swift; sourceTree = "<group>"; };
 		6BD8667E262AE47E00C5985C /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
+		6BD86684262AE78B00C5985C /* EMAIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMAIndicator.swift; sourceTree = "<group>"; };
 		6BD8668A262AE94100C5985C /* ArrayMathExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayMathExtensions.swift; sourceTree = "<group>"; };
+		6BD86690262AF48000C5985C /* TechnicalIndicatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicalIndicatorTests.swift; sourceTree = "<group>"; };
 		6BDE061625BB15EC00731878 /* MarketRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketRecorder.swift; sourceTree = "<group>"; };
 		6BE6569F25C08C59001AAF59 /* Percent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Percent.swift; sourceTree = "<group>"; };
 		6BE656A725C09627001AAF59 /* CryptoTraderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CryptoTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -670,6 +679,15 @@
 			path = CodableTypes;
 			sourceTree = "<group>";
 		};
+		6BB907CE2628034F00B162CD /* Technical Indicators */ = {
+			isa = PBXGroup;
+			children = (
+				6BB907CF2628038400B162CD /* MacdIndicator.swift */,
+				6BD86684262AE78B00C5985C /* EMAIndicator.swift */,
+			);
+			path = "Technical Indicators";
+			sourceTree = "<group>";
+		};
 		6BCA376A25C499FD00B58E3C /* Merge */ = {
 			isa = PBXGroup;
 			children = (
@@ -775,6 +793,7 @@
 			isa = PBXGroup;
 			children = (
 				6BE656A925C09627001AAF59 /* PercentTests.swift */,
+				6BD86690262AF48000C5985C /* TechnicalIndicatorTests.swift */,
 				6B5662CD25D946DD00177B33 /* BinanceRequestAuthenticationTests.swift */,
 				6BE656AB25C09627001AAF59 /* Info.plist */,
 			);
@@ -822,6 +841,7 @@
 			isa = PBXGroup;
 			children = (
 				6BD86679262AE45F00C5985C /* Math */,
+				6BB907CE2628034F00B162CD /* Technical Indicators */,
 				6BA1C53B25B4D72800ECEB5F /* CodableTypes */,
 				6BFC306025BCD5FB00BDD732 /* CryptoExchanges */,
 				6B8D17C825B757BD0021B64E /* Extensions */,
@@ -1005,6 +1025,7 @@
 				6B7116F225BB38E500D34447 /* MarketAggregatedTrade.swift in Sources */,
 				6B56642225D9760400177B33 /* TradingApiOrderRequest.swift in Sources */,
 				6B9D04A025B7837F00EC53E1 /* DateFactory.swift in Sources */,
+				6BD86685262AE78B00C5985C /* EMAIndicator.swift in Sources */,
 				6B3E98D425AB23D4004509E2 /* MarketHistory.swift in Sources */,
 				6B56641A25D971B800177B33 /* TradingApiOrder.swift in Sources */,
 				6BA6B49925D081D900D53521 /* BinanceApiUrls.swift in Sources */,
@@ -1065,6 +1086,7 @@
 				6BD8668B262AE94100C5985C /* ArrayMathExtensions.swift in Sources */,
 				6BD3CE7225D46B4F00524386 /* BinanceApiRequestSender.swift in Sources */,
 				6B63AF4325D9A40800F67300 /* BinanceCreateOrderAckResponse.swift in Sources */,
+				6BB907D02628038400B162CD /* MacdIndicator.swift in Sources */,
 				6BD3CE9925D4781B00524386 /* BinanceUserDataStreamKeepAliveRequest.swift in Sources */,
 				6BE9523625D3AF7F00A71861 /* BinanceApiRequest.swift in Sources */,
 				6B56643225D9778600177B33 /* BinanceOpenOrderResponse.swift in Sources */,
@@ -1113,6 +1135,7 @@
 				6B5663CF25D94C8400177B33 /* OrderType.swift in Sources */,
 				6B56644A25D9856B00177B33 /* BinanceCreateOrderRequest.swift in Sources */,
 				6B5664F325D9A24300177B33 /* ExchangeClient.swift in Sources */,
+				6BD86691262AF48000C5985C /* TechnicalIndicatorTests.swift in Sources */,
 				6B56642C25D9775F00177B33 /* BinanceListOpenOrderRequest.swift in Sources */,
 				6B5663D025D94C8400177B33 /* OrderSide.swift in Sources */,
 				6B5C9E1425E151ED00D6471C /* SimulatedFullExchange.swift in Sources */,
@@ -1124,6 +1147,7 @@
 				6B1373E325DAE11A0061CBBE /* BinanceRequestSecurity.swift in Sources */,
 				6B5663D425D94C8400177B33 /* BinanceRequestPreparator.swift in Sources */,
 				6B56643C25D9781400177B33 /* BinanceSymbolConverter.swift in Sources */,
+				6BD8669E262AF4ED00C5985C /* EMAIndicator.swift in Sources */,
 				6B5664BF25D9944F00177B33 /* MarketAggregatedHistory.swift in Sources */,
 				6B5663D525D94C8400177B33 /* BinanceApiRequest.swift in Sources */,
 				6B5663D625D94C8400177B33 /* BinanceApiRequestSender.swift in Sources */,
@@ -1135,6 +1159,7 @@
 				6B5663DA25D94C8400177B33 /* BinanceAggregatedTradeResponse.swift in Sources */,
 				6B5663DB25D94C8400177B33 /* BinanceMarketStream.swift in Sources */,
 				6B56641C25D971B800177B33 /* TradingApiOrder.swift in Sources */,
+				6BB907D22628038400B162CD /* MacdIndicator.swift in Sources */,
 				6B56645D25D9892E00177B33 /* BinanceOrderStatusConverter.swift in Sources */,
 				6B5663DC25D94C8400177B33 /* BinanceTrading.swift in Sources */,
 				6BAC335025E440AE0066D080 /* ArrayExtension.swift in Sources */,
@@ -1254,6 +1279,7 @@
 				6BFC307325BCD6B100BDD732 /* BinanceTickerResponse.swift in Sources */,
 				6BD2A46925D6F1770035073B /* BinanceUserDataStreamExecutionOrderResponse.swift in Sources */,
 				6B1373D225DAD8D20061CBBE /* BinanceCancelOrderResponse.swift in Sources */,
+				6BB907D12628038400B162CD /* MacdIndicator.swift in Sources */,
 				6B56640325D9517700177B33 /* DataExtensions.swift in Sources */,
 				6B52312825D0746500F97959 /* OrderStatus.swift in Sources */,
 				6B56641B25D971B800177B33 /* TradingApiOrder.swift in Sources */,
