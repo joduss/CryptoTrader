@@ -97,3 +97,4 @@ archive.xcarchive
 build.xcarchive
 KrakenHistoricalDataFetcher/trades_ICX-usd.csv
 KrakenHistoricalDataFetcher/trades_btc-usd.csv
+Parameters
