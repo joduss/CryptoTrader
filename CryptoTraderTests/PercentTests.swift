@@ -1,7 +1,7 @@
 //
 
 import XCTest
-@testable import CryptoTraderLib
+//@testable import CryptoTraderLib
 
 class PercentTests: XCTestCase {
 
