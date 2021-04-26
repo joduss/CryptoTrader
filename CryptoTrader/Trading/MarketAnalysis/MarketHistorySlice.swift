@@ -369,4 +369,23 @@ extension MarketHistorySlice {
         
         return rangeToSearch.lowerBound
     }
+    
+    public func aggregateClose(by interval: TimeInterval, from date: Date) -> MarketHistorySlice {
+        guard let last = self.prices.last else { return MarketHistorySlice(prices: ArraySlice())}
+        
+        var aggregatedPrices = ContiguousArray<DatedPrice>()
+        aggregatedPrices.reserveCapacity(self.prices.count)
+        
+        aggregatedPrices.append(last)
+                
+        for price in self.prices.reversed() {
+            if aggregatedPrices.last!.date - price.date > interval {
+                aggregatedPrices.append(price)
+            }
+        }
+        
+        aggregatedPrices.reverse()
+        
+        return MarketHistorySlice(prices: aggregatedPrices[aggregatedPrices.startIndex..<aggregatedPrices.endIndex])
+    }
 }

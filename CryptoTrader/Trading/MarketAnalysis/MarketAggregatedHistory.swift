@@ -51,7 +51,10 @@ final class MarketAggregatedHistory: MarketHistorySlice {
     }
     
     /// Remove too old data.
-    private func cleanup() {
+    public func cleanup() {
+        if self.prices.count < 2 { return }
+        if self.prices.last!.date - self.prices.first!.date < intervalToKeep { return }
+        
         self.prices.withUnsafeBufferPointer({
             unsafePrices in
             
