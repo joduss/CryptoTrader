@@ -37,7 +37,13 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var openBTSSellOperations: [TraderBTSSellOperation] = []
     private var closedBTSSellOperations: [TraderBTSSellOperation] = []
 
-    private var orderValue: Double = 0
+    private var orderValue: Double {
+        if config.maxOrdersCount - openBTSSellOperations.count == 0 {
+            return 0
+        }
+        
+        return self.currentBalance / Double((config.maxOrdersCount - openBTSSellOperations.count))
+    }
 
     private var locked: Date? = nil
 
@@ -81,7 +87,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.exchange = exchange
         self.symbol = exchange.symbol
         self.initialBalance = initialBalance
-        self.orderValue = initialBalance / Double(config.maxOrdersCount)
         self.saveStateLocation = saveStateLocation
         self.currentBalance = currentBalance
         self.dateFactory = dateFactory ?? DateFactory.init()
@@ -95,7 +100,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         self.restore()
 
         // Balance update. (Might be more, might be less)
-        guard initialBalance != self.initialBalance else { return }
+        guard initialBalance != self.initialBalance else {
+            return
+        }
         let balanceChange = initialBalance - self.initialBalance
         
         guard currentBalance + balanceChange >= 0 else {
@@ -104,7 +111,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         
         self.initialBalance = initialBalance
         self.currentBalance = self.currentBalance + balanceChange
-        self.orderValue = self.currentBalance / Double(config.maxOrdersCount - openBTSSellOperations.count)
     }
     
     
@@ -158,7 +164,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 closedSellOperations: closedBTSSellOperations,
                 currentBalance: currentBalance,
                 initialBalance: initialBalance,
-                orderValue: orderValue,
                 profits: profits,
                 startDate: startDate
             )
@@ -183,7 +188,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
             closedBTSSellOperations = state.closedSellOperations
             currentBalance = state.currentBalance
             initialBalance = state.initialBalance
-            orderValue = state.orderValue
             profits = state.profits
             startDate = state.startDate
         } catch {
@@ -297,7 +301,9 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         let closestBelowBuyPrice = self.closestBelowOrder(to: price)?.initialTrade.price
         
         // RULE 1: Special buy when there is a huge dip
-        if  let closestAbove = closestAboveBuyPrice, Percent(differenceOf: price, from: closestAbove) < config.minDistancePercentNegative,
+        if  openBTSBuyOperation == nil,
+            let closestAbove = closestAboveBuyPrice,
+            Percent(differenceOf: price, from: closestAbove) < config.minDistancePercentNegative,
             price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent,
            currentBalance >= orderValue {
             self.lastDip = currentDate
@@ -334,6 +340,10 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                 self.updateBuyOperation()
                 return
             } else if price >= buyOperation.stopLossPrice {
+                if notTooCloseBuy(buyPrice: currentAskPrice, closestAboveBuyPrice: closestAboveBuyPrice, closestBelowBuyPrice: closestBelowBuyPrice) == false {
+                    return
+                }
+                
                 buy(buyOperation)
             } else {
                 // nothing
@@ -371,8 +381,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         }
         
         // TODO: check diff with and without
- //       if let abovePrice = closestAboveBuyPrice {
-        if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
+        if let abovePrice = closestAboveBuyPrice {
+//        if let abovePrice = closestAboveBuyPrice, closestBelowBuyPrice == nil {
             let lastLoosingTrades = openBTSSellOperations.filter({
                 op in
                 op.initialTrade.price > price && currentDate - op.initialTrade.date < config.lock2LossesInLast
@@ -445,8 +455,27 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         saveState()
     }
     
+    private func notTooCloseBuy(buyPrice: Double, closestAboveBuyPrice: Double?, closestBelowBuyPrice: Double?) -> Bool {
+        
+        // Check if the current price is not too close of another order
+        // made at a higher price
+        if let abovePrice = closestAboveBuyPrice,
+           Percent(differenceOf: buyPrice, from: abovePrice) > config.minDistancePercentNegative {
+            return false
+        }
+        
+        // Check if the current price is not too close of another order made at a lower price
+        if let belowPrice = closestBelowBuyPrice,
+           Percent(differenceOf: buyPrice, from: belowPrice) < config.minDistancePercentPositive {
+            return false
+        }
+        
+        return true
+    }
+    
     /// Send a buy order to the exchange platform for the given operation.
     private func buy(_ operation: TraderBTSBuyOperation) {
+        
         let idGenerator = TraderBTSIdGenerator(
             id: operation.uuid,
             date: currentDate,
@@ -603,7 +632,6 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
                     self.openBTSSellOperations.remove(operation)
                     self.closedBTSSellOperations.append(operation)
 
-                    self.orderValue += operation.profits / Double(self.config.maxOrdersCount)
                     self.currentBalance += order.cummulativeQuoteQty
                     self.profits += operation.profits
                 }
