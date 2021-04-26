@@ -52,13 +52,17 @@ extension ExchangeMarketDataStream {
     }
     
     public func error() {
-        sourcePrint("Websocket connection did encounter an error...")
-        recreateSocket()
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 15) {
+            sourcePrint("Websocket connection did encounter an error...")
+            self.recreateSocket()
+        }
     }
     
     public func didClose() {
-        sourcePrint("Websocket connection did close...")
-        recreateSocket()
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 15) {
+            sourcePrint("Websocket connection did close...")
+            self.recreateSocket()
+        }
     }
 }
 

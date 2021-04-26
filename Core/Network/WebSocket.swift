@@ -19,14 +19,16 @@ public protocol WebSocketDelegate {
 // MARK: - WebSocket
 public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     
-    
     private let url: URL
     private var webSocketTask: URLSessionWebSocketTask!
-    private var session: URLSession!
+    private var session: URLSession?
     private var timer: Timer?
+    
+    private var semaphore = DispatchSemaphore(value: 1)
     
     public var delegate: WebSocketDelegate?
     public var pingInterval: Double = 120
+    
 
     
     init(url: URL) {
@@ -37,19 +39,29 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     // MARK: Connection setup
     
     public func connect() {
+        semaphore.wait()
+        
         sourcePrint("Creating a websocket connection.")
         session?.invalidateAndCancel()
         
         session = URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue())
-        webSocketTask = session.webSocketTask(with: url)
+        webSocketTask = session?.webSocketTask(with: url)
         webSocketTask.resume()
+        
+        semaphore.signal()
     }
     
     public func disconnect() {
+        semaphore.wait()
+        
         sourcePrint("Disconnect the websocket.")
-        session?.invalidateAndCancel()
+        let oldSession = self.session
+        self.session = nil
         webSocketTask = nil
         session = nil
+        oldSession?.invalidateAndCancel()
+        
+        semaphore.signal()
     }
     
     /// Sends a ping to the server. When the result is back, 'OnCompleted' is called with the result of the ping.
@@ -61,7 +73,7 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
             if let error = error {
                 sourcePrint("Error when sending PING \(error)")
                 onCompleted?(false)
-                strongSelf.delegate?.error()
+                self?.delegate?.error()
                 self?.timer?.invalidate()
             } else {
                 sourcePrint("Web Socket connection is alive")
@@ -87,17 +99,23 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
     
     func send(message: String) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+            self.semaphore.wait()
+            
             self.webSocketTask?.send(.string(message)) { error in
                 if let error = error {
                     sourcePrint("Error when sending a message: \(error)")
                     self.delegate?.error()
                 }
             }
+            
+            self.semaphore.signal()
         }
     }
     
     /// Receive a message from the server
     private func receive() {
+        semaphore.wait()
+        
         webSocketTask?.receive { result in
             switch result {
             case .success(let message):
@@ -116,6 +134,8 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
                 self.delegate?.error()
             }
         }
+        
+        semaphore.signal()
     }
     
     // MARK: URLSessionDelegate methods
@@ -143,6 +163,4 @@ public class WebSocket: NSObject, URLSessionWebSocketDelegate {
         self.timer?.invalidate()
         delegate?.error()
     }
-    
-    
 }
