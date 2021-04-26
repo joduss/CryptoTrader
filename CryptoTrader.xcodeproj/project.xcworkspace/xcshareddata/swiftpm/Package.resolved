@@ -6,7 +6,7 @@
         "repositoryURL": "git@github.com:joduss/JoLibrary.git",
         "state": {
           "branch": "main",
-          "revision": "d26e30a63bf07c603dec8059ffe3a484897850e1",
+          "revision": "7be1c6d2fd312899a6422af5765ed77b8c6f5dfd",
           "version": null
         }
       },
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
           "branch": null,
-          "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
-          "version": "0.3.2"
+          "revision": "47bd06ebeff8146ecd0020809e186218b46f465f",
+          "version": "0.4.2"
         }
       },
       {

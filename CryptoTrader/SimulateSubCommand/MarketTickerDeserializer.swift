@@ -13,7 +13,7 @@ class MarketTickerDeserializer {
         
         while true {
             
-            guard let line = reader.readLine() else {
+            guard let line: String = reader.readLine() else {
                 break
             }
             
