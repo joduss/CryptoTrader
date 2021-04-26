@@ -35,7 +35,7 @@ extension TraderMain {
         func run() throws {
             print(self)
             let simulation = try SimulateSubCommandExecution(symbol: symbol,
-                                           initialBalance: initialBalance,
+                                           initialBalance: Decimal(initialBalance),
                                            tickersLocation: tickersLocation,
                                            tickersStartIdx: startIdx,
                                            tickersEndIdx: endIdx)

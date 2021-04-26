@@ -16,6 +16,10 @@ extension Decimal {
         formatter.maximumFractionDigits = decimals
         return formatter.string(from: self as NSDecimalNumber)!
     }
+    
+    init?(_ string: String) {
+        self.init(string: string)
+    }
 }
 
 

@@ -9,13 +9,13 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
     let initialTrade: TraderBTSTrade
     
     // If the price goes below the stop-loss-price, a market order is executed.
-    var stopLossPrice: Double = 0
+    var stopLossPrice: Decimal = 0
     
     // If the price goes over, the stop-loss and update-price are updated.
-    var updateWhenAbovePrice: Double = 0
+    var updateWhenAbovePrice: Decimal = 0
     
     private(set) var status: OrderStatus = .new
-    private(set) var profits = 0.0
+    private(set) var profits: Decimal = 0.0
     private(set) var closingTrade: TraderBTSTrade?
     
     
@@ -38,7 +38,7 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
     }
     
     
-    func description(currentPrice: Double) -> String {
+    func description(currentPrice: Decimal) -> String {
         let df = OutputDateFormatter.instance
         
         let openDateFormatted = openDate != nil ? "\(df.format(date: openDate!))" : "?"

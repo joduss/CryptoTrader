@@ -4,13 +4,13 @@ import Foundation
 class SimulateSubCommandExecution {
     
     let symbol: CryptoSymbol
-    var initialBalance: Double
+    var initialBalance: Decimal
     var tickers: ContiguousArray<MarketTicker> = ContiguousArray<MarketTicker>()
     
     let dateFactory = DateFactory()
     
     internal init(symbol: CryptoSymbol,
-                  initialBalance: Double,
+                  initialBalance: Decimal,
                   tickersLocation: String,
                   tickersStartIdx: Int? = nil,
                   tickersEndIdx: Int? = nil) throws {
@@ -26,7 +26,7 @@ class SimulateSubCommandExecution {
     
     @discardableResult
     /// Returns (profits, summary)
-    func execute(strategy: TradingStrategy) -> (Double, String){
+    func execute(strategy: TradingStrategy) -> (Decimal, String){
         switch strategy {
             case .bts:
                 return executeBTS(printPrice: true)
@@ -36,7 +36,7 @@ class SimulateSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    func executeMacd(printPrice: Bool = true, config: TraderMacdStrategyConfig? = nil) -> (Double, String) {
+    func executeMacd(printPrice: Bool = true, config: TraderMacdStrategyConfig? = nil) -> (Decimal, String) {
         let config = config ?? TraderMacdStrategyConfig()
         
         let simulation = TradingSimulation(symbol: symbol,
@@ -48,7 +48,7 @@ class SimulateSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    func executeBTS(printPrice: Bool = true, config: TraderBTSStrategyConfig? = nil) -> (Double, String){
+    func executeBTS(printPrice: Bool = true, config: TraderBTSStrategyConfig? = nil) -> (Decimal, String) {
         var config: TraderBTSStrategyConfig!  = config
         
         if config == nil {

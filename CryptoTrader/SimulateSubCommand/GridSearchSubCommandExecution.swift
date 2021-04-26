@@ -7,7 +7,7 @@ class GridSearchSubCommandExecution {
     
     private let testSema = DispatchSemaphore(value: 1)
     
-    private let initialBalance = 200.0
+    private let initialBalance: Decimal = 200.0
 
     
     internal init(symbol: CryptoSymbol,
@@ -33,7 +33,7 @@ class GridSearchSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    private func executeMacd(config: TraderMacdStrategyConfig, dateFactory: DateFactory) -> (Double, String) {
+    private func executeMacd(config: TraderMacdStrategyConfig, dateFactory: DateFactory) -> (Decimal, String) {
         let simulation = TradingSimulation(symbol: symbol,
                                            simulatedExchange: createSimulatedExchange(dateFactory: dateFactory),
                                            dateFactory: dateFactory,
@@ -44,7 +44,7 @@ class GridSearchSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    func executeBTS(config: TraderBTSStrategyConfig, dateFactory: DateFactory) -> (Double, String){
+    func executeBTS(config: TraderBTSStrategyConfig, dateFactory: DateFactory) -> (Decimal, String){
         
         let simulation = TradingSimulation(symbol: symbol,
                                            simulatedExchange: createSimulatedExchange(dateFactory: dateFactory),
@@ -68,7 +68,7 @@ class GridSearchSubCommandExecution {
         
         sourcePriceHidden = true
         
-        var results: [(Double, String)] = []
+        var results: [(Decimal, String)] = []
         
         let queue = OperationQueue()
         let group = DispatchGroup()
@@ -259,7 +259,7 @@ class GridSearchSubCommandExecution {
         
         sourcePriceHidden = true
         
-        var results: [(Double, String)] = []
+        var results: [(Decimal, String)] = []
         
         let queue = OperationQueue()
         let group = DispatchGroup()

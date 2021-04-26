@@ -4,8 +4,6 @@ import ArgumentParser
 
 extension TraderMain {
     
-
-    
     struct Trade: ParsableCommand {
         
         // MARK: Command line options, arguments, etc
@@ -26,7 +24,10 @@ extension TraderMain {
         // MARK: Command line main.
         // ------------------------------
         mutating func run() throws {
-            let _ = TradeSubCommand(symbol: symbol, initialBalance: initialBalance, maxOperationCount: maxOperationCount, saveStateLocation: saveStateLocation)
+            let _ = TradeSubCommand(symbol: symbol,
+                                    initialBalance: Decimal(initialBalance),
+                                    maxOperationCount: maxOperationCount,
+                                    saveStateLocation: saveStateLocation)
         }
     }
 }
@@ -37,20 +38,18 @@ struct TradeSubCommand {
     private let trader: SimpleTrader!
     
     let symbol: CryptoSymbol
-    let initialBalance: Double
+    let initialBalance: Decimal
     let maxOperationCount: Int
     let saveStateLocation: String
     
     
-    internal init(symbol: CryptoSymbol, initialBalance: Double, maxOperationCount: Int, saveStateLocation: String) {
+    internal init(symbol: CryptoSymbol, initialBalance: Decimal, maxOperationCount: Int, saveStateLocation: String) {
         
         self.symbol = symbol
         self.initialBalance = initialBalance
         self.maxOperationCount = maxOperationCount
         self.saveStateLocation = saveStateLocation
-        
-        let dateFactory = DateFactory()
-        
+                
         exchange = BinanceClient(symbol: symbol, config: BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey))
         
         var config: TraderBTSStrategyConfig!

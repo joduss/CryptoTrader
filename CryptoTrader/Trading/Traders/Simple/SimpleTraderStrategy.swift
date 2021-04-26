@@ -13,7 +13,7 @@ protocol SimpleTraderStrategy {
     func sellAll(profit: Percent)
 
     func update(report: OrderExecutionReport)
-    func updateTicker(bid: Double, ask: Double)
+    func updateTicker(bid: Decimal, ask: Decimal)
     
     @discardableResult
     func summary(shouldPrint: Bool) -> String

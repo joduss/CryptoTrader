@@ -7,7 +7,7 @@ final class MarketAggregatedHistory: MarketHistorySlice {
     private var lastCleanup = 0
     
     private var currentTrade: DatedPrice? = nil
-    private var currentTradeAggregationCount = 0.0
+    private var currentTradeAggregationCount: Decimal = 0.0
     private var aggregationPeriod: TimeInterval
     
     init(intervalToKeep: TimeInterval, aggregationPeriod: TimeInterval = 1) {

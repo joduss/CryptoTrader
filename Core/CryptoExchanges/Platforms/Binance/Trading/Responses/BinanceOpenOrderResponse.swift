@@ -6,11 +6,11 @@ struct BinanceOrderSummaryResponse: Decodable {
     let platformOrderId: Int
     let clientOrderId: String
 
-    let price: Double
-    let originalQty: Double
-    let executedQty: Double
-    let cummulativeQuoteQty: Double
-    let stopPrice: Double
+    let price: Decimal
+    let originalQty: Decimal
+    let executedQty: Decimal
+    let cummulativeQuoteQty: Decimal
+    let stopPrice: Decimal
 
     let status: OrderStatus
     let type: OrderType
@@ -19,7 +19,7 @@ struct BinanceOrderSummaryResponse: Decodable {
     let time: Date
     let updateTime: Date
 
-    let originalQuoteQty: Double
+    let originalQuoteQty: Decimal
     
     enum CodingKeys: String, CodingKey {
         case symbol
@@ -45,11 +45,11 @@ struct BinanceOrderSummaryResponse: Decodable {
         platformOrderId = try values.decode(Int.self, forKey: .platformOrderId)
         clientOrderId = try values.decode(String.self, forKey: .clientOrderId)
         
-        price = Double(try values.decode(String.self, forKey: .price))!
-        originalQty = Double(try values.decode(String.self, forKey: .originalQty))!
-        executedQty = Double(try values.decode(String.self, forKey: .executedQty))!
-        cummulativeQuoteQty = Double(try values.decode(String.self, forKey: .cummulativeQuoteQty))!
-        stopPrice = Double(try values.decode(String.self, forKey: .stopPrice))!
+        price = Decimal(string: try values.decode(String.self, forKey: .price))!
+        originalQty = Decimal(string: try values.decode(String.self, forKey: .originalQty))!
+        executedQty = Decimal(string: try values.decode(String.self, forKey: .executedQty))!
+        cummulativeQuoteQty = Decimal(string: try values.decode(String.self, forKey: .cummulativeQuoteQty))!
+        stopPrice = Decimal(string: try values.decode(String.self, forKey: .stopPrice))!
         
         status = try BinanceOrderStatusConverter.convert(try values.decode(String.self, forKey: .status))
         type = try BinanceOrderTypeConverter.convert(value: try values.decode(String.self, forKey: .type))
@@ -62,10 +62,10 @@ struct BinanceOrderSummaryResponse: Decodable {
             timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(TimeInterval.self, forKey: .updateTime))
         )
         
-        originalQuoteQty = Double(try values.decode(String.self, forKey: .originalQuoteQty))!
+        originalQuoteQty = Decimal(string: try values.decode(String.self, forKey: .originalQuoteQty))!
     }
     
-    init(symbol: CryptoSymbol, platformOrderId: Int, clientOrderId: String, price: Double, originalQty: Double, executedQty: Double, cummulativeQuoteQty: Double, stopPrice: Double, status: OrderStatus, type: OrderType, side: OrderSide, time: Date, updateTime: Date, originalQuoteQty: Double) {
+    init(symbol: CryptoSymbol, platformOrderId: Int, clientOrderId: String, price: Decimal, originalQty: Decimal, executedQty: Decimal, cummulativeQuoteQty: Decimal, stopPrice: Decimal, status: OrderStatus, type: OrderType, side: OrderSide, time: Date, updateTime: Date, originalQuoteQty: Decimal) {
         self.symbol = symbol
         self.platformOrderId = platformOrderId
         self.clientOrderId = clientOrderId

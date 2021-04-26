@@ -29,18 +29,20 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     private(set) var startDate: Date
     var currentDate: Date { return dateFactory.now }
     
-    private var initialBalance: Double
+    private var initialBalance: Decimal
     
-    private var currentBalance: Double {
-        didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
-    }
+    private var currentBalance: Decimal = 0
     
-    private(set) var profits: Double = 0
+//    private var currentBalance: Double {
+//        didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
+//    }
     
-    private var orderValue: Double = 0
+    private(set) var profits: Decimal = 0
+    
+    private var orderValue: Decimal = 0
 
-    private var currentBidPrice: Double = 0
-    private var currentAskPrice: Double = 0
+    private var currentBidPrice: Decimal = 0
+    private var currentAskPrice: Decimal = 0
     
     private var openOperations: [MacdOperation] = []
     private var closedOperations: [MacdOperation] = []
@@ -48,7 +50,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     
     private var macdState = MACDState.unknown
 
-    private var queue = Queue<Double>()
+    private var queue = Queue<Decimal>()
     
 //    private let marketStatistic: MarketAggregatedHistory
     private let macdIndicator: MacdIndicator
@@ -62,7 +64,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     // MARK: Computed properties
     // -------------------------------
     
-    private var lastBuyPrice: Double? {
+    private var lastBuyPrice: Decimal? {
         return openOperations.last?.openPrice
     }
     
@@ -93,8 +95,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     init(
         exchange: ExchangeClient,
         config: TraderMacdStrategyConfig,
-        initialBalance: Double,
-        currentBalance: Double,
+        initialBalance: Decimal,
+        currentBalance: Decimal,
         saveStateLocation: String,
         dateFactory: DateFactory? = nil
     ) {
@@ -102,7 +104,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         self.exchange = exchange
         self.symbol = exchange.symbol
         self.initialBalance = initialBalance
-        self.orderValue = initialBalance / Double(config.maxOrdersCount)
+        self.orderValue = initialBalance / Decimal(config.maxOrdersCount)
         self.saveStateLocation = saveStateLocation
         self.currentBalance = currentBalance
         self.dateFactory = dateFactory ?? DateFactory.init()
@@ -136,7 +138,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         
         self.initialBalance = initialBalance
         self.currentBalance = self.currentBalance + balanceChange
-        self.orderValue = self.currentBalance / Double(config.maxOrdersCount - openOperations.count)
+        self.orderValue = self.currentBalance / Decimal(config.maxOrdersCount - openOperations.count)
     }
     
     
@@ -213,11 +215,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     
     private var nextSellDecisionAfter = Date(timeIntervalSince1970: 0)
 
-    func updateTicker(bid: Double, ask: Double) {
-        
-        if currentDate > Date(timeIntervalSince1970: 1613025960) {
-            var a = 10
-        }
+    func updateTicker(bid: Decimal, ask: Decimal) {
         
         if (csvInitialized) {
             csvLine.write()
@@ -266,7 +264,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     // ================================================================
             
     /// Called on second
-    func updateAsk(price: Double, macd: Macd) {
+    func updateAsk(price: Decimal, macd: Macd) {
         self.currentAskPrice = price
         
         /// There are always sufficient found here!
@@ -355,7 +353,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         return true
     }
     
-    private func isTooClose(price: Double) -> Bool {
+    private func isTooClose(price: Decimal) -> Bool {
         if let aboveOperation = openOperations.filter({$0.openPrice > price}).min(by: {$0.openPrice < $1.openPrice}) {
             return Percent(differenceOf: price, from: aboveOperation.openPrice) > config.minDistancePercentBelow ?? 0
         }
@@ -372,7 +370,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     // MARK: Decisiong about selling
     // =================================================================
     
-    func stopLoss(bidPrice: Double) {
+    func stopLoss(bidPrice: Decimal) {
         // Need a STOP LOSS
         if let op = openOperations.first, Percent(differenceOf: bidPrice, from: op.openPrice) < config.stopLossPercent {
             sell(operation: op)
@@ -382,7 +380,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     }
     
     /// Called first.
-    func updateBid(price: Double, macd: Macd) {
+    func updateBid(price: Decimal, macd: Macd) {
         
         guard let mcadValue = macd.macdLine.last,
               let mcadSignal = macd.signalLine.last else {
@@ -439,7 +437,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
                         self.openOperations.remove(operation)
                         self.closedOperations.append(operation)
                         
-                        self.orderValue += operation.profits! / Double(self.config.maxOrdersCount)
+                        self.orderValue += operation.profits! / Decimal(self.config.maxOrdersCount)
                         self.currentBalance += order.cummulativeQuoteQty
                         self.profits += operation.profits!
                         
@@ -457,8 +455,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     // =================================================================
     
     /// Returns the closest sell operation whose buy price is higher or equal than the current price.
-    private func closestAboveOrder(to price: Double) -> MacdOperation? {
-        var diff = Double.greatestFiniteMagnitude
+    private func closestAboveOrder(to price: Decimal) -> MacdOperation? {
+        var diff = Decimal.greatestFiniteMagnitude
         var closest: MacdOperation?
         
         for otherOrder in self.openOperations {
@@ -475,8 +473,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     }
     
     /// Returns the closest sell operation whose buy price is lower or equal than the current price.
-    private func closestBelowOrder(to price: Double) -> MacdOperation? {
-        var diff = Double.greatestFiniteMagnitude
+    private func closestBelowOrder(to price: Decimal) -> MacdOperation? {
+        var diff = Decimal.greatestFiniteMagnitude
         var closest: MacdOperation?
         
         for otherOrder in self.openOperations {
@@ -497,7 +495,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
 
     private var lastPeriodStart: Date = Date(timeIntervalSince1970: 0)
     
-    func enqueueBid(_ bidPrice: Double) {
+    func enqueueBid(_ bidPrice: Decimal) {
         
         if currentDate - lastPeriodStart > TimeInterval(config.macdPeriod * 60) {
             lastPeriodStart = currentDate
@@ -515,7 +513,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     @discardableResult
     func summary(shouldPrint: Bool = true) -> String {
         let currentPrice = currentBidPrice
-        let coins: Double = openOperations.reduce(
+        let coins: Decimal = openOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.quantity) }
         )
@@ -545,8 +543,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         
         let runDuration: TimeInterval = currentDate - startDate
         let profitPercent = Percent(ratioOf: profits, to: initialBalance).percentage
-        let profitPerDay = (profits / (runDuration / 3600 / 24))
-        let profitPerDayPercent = (profitPercent / (runDuration / 3600 / 24))
+        let profitPerDay: Decimal = (profits / Decimal(runDuration / 3600 / 24))
+        let profitPerDayPercent: Decimal = (profitPercent / Decimal(runDuration / 3600 / 24))
         
         summaryString += "\n==========================================\n"
         summaryString += "Summary\n"
@@ -575,14 +573,4 @@ class TraderMACDStrategy: SimpleTraderStrategy {
 //            .prices
 //            .map({$0.price})
 //    }
-    
-    // MARK: - Utilities
-    
-    private func roundPrice(_ price: Double) -> Double {
-        return round(price * 100) / 100.0
-    }
-    
-    private func roundQty(_ qty: Double) -> Double {
-        return round(qty * 10e5) / 10e5
-    }
 }

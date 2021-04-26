@@ -75,7 +75,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         })
 
         for order in orders {
-            var price = 0.0
+            var price: Decimal = 0.0
 
             switch order.type {
             case .market:
@@ -92,7 +92,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
 
             sourcePrint("Order \(order) has been fullfiled.")
 
-            let qty = order.quantity ?? order.value! / price
+            let qty: Decimal = order.quantity ?? order.value! / price
 
             let report = OrderExecutionReport(
                 orderCreationTime: dateFactory.now,
@@ -138,7 +138,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
         })
 
         for order in orders {
-            var price = 0.0
+            var price: Decimal = 0.0
 
             switch order.type {
             case .market:

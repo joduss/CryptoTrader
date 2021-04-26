@@ -5,30 +5,30 @@ class MacdOperation: Codable, CustomStringConvertible {
     var id: String = ""
     
     let openDate: Date
-    let openCost: Double
-    let openPrice: Double
+    let openCost: Decimal
+    let openPrice: Decimal
     
-    let quantity: Double
+    let quantity: Decimal
     
     var closeDate: Date?
-    var closeCost: Double?
-    var closePrice: Double?
+    var closeCost: Decimal?
+    var closePrice: Decimal?
     
     var closed: Bool { return closeDate != nil}
     
-    var profits: Double? {
+    var profits: Decimal? {
         guard let closeCost = self.closeCost else { return nil }
         return closeCost - openCost
     }
     
-    init(time: Date, price: Double, quantity: Double, cost: Double) {
+    init(time: Date, price: Decimal, quantity: Decimal, cost: Decimal) {
         self.openDate = time
         self.openPrice = price
         self.quantity = quantity
         self.openCost = cost
     }
     
-    func close(time: Date, price: Double, cost: Double) {
+    func close(time: Date, price: Decimal, cost: Decimal) {
         self.closeDate = time
         self.closePrice = price
         self.closeCost = cost
@@ -40,7 +40,7 @@ class MacdOperation: Codable, CustomStringConvertible {
         let openDateFormatted = df.format(date: openDate)
         
         if !closed {
-            return "\(id) - Open on \(openDateFormatted) - \(quantity)@\(openPrice) = \(openCost)"
+            return "\(id) - Open on \(openDateFormatted) - \(quantity) @ \(openPrice) = \(openCost)"
         }
         
         
@@ -52,14 +52,14 @@ class MacdOperation: Codable, CustomStringConvertible {
         return "\(id) - Closed on \(closeDateFormatted). Value: \(openCost) => \(closeCost!) (\(profits), \(profitsPercent)%), Price: \(openPrice) => \(closePrice!). Qty: \(quantity)"
     }
     
-    func description(currentPrice: Double) -> String {
+    func description(currentPrice: Decimal) -> String {
         let df = OutputDateFormatter.instance
         let openDateFormatted = df.format(date: openDate)
         
         return "\(id) - Open on \(openDateFormatted) - \(quantity) @ \(openPrice) = \(openCost) - Current profits : \(currentPrice * quantity - openCost) (\(Percent(differenceOf: currentPrice * quantity, from: openCost))%) (fee not taken into account)"
     }
     
-    func replace(time: Date, price: Double, quantity: Double, cost: Double) -> (MacdOperation, Double) {
+    func replace(time: Date, price: Decimal, quantity: Decimal, cost: Decimal) -> (MacdOperation, Decimal) {
         let profits = price * quantity - openCost
         let replacingOp = MacdOperation(time: time, price: price, quantity: quantity, cost: cost)
         

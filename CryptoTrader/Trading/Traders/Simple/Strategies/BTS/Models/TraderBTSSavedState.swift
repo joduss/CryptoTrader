@@ -3,9 +3,8 @@ import Foundation
 struct TraderBTSSavedState: Codable {
     var openSellOperations: [TraderBTSSellOperation]
     var closedSellOperations: [TraderBTSSellOperation]
-    var currentBalance: Double
-    var initialBalance: Double
-    var orderValue: Double
-    var profits: Double
+    var currentBalance: Decimal
+    var initialBalance: Decimal
+    var profits: Decimal
     var startDate: Date
 }

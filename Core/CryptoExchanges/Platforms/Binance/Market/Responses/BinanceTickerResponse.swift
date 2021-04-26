@@ -14,10 +14,10 @@ struct BinanceTickerResponse: Decodable {
     
     let updateId: Int
     let symbol: String
-    let bidPrice: Double
-    let bidQuantity: Double
-    let askPrice: Double
-    let askQuantity: Double
+    let bidPrice: Decimal
+    let bidQuantity: Decimal
+    let askPrice: Decimal
+    let askQuantity: Decimal
 
     enum CodingKeys: String, CodingKey {
         case updateId = "u"
@@ -32,9 +32,9 @@ struct BinanceTickerResponse: Decodable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         updateId = try values.decode(Int.self, forKey: .updateId)
         symbol = try values.decode(String.self, forKey: .symbol)
-        bidPrice = Double(try values.decode(String.self, forKey: .bestBidPrice))!
-        bidQuantity = Double(try values.decode(String.self, forKey: .bestBidQuantity))!
-        askPrice = Double(try values.decode(String.self, forKey: .bestAskPrice))!
-        askQuantity = Double(try values.decode(String.self, forKey: .bestAskQuantity))!
+        bidPrice = Decimal(string: try values.decode(String.self, forKey: .bestBidPrice))!
+        bidQuantity = Decimal(string: try values.decode(String.self, forKey: .bestBidQuantity))!
+        askPrice = Decimal(string: try values.decode(String.self, forKey: .bestAskPrice))!
+        askQuantity = Decimal(string: try values.decode(String.self, forKey: .bestAskQuantity))!
     }
 }

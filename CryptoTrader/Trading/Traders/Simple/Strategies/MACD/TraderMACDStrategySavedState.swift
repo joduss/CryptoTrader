@@ -4,9 +4,9 @@ struct TraderMACDStrategySavedState: Codable {
     
     var openOperations: [MacdOperation]
     var closeOperations: [MacdOperation]
-    var currentBalance: Double
-    var initialBalance: Double
-    var orderValue: Double
-    var profits: Double
+    var currentBalance: Decimal
+    var initialBalance: Decimal
+    var orderValue: Decimal
+    var profits: Decimal
     var startDate: Date
 }

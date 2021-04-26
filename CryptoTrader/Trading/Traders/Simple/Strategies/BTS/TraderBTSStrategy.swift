@@ -1,6 +1,6 @@
 import Foundation
 
-class SimpleTraderBTSStrategy: SimpleTraderStrategy {
+class TraderBTSStrategy: SimpleTraderStrategy {
     
 
     // MARK: Configuration
@@ -22,27 +22,27 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private(set) var startDate: Date
     var currentDate: Date { return dateFactory.now }
     
-    private var initialBalance: Double
+    private var initialBalance: Decimal
 
-    private var currentBalance: Double {
+    private var currentBalance: Decimal {
         didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
     }
 
-    private(set) var profits: Double = 0
+    private(set) var profits: Decimal = 0
 
-    private var currentBidPrice: Double = 0
-    private var currentAskPrice: Double = 0
+    private var currentBidPrice: Decimal = 0
+    private var currentAskPrice: Decimal = 0
 
     private var openBTSBuyOperation: TraderBTSBuyOperation?
     private var openBTSSellOperations: [TraderBTSSellOperation] = []
     private var closedBTSSellOperations: [TraderBTSSellOperation] = []
 
-    private var orderValue: Double {
+    private var orderValue: Decimal {
         if config.maxOrdersCount - openBTSSellOperations.count == 0 {
             return 0
         }
         
-        return self.currentBalance / Double((config.maxOrdersCount - openBTSSellOperations.count))
+        return self.currentBalance / Decimal((config.maxOrdersCount - openBTSSellOperations.count))
     }
 
     private var locked: Date? = nil
@@ -50,7 +50,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: Computed properties
     // -------------------------------
     
-    private var lastBuyPrice: Double? {
+    private var lastBuyPrice: Decimal? {
         return lastBuyOrder?.initialTrade.price
     }
 
@@ -78,8 +78,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     init(
         exchange: ExchangeClient,
         config: TraderBTSStrategyConfig,
-        initialBalance: Double,
-        currentBalance: Double,
+        initialBalance: Decimal,
+        currentBalance: Decimal,
         saveStateLocation: String,
         dateFactory: DateFactory? = nil
     ) {
@@ -273,7 +273,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: - Decisions
     // ================================================================
 
-    func updateTicker(bid: Double, ask: Double) {
+    func updateTicker(bid: Decimal, ask: Decimal) {
         updateBid(price: bid)
         updateAsk(price: ask)
     }
@@ -285,7 +285,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     private var lastDip: Date? = nil
     
 
-    private func updateAsk(price: Double) {
+    private func updateAsk(price: Decimal) {
                 
         /// There are always sufficient found here!
         /// There are 2h of statistic availables
@@ -455,7 +455,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         saveState()
     }
     
-    private func notTooCloseBuy(buyPrice: Double, closestAboveBuyPrice: Double?, closestBelowBuyPrice: Double?) -> Bool {
+    private func notTooCloseBuy(buyPrice: Decimal, closestAboveBuyPrice: Decimal?, closestBelowBuyPrice: Decimal?) -> Bool {
         
         // Check if the current price is not too close of another order
         // made at a higher price
@@ -527,7 +527,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // =================================================================
 
 
-    func updateBid(price: Double) {
+    func updateBid(price: Decimal) {
         guard price != self.currentBidPrice else { return }
         
         self.currentBidPrice = price
@@ -539,7 +539,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
 
     
-    private func update(operation: TraderBTSSellOperation, price: Double) {
+    private func update(operation: TraderBTSSellOperation, price: Decimal) {
 
         // If the operation has not sell order associated, we
         // check if an order can be made.
@@ -566,7 +566,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
         }
     }
 
-    func createStopLoss(operation: TraderBTSSellOperation, price: Double) {
+    func createStopLoss(operation: TraderBTSSellOperation, price: Decimal) {
 
         // If the price is higher than the upper limit, we update the stop-loss sell price.
         var stopLossPricePercent: Percent =
@@ -645,8 +645,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     // MARK: - Helpers
     // =================================================================
 
-    private func closestOrder(to price: Double) -> TraderBTSSellOperation? {
-        var diff = Double.greatestFiniteMagnitude
+    private func closestOrder(to price: Decimal) -> TraderBTSSellOperation? {
+        var diff = Decimal.greatestFiniteMagnitude
         var closest: TraderBTSSellOperation?
 
         for otherOrder in self.openBTSSellOperations {
@@ -661,8 +661,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
 
     /// Returns the closest sell operation whose buy price is higher or equal than the current price.
-    private func closestAboveOrder(to price: Double) -> TraderBTSSellOperation? {
-        var diff = Double.greatestFiniteMagnitude
+    private func closestAboveOrder(to price: Decimal) -> TraderBTSSellOperation? {
+        var diff = Decimal.greatestFiniteMagnitude
         var closest: TraderBTSSellOperation?
         
         for otherOrder in self.openBTSSellOperations {
@@ -679,8 +679,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     }
     
     /// Returns the closest sell operation whose buy price is lower or equal than the current price.
-    private func closestBelowOrder(to price: Double) -> TraderBTSSellOperation? {
-        var diff = Double.greatestFiniteMagnitude
+    private func closestBelowOrder(to price: Decimal) -> TraderBTSSellOperation? {
+        var diff = Decimal.greatestFiniteMagnitude
         var closest: TraderBTSSellOperation?
         
         for otherOrder in self.openBTSSellOperations {
@@ -705,7 +705,7 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
     @discardableResult
     func summary(shouldPrint: Bool = true) -> String {
         let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), before: currentDate).average()
-        let coins: Double = openBTSSellOperations.reduce(
+        let coins: Decimal = openBTSSellOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.initialTrade.quantity) }
         )
@@ -743,8 +743,8 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
         let runDuration: TimeInterval = currentDate - startDate
         let profitPercent = Percent(ratioOf: profits, to: initialBalance).percentage
-        let profitPerDay = (profits / (runDuration / 3600 / 24))
-        let profitPerDayPercent = (profitPercent / (runDuration / 3600 / 24))
+        let profitPerDay = (profits / Decimal(runDuration / 3600 / 24))
+        let profitPerDayPercent = (profitPercent / Decimal(runDuration / 3600 / 24))
 
         summaryString += "\n==========================================\n"
         summaryString += "Summary\n"
@@ -769,11 +769,13 @@ class SimpleTraderBTSStrategy: SimpleTraderStrategy {
 
     // MARK: - Utilities
     
-    private func roundPrice(_ price: Double) -> Double {
-        return round(price * 100) / 100.0
+    private func roundPrice(_ price: Decimal) -> Decimal {
+        let doublePrice = (price as NSDecimalNumber).doubleValue
+        return Decimal(round(doublePrice * 100) / 100.0)
     }
 
-    private func roundQty(_ qty: Double) -> Double {
-        return round(qty * 10e5) / 10e5
+    private func roundQty(_ qty: Decimal) -> Decimal {
+        let doubleQty = (qty as NSDecimalNumber).doubleValue
+        return Decimal(round(doubleQty * 10e5) / 10e5)
     }
 }
