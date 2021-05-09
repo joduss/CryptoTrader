@@ -56,6 +56,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "simulate --btc_usd --bts &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "simulate --btc_usd --macd -e 15000000 &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
             isEnabled = "NO">
          </CommandLineArgument>
@@ -69,7 +73,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "simulate --btc_usd --macd &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "simulate --help"

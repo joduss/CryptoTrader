@@ -52,16 +52,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "simulate --btc_usd --bts -s 20000000 &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "simulate --btc_usd --macd &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "simulate --btc_usd --macd -e 20000000 &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
-            isEnabled = "NO">
+            argument = "simulate --btc_usd --bts &quot;/Users/jonathanduss/Documents/Data Mining/btc.tickers&quot;"
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
