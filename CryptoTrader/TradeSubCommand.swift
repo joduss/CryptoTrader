@@ -1,8 +1,18 @@
 import Foundation
 import ArgumentParser
 
+enum StrategyType: String, EnumerableFlag, CustomStringConvertible {
+    case macd
+    case bts
+    
+    public var description: String {
+        return self.rawValue
+    }
+}
 
 extension TraderMain {
+    
+
     
     struct Trade: ParsableCommand {
         
@@ -21,13 +31,17 @@ extension TraderMain {
         @Argument
         var saveStateLocation: String
         
+        @Flag(exclusivity: .chooseFirst, help: "Strategy to use.")
+        var strategy: StrategyType
+        
         // MARK: Command line main.
         // ------------------------------
         mutating func run() throws {
             let _ = TradeSubCommand(symbol: symbol,
                                     initialBalance: Decimal(initialBalance),
                                     maxOperationCount: maxOperationCount,
-                                    saveStateLocation: saveStateLocation)
+                                    saveStateLocation: saveStateLocation,
+                                    strategyType: strategy)
         }
     }
 }
@@ -35,15 +49,19 @@ extension TraderMain {
 struct TradeSubCommand {
 
     private let exchange: ExchangeClient!
-    private let trader: SimpleTrader!
+    private var trader: SimpleTrader! = nil
     
     let symbol: CryptoSymbol
     let initialBalance: Decimal
-    let maxOperationCount: Int
+    let maxOperationCount: Int?
     let saveStateLocation: String
     
     
-    internal init(symbol: CryptoSymbol, initialBalance: Decimal, maxOperationCount: Int, saveStateLocation: String) {
+    internal init(symbol: CryptoSymbol,
+                  initialBalance: Decimal,
+                  maxOperationCount: Int,
+                  saveStateLocation: String,
+                  strategyType: StrategyType) {
         
         self.symbol = symbol
         self.initialBalance = initialBalance
@@ -52,11 +70,31 @@ struct TradeSubCommand {
                 
         exchange = BinanceClient(symbol: symbol, config: BinanceApiConfiguration(key: BinanceApiKey.apiKey, secret: BinanceApiKey.secreteKey))
         
+        var strategy: SimpleTraderStrategy!
+        
+        switch strategyType {
+            case .bts:
+                strategy = createBTSStrategy(exchange: exchange)
+                break
+            case .macd:
+                strategy = createMACDStrategy()
+                break
+        }
+
+        sourcePrint("Strategy:\n \(strategy!)")
+        trader = SimpleTrader(client: exchange, strategy: strategy)
+        
+        self.readUserInput()
+    }
+    
+    
+    func createBTSStrategy(exchange: ExchangeClient) -> SimpleTraderStrategy {
+        
         var config: TraderBTSStrategyConfig!
         
         switch symbol {
             case .btc_usd:
-                config = TraderBTSStrategyConfigBTC()
+                config = TraderBTSStrategyConfigBTC2()
                 break
             case .eth_usd:
                 config = TraderBTSStrategyConfigETH()
@@ -64,18 +102,22 @@ struct TradeSubCommand {
                 config = TraderBTSStrategyConfigICX()
         }
         
-        config.maxOrdersCount = maxOperationCount
+        config.maxOrdersCount = maxOperationCount ?? config.maxOrdersCount
         
+        return TraderBTSStrategy(exchange: exchange,
+                                 config: config,
+                                 initialBalance: initialBalance,
+                                 currentBalance: initialBalance,
+                                 saveStateLocation: saveStateLocation)
+    }
+    
+    func createMACDStrategy() -> SimpleTraderStrategy {
         
-        let strategy = SimpleTraderBTSStrategy(exchange: exchange,
-                                               config: config,
-                                               initialBalance: initialBalance,
-                                               currentBalance: initialBalance,
-                                               saveStateLocation: saveStateLocation,
-                                               dateFactory: dateFactory)
-        trader = SimpleTrader(client: exchange, strategy: strategy)
-        
-        self.readUserInput()
+        return TraderMACDStrategy(exchange: exchange,
+                                  config: TraderMacdStrategyConfig(),
+                                  initialBalance: initialBalance,
+                                  currentBalance: initialBalance,
+                                  saveStateLocation: saveStateLocation)
     }
     
     func readUserInput() {
