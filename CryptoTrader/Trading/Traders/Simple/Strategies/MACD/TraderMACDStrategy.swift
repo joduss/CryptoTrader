@@ -52,7 +52,6 @@ class TraderMACDStrategy: SimpleTraderStrategy {
 
     private var queue = Queue<Decimal>()
     
-//    private let marketStatistic: MarketAggregatedHistory
     private let macdIndicator: MacdIndicator
     
     private var csvLine: TraderMACDStrategyCSVLine
@@ -110,12 +109,9 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         self.dateFactory = dateFactory ?? DateFactory.init()
         self.startDate = self.dateFactory.now
         
-//        self.marketStatistic = MarketAggregatedHistory(intervalToKeep: TimeInterval.fromMinutes(config.macdLong * config.macdPeriod),
-//                                                       aggregationPeriod: TimeInterval.fromMinutes(1))
         self.macdIndicator = MacdIndicator(shortPeriod: config.macdShort, longPeriod: config.macdLong, signalPeriod: config.macdSignal)
                 
         queue.reserveCapacity(config.macdLong)
-//        queue.limitSize = config.macdLong * 2
         queue.limitSize = config.macdLong * 2
 
         FileManager.default.createFile(atPath: "/Users/jonathanduss/Desktop/macd-buy-analysis.csv", contents: nil, attributes: nil)
@@ -227,10 +223,6 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         
         self.currentBidPrice = bid
         enqueueBid(bid)
-//        marketStatistic.record(DatedPrice(price: bid, date: currentDate))
-//        marketStatistic.cleanup()
-        
-
         
         stopLoss(bidPrice: bid)
         
@@ -550,6 +542,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
         summaryString += "Summary\n"
         summaryString += "==========================================\n\n"
         
+        summaryString += "Strategy type: MACD\n"
+        summaryString += "Currency: \(symbol)\n"
         summaryString += "Order value: \(orderValue.format(decimals: 2))\n"
         summaryString += "Current balance: \(currentBalance.format(decimals: 2))\n\n"
         summaryString += "Coins: \(coins) @ \(currentPrice.format(decimals: 2))\n"

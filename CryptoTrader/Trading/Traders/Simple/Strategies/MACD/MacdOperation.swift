@@ -56,7 +56,7 @@ class MacdOperation: Codable, CustomStringConvertible {
         let df = OutputDateFormatter.instance
         let openDateFormatted = df.format(date: openDate)
         
-        return "\(id) - Open on \(openDateFormatted) - \(quantity) @ \(openPrice) = \(openCost) - Current profits : \(currentPrice * quantity - openCost) (\(Percent(differenceOf: currentPrice * quantity, from: openCost))%) (fee not taken into account)"
+        return "\(id) - Open on \(openDateFormatted) - \(quantity) @ \(openPrice) = \(openCost) - Current profits : \(currentPrice * quantity - openCost) (\(Percent(differenceOf: currentPrice * quantity, from: openCost))%) (fee removed)"
     }
     
     func replace(time: Date, price: Decimal, quantity: Decimal, cost: Decimal) -> (MacdOperation, Decimal) {

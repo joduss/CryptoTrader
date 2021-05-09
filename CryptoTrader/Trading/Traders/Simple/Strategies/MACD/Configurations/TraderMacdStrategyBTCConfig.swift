@@ -27,9 +27,7 @@ struct TraderMacdStrategyConfig {
     var minDistancePercentBelow: Percent? = -0.75
     
     /// Min distance between the order below and a new order
-    var minDistancePercentAbove: Percent? = 1.0
-    
-    
+    var minDistancePercentAbove: Percent? = 1.0    
     
     var minProfitsPercent: Percent = 0.8
     var stopLossPercent: Percent = -1000

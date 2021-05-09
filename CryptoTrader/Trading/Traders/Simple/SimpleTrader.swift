@@ -78,7 +78,7 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         decisionCount += 1
 
         if decisionCount % printDecisionFrequency == 0 {
-            sourcePrint("Decision for bid price \(ticker.bidPrice) / ask price \(ticker.askPrice)")
+            sourcePrint("Decision for bid price \(ticker.bidPrice.format(decimals: 3)) / ask price \(ticker.askPrice.format(decimals: 3))")
         }
 
         strategy.updateTicker(bid: ticker.bidPrice, ask: ticker.askPrice)
