@@ -14,6 +14,8 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     private let config: TraderBTSStrategyConfig
     private let marketAnalyzer: MarketAggregatedHistory
     
+    private let minOrderValue: Decimal = 10.2
+    
     private let symbol: CryptoSymbol
 
     // MARK: State
@@ -25,7 +27,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     private var initialBalance: Decimal
 
     private var currentBalance: Decimal {
-        didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
+        didSet { sourcePrint("Current Balance: \(oldValue.format(decimals: 3)) -> \(currentBalance.format(decimals: 3))") }
     }
 
     private(set) var profits: Decimal = 0
@@ -81,7 +83,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         initialBalance: Decimal,
         currentBalance: Decimal,
         saveStateLocation: String,
-        dateFactory: DateFactory? = nil
+        dateFactory: DateFactory = DateFactory.init()
     ) {
         self.config = config
         self.exchange = exchange
@@ -89,7 +91,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         self.initialBalance = initialBalance
         self.saveStateLocation = saveStateLocation
         self.currentBalance = currentBalance
-        self.dateFactory = dateFactory ?? DateFactory.init()
+        self.dateFactory = dateFactory
         self.startDate = self.dateFactory.now
         
         let maxInterval = max(config.lockCheckTrendInterval, config.unlockCheckTrendInterval)
@@ -302,16 +304,18 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         
         // RULE 1: Special buy when there is a huge dip
         if  openBTSBuyOperation == nil,
+            orderValue > 0,
+            currentBalance >= orderValue,
             let closestAbove = closestAboveBuyPrice,
             Percent(differenceOf: price, from: closestAbove) < config.minDistancePercentNegative,
-            price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent,
-           currentBalance >= orderValue {
+            price < marketAnalyzer.prices(last: TimeInterval.fromMinutes(30), before: currentDate - config.dipDropThresholdTime).average() -% config.dipDropThresholdPercent
+             {
             self.lastDip = currentDate
             sourcePrint("Special buy preparation of a big drop")
             updateBuyOperation()
         }
 
-        if openBTSBuyOperation == nil && currentBalance < 2 * orderValue {
+        if openBTSBuyOperation == nil && (currentBalance < orderValue ||  currentBalance < 2 * orderValue) {
             return
         }
 
@@ -442,6 +446,9 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     }
 
     private func updateBuyOperation() {
+        guard orderValue > 0 else { return }
+        guard currentBalance >= orderValue else { return }
+        
         guard let buyOperation = self.openBTSBuyOperation else {
             self.openBTSBuyOperation = TraderBTSBuyOperation(currentPrice: currentAskPrice, config: config)
             updateBuyOperation()
@@ -512,7 +519,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
                     )
                     self.currentBalance -= order.cummulativeQuoteQty
                     self.openBTSSellOperations.append(TraderBTSSellOperation(trade: trade, now: self.currentDate))
-                    sourcePrint("Successfully bought \(order.originalQty)@\(order.price) (\(order.status))")
+                    sourcePrint("Successfully bought \(order.originalQty.format(decimals: 10))@\(order.price) (\(order.status))")
                 }
                 semaphore.signal()
             }
@@ -750,6 +757,8 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         summaryString += "Summary\n"
         summaryString += "==========================================\n\n"
 
+        summaryString += "Strategy type: BTS\n"
+        summaryString += "Currency: \(symbol)\n"
         summaryString += "Order value: \(orderValue.format(decimals: 2))\n"
         summaryString += "Current balance: \(currentBalance.format(decimals: 2))\n\n"
         summaryString += "Coins: \(coins) @ \(currentPrice.format(decimals: 2))\n"

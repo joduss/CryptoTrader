@@ -78,6 +78,6 @@ class TraderBTSSellOperation: CustomStringConvertible, Codable {
             return ""
         }
         
-        return "\n Will sell if price < \(stopLossPrice), update if price > \(updateWhenAbovePrice)"
+        return "\n Will sell if price < \(stopLossPrice.format(decimals: 3)), update if price > \(updateWhenAbovePrice.format(decimals: 3))"
     }
 }
