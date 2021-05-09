@@ -17,20 +17,20 @@ class MarketOHLCDataTransformer {
     }
     
     func transform(outputFileHandle: FileHandle, interval: TimeInterval) throws {
-//        outputFileHandle.write("\(Time),\"Open\",\"High\",\"Low\",\"Close\",\"Volume\",\"Trades\"\n")
         
         let reader = TextFileReader.openFile(at: tradesFile)
         var lineCount = 0
+        var lastDate = Date()
         
         var currentOhlcRecord: OHLCRecord?
         
-        while let line = reader.readLine() {
+        while let line: String = reader.readLine() {
             lineCount += 1
             
             let trade = deserialize(line: line)
             
-            if (lineCount % 100000 == 0) {
-                print("Lines processed: \(lineCount)")
+            if (lineCount % 100000 == 0 && lineCount > 0) {
+                print("Lines processed: \(lineCount). Current date: \(lastDate)")
             }
                         
             guard let record = currentOhlcRecord else {
@@ -41,6 +41,7 @@ class MarketOHLCDataTransformer {
             if trade.time - record.time > interval {
                 outputFileHandle.write("\(record.time.timeIntervalSince1970),\(record.open),\(record.high),\(record.low),\(record.close),\(record.volume),\(record.trades)\n")
                 currentOhlcRecord = OHLCRecord(trade: trade)
+                lastDate = record.time
                 continue
             }
             

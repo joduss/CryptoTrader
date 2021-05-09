@@ -98,7 +98,7 @@ public class FileMerger {
         
         var lineCount = 0
         
-        while let line = reader.readLine() {
+        while let line: String = reader.readLine() {
             var lineId: Int = -1
             var lineData: Data!
             // The deserialization has a memory leak during deserialization.
