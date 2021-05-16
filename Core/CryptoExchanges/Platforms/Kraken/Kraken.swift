@@ -67,7 +67,7 @@ public class Kraken: ExchangeMarketDataStream, WebSocketDelegate {
     public func process(response: String) {
         if response.starts(with: "[") {
             let serverResponse = KrakenTickerResponse(response: response)
-            marketDataStreamSubscriber?.process(trade: MarketAggregatedTrade(id: Int.random(in: 0...Int.max),date: Date(), symbol: symbol.rawValue, price: serverResponse.price, quantity: 0, buyerIsMaker: false))
+            marketDataStreamSubscriber?.process(trade: MarketFullAggregatedTrade(id: Int.random(in: 0...Int.max),date: Date(), symbol: symbol.rawValue, price: serverResponse.price, quantity: 0))
         }
     }
 }

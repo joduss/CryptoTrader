@@ -11,7 +11,7 @@ class KrakenTickerResponse: Codable {
 
     let response: String
 
-    var price: Double! = nil
+    var price: Decimal! = nil
 
     private var responseData: Data {
         return response.data(using: .utf8)!
