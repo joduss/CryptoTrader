@@ -1,12 +1,12 @@
 import Foundation
 
-public protocol ExchangeMarketDataStreamSubscriber: class {
+public protocol ExchangeMarketDataStreamSubscriber: AnyObject {
     func process(ticker: MarketTicker)
-    func process(trade: MarketAggregatedTrade)
+    func process(trade: MarketFullAggregatedTrade)
     func process(depthUpdate: MarketDepth)
 }
 
-public protocol ExchangeMarketDataStream: class {
+public protocol ExchangeMarketDataStream: AnyObject {
     var subscribedToTickerStream: Bool { get }
     var subscribedToAggregatedTradeStream: Bool { get }
     var subscribedToMarketDepthStream: Bool { get }

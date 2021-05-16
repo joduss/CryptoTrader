@@ -55,8 +55,8 @@ class GridSearchSubCommandExecution {
         return simulation.simulate(config: config)
     }
     
-    private func createSimulatedExchange(dateFactory: DateFactory) -> SimulatedFullExchange {
-        return SimulatedFullExchange(symbol: symbol, tickers: tickers, dateFactory: dateFactory)
+    private func createSimulatedExchange(dateFactory: DateFactory) -> SimulatedTickerBasedExchange {
+        return SimulatedTickerBasedExchange(symbol: symbol, tickers: tickers, dateFactory: dateFactory)
     }
     
     

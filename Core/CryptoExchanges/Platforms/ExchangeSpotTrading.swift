@@ -1,6 +1,6 @@
 import Foundation
 
-protocol ExchangeSpotTrading: class {
+protocol ExchangeSpotTrading: AnyObject {
 
     func listOpenOrder(completion: @escaping ([BinanceOrderSummaryResponse]?) -> ())
     func cancelOrder(symbol: CryptoSymbol, id: String, newId: String?, completion: @escaping (Bool) -> ())

@@ -24,8 +24,11 @@ extension TraderMain {
         @Flag(exclusivity: .chooseFirst, help: "Strategy")
         var strategy: TradingStrategy
         
-        @Argument
-        var tickersLocation: String
+        @Option(name: .customLong("tickers"), help: "Ticker file")
+        var tickersLocation: String?
+        
+        @Option(name: .customLong("trades"), help: "CSV trades file")
+        var tradesLocation: String?
         
         @Flag(help: "Double data")
         var doubleData: Bool = false
@@ -34,11 +37,13 @@ extension TraderMain {
         // ------------------------------
         func run() throws {
             print(self)
+            
             let simulation = try SimulateSubCommandExecution(symbol: symbol,
                                            initialBalance: Decimal(initialBalance),
                                            tickersLocation: tickersLocation,
-                                           tickersStartIdx: startIdx,
-                                           tickersEndIdx: endIdx)
+                                           tradesLocation: tradesLocation,
+                                           dataStartIdx: startIdx,
+                                           dataEndIdx: endIdx)
             
             simulation.execute(strategy: strategy)
         }

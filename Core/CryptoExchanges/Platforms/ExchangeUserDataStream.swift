@@ -1,11 +1,11 @@
 import Foundation
 
-protocol ExchangeUserDataStreamSubscriber: class {
+protocol ExchangeUserDataStreamSubscriber: AnyObject {
     //func updated(balance: Double)
     func updated(order: OrderExecutionReport)
 }
 
-protocol ExchangeUserDataStream: class {
+protocol ExchangeUserDataStream: AnyObject {
     var subscribed: Bool { get }
     var webSocketHandler: WebSocketHandler { get }
     var userDataStreamSubscriber: ExchangeUserDataStreamSubscriber? { get set }

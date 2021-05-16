@@ -107,7 +107,7 @@ class AggregatedTradeToOHLCDataTransformer {
 
 
     /// Deserialize a line ( "price, volume, time")
-    private func deserialize(line: String) -> BasicTrade {
+    private func deserialize(line: String) -> MarketMinimalAggregatedTrade {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
 
         return BasicTrade(

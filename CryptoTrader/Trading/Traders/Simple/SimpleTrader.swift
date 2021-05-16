@@ -67,7 +67,6 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
     }
 
     func process(ticker: MarketTicker) {
-
         if isUpdating {
             return
         }
@@ -87,8 +86,24 @@ class SimpleTrader: ExchangeMarketDataStreamSubscriber, ExchangeUserDataStreamSu
         updateProcessSemaphore.signal()
     }
 
-    func process(trade: MarketAggregatedTrade) {
-
+    func process(trade: MarketFullAggregatedTrade) {
+        if isUpdating {
+            return
+        }
+        
+        updateProcessSemaphore.wait()
+        isUpdating = true
+        
+        decisionCount += 1
+        
+        if decisionCount % printDecisionFrequency == 0 {
+            sourcePrint("Decision for trade \(trade.price.format(decimals: 3))")
+        }
+        
+        strategy.updateTicker(bid: trade.price, ask: trade.price)
+        
+        isUpdating = false
+        updateProcessSemaphore.signal()
     }
 
     func process(depthUpdate: MarketDepth) {}

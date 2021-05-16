@@ -1,6 +1,6 @@
 import Foundation
 
-class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMarketDataStream,
+class SimulatedTradeBasedExchange: SimulatedExchange, ExchangeUserDataStream, ExchangeMarketDataStream,
     ExchangeSpotTrading
 {
     let symbol: CryptoSymbol
@@ -11,19 +11,19 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     
     var feeRate = Percent(0.1)
 
-    private let tickers: ContiguousArray<MarketTicker>
+    private let trades: ContiguousArray<MarketMinimalAggregatedTrade>
     private let dateFactory: DateFactory
-    private var currentTicker: MarketTicker
+    private var currentTrade: MarketMinimalAggregatedTrade
     private var exchangeOrderId = 1
     private var group = DispatchGroup()
 
-    init(symbol: CryptoSymbol, tickers: ContiguousArray<MarketTicker>, dateFactory: DateFactory) {
-        self.tickers = tickers
+    init(symbol: CryptoSymbol, trades: ContiguousArray<MarketMinimalAggregatedTrade>, dateFactory: DateFactory) {
+        self.trades = trades
         self.symbol = symbol
         self.dateFactory = dateFactory
-        currentTicker = tickers.first!
+        currentTrade = trades.first!
         
-        dateFactory.now = currentTicker.date
+        dateFactory.now = currentTrade.time
     }
 
     // ================================================================
@@ -35,26 +35,26 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
     func start() {
         dateFactory.simulated = true
 
-        self.tickers.withUnsafeBufferPointer({ unsafeTickers in
-            for ticker in unsafeTickers {
-                currentTicker = ticker
-                onNewTicker(ticker)
+        self.trades.withUnsafeBufferPointer({ unsafeTrades in
+            for trade in unsafeTrades {
+                currentTrade = trade
+                onNewTrade(trade)
             }
         })
     }
 
-    private func onNewTicker(_ ticker: MarketTicker) {
-        dateFactory.now = ticker.date
-        self.executeOrders(ticker)
-        self.marketDataStreamSubscriber?.process(ticker: ticker)
+    private func onNewTrade(_ trade: MarketMinimalAggregatedTrade) {
+        dateFactory.now = trade.time
+        self.executeOrders(trade)
+        self.marketDataStreamSubscriber?.process(trade: MarketFullAggregatedTrade(id: 0, date: trade.time, symbol: symbol.rawValue, price: trade.price, quantity: trade.quantity))
     }
 
-    private func executeOrders(_ ticker: MarketTicker) {
+    private func executeOrders(_ ticker: MarketMinimalAggregatedTrade) {
         executeBuyOrders(ticker)
         executeSellOrders(ticker)
     }
 
-    private func executeBuyOrders(_ ticker: MarketTicker) {
+    private func executeBuyOrders(_ trade: MarketMinimalAggregatedTrade) {
         let orders = orderRequests.filter({ order in
             if order.side == .sell {
                 return false
@@ -64,11 +64,11 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             case .market:
                 return true
             case .limit:
-                return ticker.askPrice <= order.price!
+                return trade.price <= order.price!
             case .stopLoss:
-                return ticker.askPrice >= order.price!
+                return trade.price >= order.price!
             case .stopLossLimit:
-                return ticker.askPrice >= order.price!
+                return trade.price >= order.price!
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
@@ -79,13 +79,13 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
 
             switch order.type {
             case .market:
-                price = ticker.askPrice
+                price = trade.price
             case .limit:
                 price = order.price!  // Worst price
             case .stopLoss:
-                price = ticker.askPrice
+                price = trade.price
             case .stopLossLimit:
-                price = ticker.askPrice
+                price = trade.price
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
@@ -119,7 +119,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
 
     }
 
-    private func executeSellOrders(_ ticker: MarketTicker) {
+    private func executeSellOrders(_ trade: MarketMinimalAggregatedTrade) {
         let orders = orderRequests.filter({ order in
             if order.side == .buy {
                 return false
@@ -129,9 +129,9 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
             case .market:
                 return true
             case .limit:
-                return ticker.bidPrice >= order.price!
+                return trade.price >= order.price!
             case .stopLoss:
-                return ticker.bidPrice <= order.price!
+                return trade.price <= order.price!
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
@@ -142,11 +142,11 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
 
             switch order.type {
             case .market:
-                price = ticker.bidPrice
+                price = trade.price
             case .limit:
                 price = order.price!  // worst price
             case .stopLoss:
-                price = ticker.bidPrice
+                price = trade.price
             default:
                 fatalError("\(order.type) is not a supported buy order.")
             }
@@ -290,7 +290,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 fatalError("Quantity and value should not both be given.")
             }
             
-            let price = order.side == .buy ? currentTicker.askPrice : currentTicker.bidPrice
+            let price = currentTrade.price
             var value = quantity * price
             value = order.side == .buy ? value +% Percent(0.1) : value -% Percent(0.1)
             
@@ -318,7 +318,7 @@ class SimulatedFullExchange: ExchangeClient, ExchangeUserDataStream, ExchangeMar
                 fatalError("Quantity and value should not both be given.")
             }
             
-            let price = order.side == .buy ? currentTicker.askPrice : currentTicker.bidPrice
+            let price = currentTrade.price
             let qty = (value / price)
             
             

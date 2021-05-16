@@ -6,21 +6,30 @@ class SimulateSubCommandExecution {
     let symbol: CryptoSymbol
     var initialBalance: Decimal
     var tickers: ContiguousArray<MarketTicker> = ContiguousArray<MarketTicker>()
-    
+    var trades: ContiguousArray<MarketMinimalAggregatedTrade> = ContiguousArray<MarketMinimalAggregatedTrade>()
+
     let dateFactory = DateFactory()
     
     internal init(symbol: CryptoSymbol,
                   initialBalance: Decimal,
-                  tickersLocation: String,
-                  tickersStartIdx: Int? = nil,
-                  tickersEndIdx: Int? = nil) throws {
+                  tickersLocation: String?,
+                  tradesLocation: String?,
+                  dataStartIdx: Int? = nil,
+                  dataEndIdx: Int? = nil) throws {
         self.symbol = symbol
         self.initialBalance = initialBalance
         
-        let startIdx = tickersStartIdx ?? 0
-        let endIdx = tickersEndIdx ?? Int.max
+        let startIdx = dataStartIdx ?? 0
+        let endIdx = dataEndIdx ?? Int.max
         
-        self.tickers = MarketTickerDeserializer.loadTickers(from: tickersLocation, startIdx: startIdx, endIdx: endIdx)
+        if let tickersLocation = tickersLocation {
+            self.tickers = MarketTickerDeserializer.loadTickers(from: tickersLocation, startIdx: startIdx, endIdx: endIdx)
+        }
+        
+        if let tradesLocation = tradesLocation {
+            self.trades = MarketMinimalAggregatedTradeDeserializer.loadTrades(from: tradesLocation, startIdx: startIdx, endIdx: endIdx)
+        }
+        
         printDateFactory = dateFactory
     }
     
@@ -72,7 +81,12 @@ class SimulateSubCommandExecution {
         return simulation.simulate(config: config)
     }
     
-    private func createSimulatedExchange() -> SimulatedFullExchange {
-        return SimulatedFullExchange(symbol: symbol, tickers: tickers, dateFactory: dateFactory)
+    private func createSimulatedExchange() -> SimulatedExchange {
+        if tickers.count == 0 {
+            return SimulatedTradeBasedExchange(symbol: symbol, trades: trades, dateFactory: dateFactory)
+        }
+        else {
+            return SimulatedTickerBasedExchange(symbol: symbol, tickers: tickers, dateFactory: dateFactory)
+        }
     }
 }

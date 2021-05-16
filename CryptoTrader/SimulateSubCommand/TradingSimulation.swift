@@ -4,14 +4,14 @@ import Foundation
 class TradingSimulation {
     
     let symbol: CryptoSymbol
-    let simulatedExchange: SimulatedFullExchange
+    let simulatedExchange: SimulatedExchange
     let dateFactory: DateFactory
     let initialBalance: Decimal
     
     var shouldPrint = true
     
     
-    init(symbol: CryptoSymbol, simulatedExchange: SimulatedFullExchange, dateFactory: DateFactory, initialBalance: Decimal) {
+    init(symbol: CryptoSymbol, simulatedExchange: SimulatedExchange, dateFactory: DateFactory, initialBalance: Decimal) {
         self.symbol = symbol
         self.simulatedExchange = simulatedExchange
         self.dateFactory = dateFactory
