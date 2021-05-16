@@ -10,25 +10,35 @@ struct OHLCRecord {
 /// Volume - The total volume traded by all trades
 /// Trades - The number of individual trades}
 
-    let open: Double
-    var high: Double
-    var low: Double
-    var close: Double
-    var volume: Double
+    let open: Decimal
+    var high: Decimal
+    var low: Decimal
+    var close: Decimal
+    var volume: Decimal
     var trades: Int
-    var time: Date
+    let time: Date
     
-    init(trade: BasicMarketTrade) {
+    init(time: Date, trade: MarketMinimalAggregatedTrade) {
+        self.time = time
         open = trade.price
         close = trade.price
         high = trade.price
         low = trade.price
         volume = trade.quantity
-        time = trade.time
         trades = 1
     }
     
-    mutating func update(with trade: BasicMarketTrade) {
+    init(time: Date, ohlc: OHLCRecord) {
+        self.time = time
+        open = ohlc.close
+        close = ohlc.close
+        high = ohlc.close
+        low = ohlc.low
+        volume = 0
+        trades = 0
+    }
+    
+    mutating func update(with trade: MarketMinimalAggregatedTrade) {
         
         if trade.price > high {
             high = trade.price

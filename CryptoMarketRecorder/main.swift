@@ -133,18 +133,18 @@ extension CryptoMarketRecorder {
         var interval: TimeInterval = 60
         
         mutating func run() throws {
-            print("Merge done")
+            print("Transformation started")
 
             let tradeCsv = self.tradeCsvFile.expandedPath()
             let resultingFile = ohlcOutputFile.expandedPath()
             
-            let transformer = MarketOHLCDataTransformer(tradesFile: tradeCsv)
+            let transformer = AggregatedTradeToOHLCDataTransformer(tradesFile: tradeCsv)
             
             FileManager.default.createFile(atPath: resultingFile, contents: nil, attributes: nil)
             try transformer.transform(outputFileHandle: FileHandle(forWritingAtPath: resultingFile)!,
-                                  interval: TimeInterval.fromMinutes(1))
+                                  aggregationInterval: TimeInterval.fromMinutes(1))
             
-            print("Merge done")
+            print("Transformation done")
         }
     }
 }
