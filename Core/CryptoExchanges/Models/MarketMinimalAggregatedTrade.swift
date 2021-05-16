@@ -1,6 +1,6 @@
 import Foundation
 
-struct BasicMarketTrade {
+struct MarketMinimalAggregatedTrade {
     var price: Double
     var quantity: Double
     var time: Date

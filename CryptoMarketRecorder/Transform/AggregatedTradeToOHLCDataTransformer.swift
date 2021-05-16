@@ -8,7 +8,7 @@ import JoLibrary
 ///// Close - The final traded price
 ///// Volume - The total volume traded by all trades
 ///// Trades - The number of individual trades
-class MarketOHLCDataTransformer {
+class AggregatedTradeToOHLCDataTransformer {
     
     private let tradesFile: String
     
