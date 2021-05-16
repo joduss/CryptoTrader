@@ -128,12 +128,11 @@ final public class BinanceMarketStream: BinanceApiFragment, WebSocketDelegate, E
             
             guard self.subscribedToAggregatedTradeStream else { return }
             
-            let trade = MarketAggregatedTrade(id: binanceTrade.tradeId,
+            let trade = MarketFullAggregatedTrade(id: binanceTrade.tradeId,
                                               date: Date(),
                                               symbol: binanceTrade.symbol,
                                               price: binanceTrade.price,
-                                              quantity: binanceTrade.quantity,
-                                              buyerIsMaker: binanceTrade.buyerIsMarker)
+                                              quantity: binanceTrade.quantity)
             marketDataStreamSubscriber?.process(trade: trade)
             return
         }
