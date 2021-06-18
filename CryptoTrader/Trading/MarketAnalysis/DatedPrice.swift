@@ -1,6 +1,6 @@
 import Foundation
 
 public struct DatedPrice {
-    let price: Decimal
+    let price: Double
     let date: Date
 }

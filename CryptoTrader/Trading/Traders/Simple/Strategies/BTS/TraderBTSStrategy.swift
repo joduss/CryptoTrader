@@ -297,7 +297,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
 
 
         self.currentAskPrice = price
-        marketAnalyzer.record(DatedPrice(price: price, date: currentDate))
+        marketAnalyzer.record(DatedPrice(price: price.doubleValue, date: currentDate))
         
         let closestAboveBuyPrice = self.closestAboveOrder(to: price)?.initialTrade.price
         let closestBelowBuyPrice = self.closestBelowOrder(to: price)?.initialTrade.price

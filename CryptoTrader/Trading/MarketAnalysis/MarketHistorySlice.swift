@@ -12,9 +12,9 @@ open class MarketHistorySlice {
     
     public internal(set) var prices: ArraySlice<DatedPrice>
     
-    private var averagePrice: Decimal!
-    private var min: Decimal!
-    private var max: Decimal!
+    private var averagePrice: Double!
+    private var min: Double!
+    private var max: Double!
     
     public init(prices: ArraySlice<DatedPrice>) {
         self.prices = prices
@@ -29,17 +29,17 @@ open class MarketHistorySlice {
     
     final public func average() -> Decimal {
         computeBasic()
-        return self.averagePrice
+        return Decimal(self.averagePrice)
     }
     
     final public func maxPrice() -> Decimal {
         computeBasic()
-        return self.max
+        return Decimal(self.max)
     }
     
     final public func minPrice() -> Decimal {
         computeBasic()
-        return self.min
+        return Decimal(self.min)
     }
 
     /// Computes the slope between the beginning of the market history slice and the end, by averaging the first, respectively last
@@ -138,9 +138,9 @@ open class MarketHistorySlice {
             return
         }
         
-        var min = Decimal.greatestFiniteMagnitude
-        var max: Decimal = 0.0
-        var total: Decimal = 0.0
+        var min = Double.greatestFiniteMagnitude
+        var max: Double = 0.0
+        var total: Double = 0.0
         
 
         if self.prices.count > 2000000 {
@@ -171,7 +171,7 @@ open class MarketHistorySlice {
         
         self.min = min
         self.max = max
-        self.averagePrice = total / Decimal(self.prices.count)
+        self.averagePrice = total / Double(self.prices.count)
     }
     
 //    func searchingSpikes(spikeRatioToPrice: Double, priceMin: Double, priceMax: Double, priceAvg: Double) -> UInt {
