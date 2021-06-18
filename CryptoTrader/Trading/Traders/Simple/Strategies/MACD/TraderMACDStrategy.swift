@@ -38,6 +38,9 @@ class TraderMACDStrategy: SimpleTraderStrategy {
 //    }
     
     private(set) var profits: Decimal = 0
+    var balanceValue: Decimal {
+        return currentBalance + openOperations.map({$0.quantity}).reduce(0, {result, value in return result + value }) * currentBidPrice
+    }
     
     private var orderValue: Decimal = 0
 
@@ -57,7 +60,7 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     private var csvLine: TraderMACDStrategyCSVLine
     private var csvInitialized = false
     
-    
+    var openOrders: Int { return openOperations.count }
 
     
     // MARK: Computed properties

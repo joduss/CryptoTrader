@@ -31,6 +31,9 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     }
 
     private(set) var profits: Decimal = 0
+    var balanceValue: Decimal {
+        return currentBalance + openBTSSellOperations.map({$0.initialTrade.quantity}).reduce(0, {result, value in return result + value }) * currentBidPrice
+    }
 
     private var currentBidPrice: Decimal = 0
     private var currentAskPrice: Decimal = 0
@@ -46,6 +49,8 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         
         return self.currentBalance / Decimal((config.maxOrdersCount - openBTSSellOperations.count))
     }
+    
+    var openOrders: Int { return openBTSSellOperations.count }
 
     private var locked: Date? = nil
 

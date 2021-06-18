@@ -17,4 +17,8 @@ protocol SimpleTraderStrategy {
     
     @discardableResult
     func summary(shouldPrint: Bool) -> String
+    
+    var profits: Decimal { get }
+    var balanceValue: Decimal { get }
+    var openOrders: Int { get }
 }
