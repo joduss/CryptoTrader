@@ -21,17 +21,14 @@ extension TraderMain {
         @Option(name: .customShort("e"), help: "End at")
         var endIdx: Int?
         
+        @Option(name: .customShort("k"), help: "Keep every N data.")
+        var keepEvery: Int = 1
+        
         @Flag(exclusivity: .chooseFirst, help: "Strategy")
         var strategy: TradingStrategy
         
-        @Option(name: .customLong("tickers"), help: "Ticker file")
-        var tickersLocation: String?
-        
-        @Option(name: .customLong("trades"), help: "CSV trades file")
-        var tradesLocation: String?
-        
-        @Flag(help: "Double data")
-        var doubleData: Bool = false
+        @Argument(help: "Ticker file")
+        var dataLocation: String
         
         // MARK: Command line main.
         // ------------------------------
@@ -40,8 +37,7 @@ extension TraderMain {
             
             let simulation = try SimulateSubCommandExecution(symbol: symbol,
                                            initialBalance: Decimal(initialBalance),
-                                           tickersLocation: tickersLocation,
-                                           tradesLocation: tradesLocation,
+                                           dataLocation: dataLocation,
                                            dataStartIdx: startIdx,
                                            dataEndIdx: endIdx)
             

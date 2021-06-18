@@ -1,6 +1,13 @@
 import Foundation
 
 
+struct TradingSimulationResults {
+    let simulationLog: String
+    let accumulatedProfits: Decimal
+    let currentValue: Decimal
+    let openOrderCount: Int
+}
+
 class TradingSimulation {
     
     let symbol: CryptoSymbol
@@ -18,7 +25,7 @@ class TradingSimulation {
         self.initialBalance = initialBalance
     }
     
-    func simulate(config: TraderBTSStrategyConfig) -> (Decimal, String) {
+    func simulate(config: TraderBTSStrategyConfig) -> TradingSimulationResults {
         
         let strategy = TraderBTSStrategy(exchange: simulatedExchange,
                                                config: config,
@@ -38,10 +45,13 @@ class TradingSimulation {
             \(strategy.summary(shouldPrint: shouldPrint))
             """
         
-        return (strategy.profits, description)
+        return TradingSimulationResults(simulationLog: description,
+                                        accumulatedProfits: strategy.profits,
+                                        currentValue: strategy.balanceValue,
+                                        openOrderCount: strategy.openOrders)
     }
     
-    func simulate(config: TraderMacdStrategyConfig) -> (Decimal, String) {
+    func simulate(config: TraderMacdStrategyConfig) -> TradingSimulationResults {
         let strategy = TraderMACDStrategy(exchange: simulatedExchange,
                                                    config: config,
                                                    initialBalance: initialBalance,
@@ -60,7 +70,10 @@ class TradingSimulation {
             \(strategy.summary())
             """
         
-        return (strategy.profits, description)
+        return TradingSimulationResults(simulationLog: description,
+                                        accumulatedProfits: strategy.profits,
+                                        currentValue: strategy.balanceValue,
+                                        openOrderCount: strategy.openOrders)
     }
     
 }

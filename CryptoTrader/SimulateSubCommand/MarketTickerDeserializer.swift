@@ -6,7 +6,7 @@ class MarketTickerDeserializer {
     class func loadTickers(from file: String, startIdx: Int, endIdx: Int) -> ContiguousArray<MarketTicker> {
         let reader = TextFileReader.openFile(at: file)
         var idx = 0
-        let keepEveryNTicker = 15
+        let keepEveryNTicker = 20
         
         var tickers = ContiguousArray<MarketTicker>()
         tickers.reserveCapacity(100000000)

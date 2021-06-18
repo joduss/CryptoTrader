@@ -17,22 +17,23 @@ extension TraderMain {
         @Option(name: .customShort("e"), help: "End at")
         var endIdx: Int?
         
+        @Option(name: .customShort("k"), help: "Keep every N data")
+        var keepEvery: Int = 1
+        
         @Flag(exclusivity: .chooseFirst, help: "Strategy")
         var strategy: TradingStrategy
         
-        @Argument
-        var tickersLocation: String
-        
-        @Flag(help: "Double data")
-        var doubleData: Bool = false
+        @Argument(help:"Trade data in csv or ticker file (.tickers).")
+        var dataLocation: String
         
         // MARK: Command line main.
         // ------------------------------
         func run() throws {
             let gridSearch = try GridSearchSubCommandExecution(symbol: symbol,
-                                                               tickersLocation: tickersLocation,
-                                                               tickersStartIdx: startIdx,
-                                                               tickersEndIdx: endIdx)
+                                                               dataLocation: dataLocation,
+                                                               dataStartIdx: startIdx,
+                                                               dataEndIdx: endIdx,
+                                                               keepEvery: keepEvery)
             
             gridSearch.execute(strategy: strategy)
         }

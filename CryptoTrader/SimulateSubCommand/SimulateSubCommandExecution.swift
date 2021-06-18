@@ -12,22 +12,27 @@ class SimulateSubCommandExecution {
     
     internal init(symbol: CryptoSymbol,
                   initialBalance: Decimal,
-                  tickersLocation: String?,
-                  tradesLocation: String?,
+                  dataLocation: String,
                   dataStartIdx: Int? = nil,
-                  dataEndIdx: Int? = nil) throws {
+                  dataEndIdx: Int? = nil,
+                  keepEvery: Int = 1) throws {
         self.symbol = symbol
         self.initialBalance = initialBalance
         
         let startIdx = dataStartIdx ?? 0
         let endIdx = dataEndIdx ?? Int.max
         
-        if let tickersLocation = tickersLocation {
-            self.tickers = MarketTickerDeserializer.loadTickers(from: tickersLocation, startIdx: startIdx, endIdx: endIdx)
+        if (dataLocation.contains(".tickers")) {
+            self.tickers = MarketTickerDeserializer.loadTickers(from: dataLocation,
+                                                                startIdx: startIdx,
+                                                                endIdx: endIdx)
         }
-        
-        if let tradesLocation = tradesLocation {
-            self.trades = MarketMinimalAggregatedTradeDeserializer.loadTrades(from: tradesLocation, startIdx: startIdx, endIdx: endIdx)
+        else {
+            self.tickers = MarketMinimalAggregatedTradeDeserializer.loadTradesAsTickers(from: dataLocation,
+                                                                                        startIdx: startIdx,
+                                                                                        endIdx: endIdx,
+                                                                                        keepEvery: keepEvery,
+                                                                                        symbol: symbol)
         }
         
         printDateFactory = dateFactory
@@ -35,7 +40,7 @@ class SimulateSubCommandExecution {
     
     @discardableResult
     /// Returns (profits, summary)
-    func execute(strategy: TradingStrategy) -> (Decimal, String){
+    func execute(strategy: TradingStrategy) -> TradingSimulationResults {
         switch strategy {
             case .bts:
                 return executeBTS(printPrice: true)
@@ -45,7 +50,7 @@ class SimulateSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    func executeMacd(printPrice: Bool = true, config: TraderMacdStrategyConfig? = nil) -> (Decimal, String) {
+    func executeMacd(printPrice: Bool = true, config: TraderMacdStrategyConfig? = nil) -> TradingSimulationResults {
         let config = config ?? TraderMacdStrategyConfig()
         
         let simulation = TradingSimulation(symbol: symbol,
@@ -57,7 +62,7 @@ class SimulateSubCommandExecution {
     }
     
     /// Returns (profits, summary)
-    func executeBTS(printPrice: Bool = true, config: TraderBTSStrategyConfig? = nil) -> (Decimal, String) {
+    func executeBTS(printPrice: Bool = true, config: TraderBTSStrategyConfig? = nil) -> TradingSimulationResults {
         var config: TraderBTSStrategyConfig!  = config
         
         if config == nil {
