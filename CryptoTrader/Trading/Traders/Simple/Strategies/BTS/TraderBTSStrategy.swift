@@ -299,6 +299,20 @@ class TraderBTSStrategy: SimpleTraderStrategy {
         /// We usually want to create order "STOP-LOSS BUY", which we update if the price continues to go down,
         /// at least if there is a clear downward trend.
         guard price != self.currentAskPrice else { return }
+        
+        
+        
+        
+        // STOP LOSS
+        for order in self.openBTSSellOperations {
+            if Percent(differenceOf: price, from: order.initialTrade.price) < config.stopLossPercent {
+                sell(operation: order)
+                locked = dateFactory.now
+            }
+        }
+        
+        
+        
 
 
         self.currentAskPrice = price
@@ -579,19 +593,27 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     }
 
     func createStopLoss(operation: TraderBTSSellOperation, price: Decimal) {
+//        // If too low, we sell => Nope, only huge loss occurs!
+//        let loss: Percent = Percent(differenceOf: price, from: operation.initialTrade.price)
+//
+//        if loss < -5 {
+//            sourcePrint("Stop-loss sellin with 5% loss.")
+//            sell(operation: operation)
+//            return
+//        }
 
         // If the price is higher than the upper limit, we update the stop-loss sell price.
-        var stopLossPricePercent: Percent =
+        var stopLossProfitPricePercent: Percent =
             Percent(differenceOf: price, from: operation.initialTrade.price) - config.sellStopLossProfitPercent
 
         var stopLossProfit = config.sellStopLossProfitPercent
         
         
-        if stopLossPricePercent < config.sellMinProfitPercent {
-            stopLossPricePercent = Percent(differenceOf: price, from: operation.initialTrade.price) - config.minSellStopLossProfitPercent
+        if stopLossProfitPricePercent < config.sellMinProfitPercent {
+            stopLossProfitPricePercent = Percent(differenceOf: price, from: operation.initialTrade.price) - config.minSellStopLossProfitPercent
             stopLossProfit = config.minSellStopLossProfitPercent
             
-            if stopLossPricePercent < config.sellMinProfitPercent {
+            if stopLossProfitPricePercent < config.sellMinProfitPercent {
                 return
             }
         }
