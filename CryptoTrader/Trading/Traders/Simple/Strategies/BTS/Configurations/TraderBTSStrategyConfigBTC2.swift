@@ -42,4 +42,9 @@ struct TraderBTSStrategyConfigBTC2: TraderBTSStrategyConfig {
     
     /// Min profit allowed
     var sellMinProfitPercent: Percent = 1.3
+    
+    
+    // MARK: SELL rules
+    
+    var stopLossPercent: Percent = -1000
 }

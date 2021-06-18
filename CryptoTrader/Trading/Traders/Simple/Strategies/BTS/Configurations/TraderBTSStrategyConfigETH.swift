@@ -44,4 +44,10 @@ struct TraderBTSStrategyConfigETH: TraderBTSStrategyConfig {
     var sellUpdateStopLossProfitPercent: Percent = 0.01
     
     var sellMinProfitPercent: Percent = 0.45
+    
+    
+    
+    // MARK: SELL rules
+    
+    var stopLossPercent: Percent = -10
 }

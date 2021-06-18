@@ -46,4 +46,9 @@ protocol TraderBTSStrategyConfig {
     
     /// Minimum lower limit compared to initial price at which we sell.
     var sellMinProfitPercent: Percent { get set }
+    
+    
+    // MARK: stop loss
+    
+    var stopLossPercent: Percent { get set }
 }

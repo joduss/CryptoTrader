@@ -45,4 +45,9 @@ struct TraderBTSStrategyConfigICX: TraderBTSStrategyConfig {
     var sellUpdateStopLossProfitPercent: Percent = 0.01
     
     var sellMinProfitPercent: Percent = 0.35
+    
+    
+    // MARK: SELL rules
+    
+    var stopLossPercent: Percent = -1000
 }
