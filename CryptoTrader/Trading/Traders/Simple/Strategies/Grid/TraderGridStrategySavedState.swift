@@ -4,9 +4,9 @@ public struct TraderGridStrategySavedState: Codable {
     
     let startDate: Date
     
-    let initialBalance: Decimal
-    let currentBalance: Decimal
-    let profits: Decimal
+    let initialBalance: Double
+    let currentBalance: Double
+    let profits: Double
     
     var orderGrid: [GridMarketPosition] = []
     var orderHistory: [GridTradeRecord] = []

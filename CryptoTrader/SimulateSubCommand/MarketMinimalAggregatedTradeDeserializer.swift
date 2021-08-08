@@ -67,8 +67,8 @@ class MarketMinimalAggregatedTradeDeserializer {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
         
         return MarketMinimalAggregatedTrade(
-            price: Decimal(String(values[0]))!,
-            quantity: Decimal(String(values[1]))!,
+            price: Double(String(values[0]))!,
+            quantity: Double(String(values[1]))!,
             time: Date(timeIntervalSince1970: TimeInterval(values[2])!)
         )
     }
@@ -78,8 +78,8 @@ class MarketMinimalAggregatedTradeDeserializer {
     private static func parse(line: String, symbol: CryptoSymbol) -> MarketTicker {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
         
-        let price = Decimal(String(values[0]))!
-        let qty = Decimal(String(values[1]))!
+        let price = Double(String(values[0]))!
+        let qty = Double(String(values[1]))!
         let time = Date(timeIntervalSince1970: TimeInterval(values[2])!)
         
         return MarketTicker(id: Int(values[3])!,

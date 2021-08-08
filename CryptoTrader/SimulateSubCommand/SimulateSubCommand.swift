@@ -36,13 +36,15 @@ extension TraderMain {
             print(self)
             
             let simulation = try SimulateSubCommandExecution(symbol: symbol,
-                                           initialBalance: Decimal(initialBalance),
+                                           initialBalance: Double(initialBalance),
                                            dataLocation: dataLocation,
                                            dataStartIdx: startIdx,
                                            dataEndIdx: endIdx,
                                            keepEvery: keepEvery)
             
-            simulation.execute(strategy: strategy)
+            let results = simulation.execute(strategy: strategy)
+            
+            print(results.simulationLog)
         }
     }
 }

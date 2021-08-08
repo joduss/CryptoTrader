@@ -37,10 +37,10 @@ class MarketTickerDeserializer {
         var symbol: CryptoSymbol!
         var id: Int!
         var date: Date!
-        var bidQty: Decimal!
-        var askPrice: Decimal!
-        var bidPrice: Decimal!
-        var askQuantity: Decimal!
+        var bidQty: Double!
+        var askPrice: Double!
+        var bidPrice: Double!
+        var askQuantity: Double!
         
         var elementIdx = 0
         var accumulated = ""
@@ -74,16 +74,16 @@ class MarketTickerDeserializer {
                     date = Date(timeIntervalSinceReferenceDate: TimeInterval(accumulated)!)
                     break
                 case 3:
-                    bidQty = Decimal(string: accumulated)!
+                    bidQty = Double(accumulated)!
                     break
                 case 4:
-                    askPrice = Decimal(string: accumulated)!
+                    askPrice = Double(accumulated)!
                     break
                 case 5:
-                    bidPrice = Decimal(string: accumulated)!
+                    bidPrice = Double(accumulated)!
                     break
                 case 6:
-                    askQuantity = Decimal(string: accumulated)!
+                    askQuantity = Double(accumulated)!
                     break
                 default:
                     break

@@ -38,7 +38,7 @@ extension TraderMain {
         // ------------------------------
         mutating func run() throws {
             let _ = TradeSubCommand(symbol: symbol,
-                                    initialBalance: Decimal(initialBalance),
+                                    initialBalance: Double(initialBalance),
                                     maxOperationCount: maxOperationCount,
                                     saveStateLocation: saveStateLocation,
                                     strategyType: strategy)
@@ -52,13 +52,13 @@ struct TradeSubCommand {
     private var trader: SimpleTrader! = nil
     
     let symbol: CryptoSymbol
-    let initialBalance: Decimal
+    let initialBalance: Double
     let maxOperationCount: Int?
     let saveStateLocation: String
     
     
     internal init(symbol: CryptoSymbol,
-                  initialBalance: Decimal,
+                  initialBalance: Double,
                   maxOperationCount: Int,
                   saveStateLocation: String,
                   strategyType: StrategyType) {

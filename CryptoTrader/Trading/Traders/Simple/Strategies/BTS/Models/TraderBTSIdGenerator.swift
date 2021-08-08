@@ -5,7 +5,7 @@ struct TraderBTSIdGenerator {
     var id: String
     var date: Date
     var action: String
-    var price: Decimal
+    var price: Double
     
     func generate() -> String {
         let formatter = DateFormatter()

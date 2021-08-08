@@ -20,8 +20,8 @@ struct BinanceAggregatedTradeResponse: Decodable {
     let date: Int
     let symbol: String
     let tradeId: Int
-    let price: Decimal
-    let quantity: Decimal
+    let price: Double
+    let quantity: Double
     let buyerIsMarker: Bool
     let ignore: Bool
     
@@ -39,9 +39,9 @@ struct BinanceAggregatedTradeResponse: Decodable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         date = try values.decode(Int.self, forKey: .date)
         symbol = try values.decode(String.self, forKey: .symbol)
-        price = Decimal(try values.decode(String.self, forKey: .price))!
+        price = Double(try values.decode(String.self, forKey: .price))!
         tradeId = try values.decode(Int.self, forKey: .tradeId)
-        quantity = Decimal(try values.decode(String.self, forKey: .quantity))!
+        quantity = Double(try values.decode(String.self, forKey: .quantity))!
         buyerIsMarker = try values.decode(Bool.self, forKey: .buyerIsMarker)
         ignore = try values.decode(Bool.self, forKey: .ignore)
     }

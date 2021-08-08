@@ -4,15 +4,15 @@ struct GridTradeRecord: Codable {
     
     var date: Date
 
-    var qty: Decimal
+    var qty: Double
     
-    var buyPrice: Decimal
-    var buyValue: Decimal
+    var buyPrice: Double
+    var buyValue: Double
     
-    var sellPrice: Decimal
-    var sellValue: Decimal
+    var sellPrice: Double
+    var sellValue: Double
     
-    var profit: Decimal {
+    var profit: Double {
         return sellValue - buyValue
     }
     

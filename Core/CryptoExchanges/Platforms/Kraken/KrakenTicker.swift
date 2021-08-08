@@ -16,7 +16,7 @@ struct KrakenTicker: Decodable {
         case c
     }
 
-    var closePrice: Decimal {
-        return Decimal(c!.array[0] as! String)!
+    var closePrice: Double {
+        return Double(c!.array[0] as! String)!
     }
 }

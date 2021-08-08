@@ -9,29 +9,29 @@ infix operator +% : AdditionPrecedence
 struct Percent: Comparable, CustomStringConvertible {
 
     /// The percentage.
-    var percentage: Decimal
+    var percentage: Double
     
     /// The value represented by the percentage.
-    var value: Decimal {
+    var value: Double {
         return percentage / 100.0
     }
     
     init(_ percentage: Double) {
-        self.percentage = Decimal(percentage)
-    }
-    
-    init(_ percentage: Decimal) {
         self.percentage = percentage
     }
     
-    init(ratioOf: Decimal, to: Decimal) {
-        self.percentage = ratioOf / to * Decimal(100.0)
+    init(_ percentage: Decimal) {
+        self.percentage = percentage.doubleValue
+    }
+    
+    init(ratioOf: Double, to: Double) {
+        self.percentage = ratioOf / to * 100.0
     }
     
     /// The  difference between a number compared to another original one.
     /// (1 - differenceOf / from) * 100
-    init(differenceOf: Decimal, from: Decimal) {
-        self.percentage = (differenceOf / from - 1) * 100
+    init(differenceOf: Double, from: Double) {
+        self.percentage = (differenceOf / from - 1) * 100.0
     }
     
     static func <(lhs: Percent, rhs: Percent) -> Bool {
@@ -44,15 +44,15 @@ struct Percent: Comparable, CustomStringConvertible {
     
     // Operations Decimal then Percent
 
-    static func *(lhs: Decimal, rhs: Percent) -> Decimal {
+    static func *(lhs: Double, rhs: Percent) -> Double {
         return lhs * rhs.value
     }
 
-    static func +%(lhs: Decimal, rhs: Percent) -> Decimal {
+    static func +%(lhs: Double, rhs: Percent) -> Double {
         return lhs * (rhs + Percent(100))
     }
 
-    static func -%(lhs: Decimal, rhs: Percent) -> Decimal {
+    static func -%(lhs: Double, rhs: Percent) -> Double {
         return lhs * (Percent(100) - rhs)
     }
 
@@ -68,11 +68,11 @@ struct Percent: Comparable, CustomStringConvertible {
 
     // Operations Percent then Double
 
-    static func *(lhs: Percent, rhs: Decimal) -> Decimal {
+    static func *(lhs: Percent, rhs: Double) -> Double {
         return lhs.value * rhs
     }
     
-    static func /(lhs: Percent, rhs: Decimal) -> Percent {
+    static func /(lhs: Percent, rhs: Double) -> Percent {
         Percent(lhs.percentage / rhs)
     }
     
@@ -83,7 +83,7 @@ struct Percent: Comparable, CustomStringConvertible {
 
 extension Percent: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
     init(integerLiteral value: IntegerLiteralType) {
-        self.init(Decimal(value))
+        self.init(Double(value))
     }
 
     init(floatLiteral value: FloatLiteralType) {

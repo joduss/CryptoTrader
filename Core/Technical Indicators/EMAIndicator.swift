@@ -5,14 +5,14 @@ public struct EMAIndicator {
     public let period: Int
     
     /// Array with values ordered in by date increasing.
-    public func compute(on data: [Decimal]) -> [Decimal] {
+    public func compute(on data: [Double]) -> [Double] {
         if (data.count == 0) {
             return []
         }
                 
-        let smoothingFactor: Decimal = 2.0 / Decimal(period + 1)
+        let smoothingFactor: Double = 2.0 / Double(period + 1)
 
-        var ema: [Decimal] = [data.first!]
+        var ema: [Double] = [data.first!]
         ema.reserveCapacity(data.count)
         
         

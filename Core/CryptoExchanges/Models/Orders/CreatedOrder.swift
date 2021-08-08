@@ -6,10 +6,10 @@ struct CreatedOrder: CustomStringConvertible {
     let platformOrderId: Int
     let clientOrderId: String
 
-    let price: Decimal
-    let originalQty: Decimal
-    let executedQty: Decimal
-    let cummulativeQuoteQty: Decimal
+    let price: Double
+    let originalQty: Double
+    let executedQty: Double
+    let cummulativeQuoteQty: Double
 
     let status: OrderStatus
     let type: OrderType

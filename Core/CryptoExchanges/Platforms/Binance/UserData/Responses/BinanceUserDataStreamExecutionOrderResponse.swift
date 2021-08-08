@@ -42,23 +42,23 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
     let clientOrderId: String
     let side: OrderSide
     let orderType: OrderType
-    let orderPrice: Decimal
-    let stopPrice: Decimal
+    let orderPrice: Double
+    let stopPrice: Double
     let originalClientOrderId: String
     let currentExecutionType: OrderExecutionType
     let currentOrderStatus: OrderStatus
     let rejectReason: String
     let orderId: Int
-    let lastExecutedQuantity: Decimal
-    let cumulativeFilledQuantity: Decimal
-    let lastExecutedPrice: Decimal
-    let commissionAmount: Decimal
+    let lastExecutedQuantity: Double
+    let cumulativeFilledQuantity: Double
+    let lastExecutedPrice: Double
+    let commissionAmount: Double
     let transactionTime : Date
     let tradeId: Int
     let orderCreationTime: Date
-    let cumulativeQuoteAssetTransactedQty: Decimal
-    let lastQuoteAssetTransactedQty: Decimal
-    let quoteOrderQty: Decimal
+    let cumulativeQuoteAssetTransactedQty: Double
+    let lastQuoteAssetTransactedQty: Double
+    let quoteOrderQty: Double
 
 
     enum CodingKeys: String, CodingKey {
@@ -97,28 +97,28 @@ struct BinanceUserDataStreamExecutionOrderResponse: Decodable {
         clientOrderId = try values.decode(String.self, forKey: .originalClientOrderId)
         side = try BinanceUserDataStreamExecutionOrderResponse.strintToOrderSide(try values.decode(String.self, forKey: .side))
         orderType = try BinanceUserDataStreamExecutionOrderResponse.strintToOrderType(try values.decode(String.self, forKey: .orderType))
-        orderPrice = Decimal(try values.decode(String.self, forKey: .orderPrice))!
-        stopPrice = Decimal(try values.decode(String.self, forKey: .stopPrice))!
+        orderPrice = Double(try values.decode(String.self, forKey: .orderPrice))!
+        stopPrice = Double(try values.decode(String.self, forKey: .stopPrice))!
         originalClientOrderId = try values.decode(String.self, forKey: .originalClientOrderId)
         currentExecutionType = try BinanceUserDataStreamExecutionOrderResponse.strintToOrderExecutionType(try values.decode(String.self, forKey: .currentExecutionType))
         currentOrderStatus = try BinanceUserDataStreamExecutionOrderResponse.strintToOrderStatus(try values.decode(String.self, forKey: .currentOrderStatus))
         
         rejectReason = try values.decode(String.self, forKey: .rejectReason)
-        lastExecutedQuantity = Decimal(try values.decode(String.self, forKey: .lastExecutedQuantity))!
-        cumulativeFilledQuantity = Decimal(try values.decode(String.self, forKey: .cumulativeFilledQuantity))!
-        lastExecutedPrice = Decimal(try values.decode(String.self, forKey: .lastExecutedPrice))!
+        lastExecutedQuantity = Double(try values.decode(String.self, forKey: .lastExecutedQuantity))!
+        cumulativeFilledQuantity = Double(try values.decode(String.self, forKey: .cumulativeFilledQuantity))!
+        lastExecutedPrice = Double(try values.decode(String.self, forKey: .lastExecutedPrice))!
         
         tradeId = try values.decode(Int.self, forKey: .tradeId)
         
-        commissionAmount = Decimal(try values.decode(String.self, forKey: .commissionAmount))!
+        commissionAmount = Double(try values.decode(String.self, forKey: .commissionAmount))!
         
         transactionTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .transactionTime)))
         orderCreationTime = Date(timeIntervalSince1970: TimeInterval.fromMilliseconds(try values.decode(Int.self, forKey: .orderCreationTime)))
 
         
-        cumulativeQuoteAssetTransactedQty = Decimal(try values.decode(String.self, forKey: .cumulativeQuoteAssetTransactiveQty))!
-        lastQuoteAssetTransactedQty = Decimal(try values.decode(String.self, forKey: .lastQuoteAssetTransactorQty))!
-        quoteOrderQty = Decimal(try values.decode(String.self, forKey: .quoteOrderQty))!
+        cumulativeQuoteAssetTransactedQty = Double(try values.decode(String.self, forKey: .cumulativeQuoteAssetTransactiveQty))!
+        lastQuoteAssetTransactedQty = Double(try values.decode(String.self, forKey: .lastQuoteAssetTransactorQty))!
+        quoteOrderQty = Double(try values.decode(String.self, forKey: .quoteOrderQty))!
     }
     
     private static func strintToOrderSide(_ value: String) throws -> OrderSide {

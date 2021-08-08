@@ -10,18 +10,18 @@ struct BinanceCreateOrderRequest: BinanceApiRequest {
     // MARK: Order data
     
     let symbol: CryptoSymbol
-    let quantity: Decimal?
+    let quantity: Double?
     let id: String
     let side: OrderSide
     let type: OrderType
     
-    var value: Decimal?
-    var price: Decimal?
-    var stopPrice: Decimal?
+    var value: Double?
+    var price: Double?
+    var stopPrice: Double?
     
     
     init(symbol: CryptoSymbol, side: OrderSide, type: OrderType, id: String,
-         qty: Decimal? = nil, price: Decimal? = nil, value: Decimal? = nil) {
+         qty: Double? = nil, price: Double? = nil, value: Double? = nil) {
         self.symbol = symbol
         self.quantity = qty
         self.id = id

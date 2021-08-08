@@ -4,14 +4,14 @@ import Foundation
 class SimulateSubCommandExecution {
     
     let symbol: CryptoSymbol
-    var initialBalance: Decimal
+    var initialBalance: Double
     var tickers: ContiguousArray<MarketTicker> = ContiguousArray<MarketTicker>()
     var trades: ContiguousArray<MarketMinimalAggregatedTrade> = ContiguousArray<MarketMinimalAggregatedTrade>()
 
     let dateFactory = DateFactory()
     
     internal init(symbol: CryptoSymbol,
-                  initialBalance: Decimal,
+                  initialBalance: Double,
                   dataLocation: String,
                   dataStartIdx: Int? = nil,
                   dataEndIdx: Int? = nil,

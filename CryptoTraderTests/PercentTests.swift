@@ -31,7 +31,7 @@ class PercentTests: XCTestCase {
     
     func testExpressibleByFloatLiteral() throws {
         let percent = Percent(100)
-        let decimalValue: Decimal = 150
+        let decimalValue: Double = 150
         
         let decimalResult = decimalValue * percent
                 

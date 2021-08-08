@@ -1,6 +1,6 @@
 import Foundation
 
 struct MarketDepthElement {
-    let priceLevel: Decimal
-    let quantity: Decimal
+    let priceLevel: Double
+    let quantity: Double
 }

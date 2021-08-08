@@ -5,20 +5,20 @@ class TraderBTSBuyOperation: CustomStringConvertible {
     
     let uuid: String = UUID().uuidString.truncate(length: 5)
     
-    private(set) var stopLossPrice: Decimal = 0
-    private(set) var updateWhenBelowPrice: Decimal = Decimal.greatestFiniteMagnitude
+    private(set) var stopLossPrice: Double = 0
+    private(set) var updateWhenBelowPrice: Double = Double.greatestFiniteMagnitude
     
     private(set) var stopLossPercent: Percent
     private(set) var updateWhenBelowPricePercent: Percent
     
-    init(currentPrice: Decimal, stopLossPercent: Percent, updateWhenBelowPricePercent: Percent) {
+    init(currentPrice: Double, stopLossPercent: Percent, updateWhenBelowPricePercent: Percent) {
         self.stopLossPercent = stopLossPercent
         self.updateWhenBelowPricePercent = updateWhenBelowPricePercent
         
         updateStopLoss(newPrice: currentPrice)
     }
     
-    init(currentPrice: Decimal, config: TraderBTSStrategyConfig) {
+    init(currentPrice: Double, config: TraderBTSStrategyConfig) {
         self.stopLossPercent = config.buyStopLossPercent
         self.updateWhenBelowPricePercent = config.buyUpdateStopLossPercent
         
@@ -27,7 +27,7 @@ class TraderBTSBuyOperation: CustomStringConvertible {
     
     // MARK: Update base on new price
     
-    func updateStopLoss(newPrice: Decimal) {
+    func updateStopLoss(newPrice: Double) {
         guard newPrice < updateWhenBelowPrice else {
             return
         }
@@ -38,7 +38,7 @@ class TraderBTSBuyOperation: CustomStringConvertible {
     
     // MARK: Logic
     
-    func shouldBuy(at price: Decimal) -> Bool {
+    func shouldBuy(at price: Double) -> Bool {
         return price >= stopLossPrice
     }
     

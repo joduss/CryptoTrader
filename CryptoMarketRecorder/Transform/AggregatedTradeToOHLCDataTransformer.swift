@@ -111,8 +111,8 @@ class AggregatedTradeToOHLCDataTransformer {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
 
         return MarketMinimalAggregatedTrade(
-            price: Decimal(String(values[0]))!,
-            quantity: Decimal(String(values[1]))!,
+            price: Double(String(values[0]))!,
+            quantity: Double(String(values[1]))!,
             time: Date(timeIntervalSince1970: TimeInterval(values[2])!)
         )
     }

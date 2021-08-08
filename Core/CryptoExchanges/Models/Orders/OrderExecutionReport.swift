@@ -7,21 +7,21 @@ struct OrderExecutionReport {
     
     let side: OrderSide
     let orderType: OrderType
-    let price: Decimal
+    let price: Double
     
     let currentExecutionType: OrderExecutionType
     let currentOrderStatus: OrderStatus
 
-    let lastExecutedQuantity: Decimal
-    let cumulativeFilledQuantity: Decimal
+    let lastExecutedQuantity: Double
+    let cumulativeFilledQuantity: Double
     
-    let lastExecutedPrice: Decimal
-    let commissionAmount: Decimal
+    let lastExecutedPrice: Double
+    let commissionAmount: Double
     
-    let cumulativeQuoteAssetQuantity: Decimal
-    let lastQuoteAssetExecutedQuantity : Decimal
+    let cumulativeQuoteAssetQuantity: Double
+    let lastQuoteAssetExecutedQuantity : Double
 
-    var averagePrice: Decimal {
+    var averagePrice: Double {
         return cumulativeFilledQuantity / cumulativeQuoteAssetQuantity
     }
 }

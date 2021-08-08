@@ -7,7 +7,7 @@ class GridSearchSubCommandExecution {
     
     private let testSema = DispatchSemaphore(value: 1)
     
-    private let initialBalance: Decimal = 100.0
+    private let initialBalance: Double = 100.0
 
     
     internal init(symbol: CryptoSymbol,

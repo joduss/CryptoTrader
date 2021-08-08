@@ -4,28 +4,28 @@ public struct MarketDepthBackup: Codable {
     
     public let date: Date
     public let id: Int
-    public private(set) var bids: [String : Decimal] = [:]
-    public private(set) var asks: [String : Decimal] = [:]
+    public private(set) var bids: [String : Double] = [:]
+    public private(set) var asks: [String : Double] = [:]
     
-    public var bidsDoubles: [Decimal : Decimal] {
-        var transformedBids = [Decimal : Decimal]()
+    public var bidsDoubles: [Double : Double] {
+        var transformedBids = [Double : Double]()
         transformedBids.reserveCapacity(bids.count)
         for (key, value) in self.bids {
-            transformedBids[Decimal(key)!] = value
+            transformedBids[Double(key)!] = value
         }
         return transformedBids
     }
     
-    public var asksDoubles: [Decimal : Decimal] {
-        var transformedAsks = [Decimal : Decimal]()
+    public var asksDoubles: [Double : Double] {
+        var transformedAsks = [Double : Double]()
         transformedAsks.reserveCapacity(asks.count)
         for (key, value) in self.asks {
-            transformedAsks[Decimal(key)!] = value
+            transformedAsks[Double(key)!] = value
         }
         return transformedAsks
     }
     
-    init(bids: [Decimal : Decimal], asks: [Decimal : Decimal], date: Date, id: Int) {
+    init(bids: [Double : Double], asks: [Double : Double], date: Date, id: Int) {
         self.bids.reserveCapacity(bids.count)
         self.asks.reserveCapacity(asks.capacity)
         self.date = date
@@ -46,12 +46,12 @@ public struct MarketDepth: Codable {
     
     public private(set) var id: Int
     public private(set) var date = Date()
-    public private(set) var bids: [Decimal : Decimal] = [:]
-    public private(set) var asks: [Decimal : Decimal] = [:]
+    public private(set) var bids: [Double : Double] = [:]
+    public private(set) var asks: [Double : Double] = [:]
     
     private var numberFormatter: NumberFormatter
 
-    public var currentPrice: Decimal = 0 {
+    public var currentPrice: Double = 0 {
         didSet {
             clean()
         }
@@ -78,12 +78,12 @@ public struct MarketDepth: Codable {
         
         bids.reserveCapacity(bidsString.count)
         for bidString in bidsString {
-            bids[Decimal(bidString.key)!] = Decimal(bidString.value)!
+            bids[Double(bidString.key)!] = Double(bidString.value)!
         }
         
         asks.reserveCapacity(asks.count)
         for askString in asksString {
-            asks[Decimal(askString.key)!] = Decimal(askString.value)!
+            asks[Double(askString.key)!] = Double(askString.value)!
         }
     }
     
@@ -173,7 +173,7 @@ public struct MarketDepth: Codable {
             let roundedLevel: String = self.numberFormatter.string(for: adaptivePriceRound(priceLevel))!
             
             if newBidsString.keys.contains(roundedLevel) {
-                let currentQty = Decimal(newBidsString[roundedLevel]!)!
+                let currentQty = Double(newBidsString[roundedLevel]!)!
                 newBidsString[roundedLevel] = numberFormatter.string(from: roundQuantity(currentQty + qty))!
             }
             else {
@@ -192,7 +192,7 @@ public struct MarketDepth: Codable {
             let roundedLevel: String = self.numberFormatter.string(for: adaptivePriceRound(priceLevel))!
             
             if newAsksString.keys.contains(roundedLevel) {
-                let currentQty = Decimal(newAsksString[roundedLevel]!)!
+                let currentQty = Double(newAsksString[roundedLevel]!)!
                 newAsksString[roundedLevel] = numberFormatter.string(from: roundQuantity(currentQty + qty))!
             }
             else {
@@ -203,18 +203,18 @@ public struct MarketDepth: Codable {
         return newAsksString
     }
     
-    private func shouldAdd(at price: Decimal) -> Bool {
+    private func shouldAdd(at price: Double) -> Bool {
         return price <= 1.5 * currentPrice && price >= currentPrice / 1.5
     }
     
     // MARK: - Helpers
     
     /// Round a price adaptively. There is more resolution close to the current price than far away.
-    func adaptivePriceRound(_ priceToRound: NSNumber) -> Decimal {
-        return adaptivePriceRound(priceToRound.decimalValue)
+    func adaptivePriceRound(_ priceToRound: NSNumber) -> Double {
+        return adaptivePriceRound(priceToRound.doubleValue)
     }
     
-    func adaptivePriceRound(_ priceToRound: Decimal) -> Decimal {
+    func adaptivePriceRound(_ priceToRound: Double) -> Double {
         
         guard currentPrice != 0 else { return priceToRound }
         
@@ -224,9 +224,9 @@ public struct MarketDepth: Codable {
         let rangeNotPrecise = currentPrice / 5 // 6000
         
         let significantDigits = 5.0
-        let numberOrder = (floor(log10(currentPrice)) as NSDecimalNumber).doubleValue
-        var orderCorrected = Decimal(pow(10, 1 + numberOrder - significantDigits))
-        orderCorrected = orderCorrected * currentPrice / pow(10,Int(numberOrder))
+        let numberOrder = floor(log10(currentPrice))
+        var orderCorrected = Double(pow(10, 1 + numberOrder - significantDigits))
+        orderCorrected = orderCorrected * currentPrice / pow(10, Double(numberOrder))
         
         if priceToRound >= currentPrice - rangeVeryPrecise && priceToRound <= currentPrice + rangeVeryPrecise {
             return roundPrice(priceToRound, roundBase: orderCorrected * 1.0)
@@ -246,15 +246,15 @@ public struct MarketDepth: Codable {
     }
     
     /// Round a price to a certain base. If base is 15, then it will ve rounded to a multiple of 15.
-    func roundPrice(_ number: Decimal, roundBase: Decimal) -> Decimal {
+    func roundPrice(_ number: Double, roundBase: Double) -> Double {
         return round(number / roundBase) * roundBase
     }
     
-    func roundQuantity(_ quantity: Decimal) -> Decimal {
+    func roundQuantity(_ quantity: Double) -> Double {
         if currentPrice == 0 {
             return quantity
         }
         
-        return round(quantity, numberOfDecimals: (ceil(2 + log10(currentPrice)) as NSDecimalNumber).intValue)
+        return round(quantity, numberOfDecimals: Int(ceil(2 + log10(currentPrice))))
     }
  }

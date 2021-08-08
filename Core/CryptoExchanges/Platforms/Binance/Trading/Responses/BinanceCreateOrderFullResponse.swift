@@ -38,10 +38,10 @@ struct BinanceCreateOrderFullResponse: Decodable {
     let platformOrderId: Int
     let clientOrderId: String
 
-    let price: Decimal
-    let originalQty: Decimal
-    let executedQty: Decimal
-    let cummulativeQuoteQty: Decimal
+    let price: Double
+    let originalQty: Double
+    let executedQty: Double
+    let cummulativeQuoteQty: Double
 
     let status: OrderStatus
     let type: OrderType
@@ -71,10 +71,10 @@ struct BinanceCreateOrderFullResponse: Decodable {
         platformOrderId = try values.decode(Int.self, forKey: .platformOrderId)
         clientOrderId = try values.decode(String.self, forKey: .clientOrderId)
 
-        price = Decimal(string: try values.decode(String.self, forKey: .price))!
-        originalQty = Decimal(string: try values.decode(String.self, forKey: .originalQty))!
-        executedQty = Decimal(string: try values.decode(String.self, forKey: .executedQty))!
-        cummulativeQuoteQty = Decimal(string: try values.decode(String.self, forKey: .cummulativeQuoteQty))!
+        price = Double( try values.decode(String.self, forKey: .price))!
+        originalQty = Double( try values.decode(String.self, forKey: .originalQty))!
+        executedQty = Double( try values.decode(String.self, forKey: .executedQty))!
+        cummulativeQuoteQty = Double( try values.decode(String.self, forKey: .cummulativeQuoteQty))!
 
         status = try BinanceOrderStatusConverter.convert(try values.decode(String.self, forKey: .status))
         type = try BinanceOrderTypeConverter.convert(value: try values.decode(String.self, forKey: .type))
@@ -91,10 +91,10 @@ struct BinanceCreateOrderFullResponse: Decodable {
         symbol: CryptoSymbol,
         platformOrderId: Int,
         clientOrderId: String,
-        price: Decimal,
-        originalQty: Decimal,
-        executedQty: Decimal,
-        cummulativeQuoteQty: Decimal,
+        price: Double,
+        originalQty: Double,
+        executedQty: Double,
+        cummulativeQuoteQty: Double,
         status: OrderStatus,
         type: OrderType,
         side: OrderSide,

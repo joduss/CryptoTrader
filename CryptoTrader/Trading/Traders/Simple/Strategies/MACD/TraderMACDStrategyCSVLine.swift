@@ -5,11 +5,11 @@ struct TraderMACDStrategyCSVLine {
     let file: FileHandle
     
     var date: Date
-    var bidPrice: Decimal
-    var buy: Decimal?
-    var sell: Decimal?
-    var macd: Decimal? = 0
-    var signal: Decimal? = 0
+    var bidPrice: Double
+    var buy: Double?
+    var sell: Double?
+    var macd: Double? = 0
+    var signal: Double? = 0
     
     mutating func reset() {
         buy = nil

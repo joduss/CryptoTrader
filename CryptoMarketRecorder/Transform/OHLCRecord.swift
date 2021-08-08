@@ -10,11 +10,11 @@ struct OHLCRecord {
 /// Volume - The total volume traded by all trades
 /// Trades - The number of individual trades}
 
-    let open: Decimal
-    var high: Decimal
-    var low: Decimal
-    var close: Decimal
-    var volume: Decimal
+    let open: Double
+    var high: Double
+    var low: Double
+    var close: Double
+    var volume: Double
     var trades: Int
     let time: Date
     

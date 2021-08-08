@@ -3,14 +3,14 @@ import Foundation
 struct TradeOrderRequest: CustomStringConvertible {
     
     let symbol: CryptoSymbol
-    var quantity: Decimal?
-    var price: Decimal?
-    var value: Decimal?
+    var quantity: Double?
+    var price: Double?
+    var value: Double?
     let side: OrderSide
     let type: OrderType
     let id: String
     
-    internal init(symbol: CryptoSymbol, quantity: Decimal? = nil, price: Decimal? = nil, value: Decimal? = nil, side: OrderSide, type: OrderType, id: String) {
+    internal init(symbol: CryptoSymbol, quantity: Double? = nil, price: Double? = nil, value: Double? = nil, side: OrderSide, type: OrderType, id: String) {
         self.symbol = symbol
         self.quantity = quantity
         self.price = price
@@ -20,7 +20,7 @@ struct TradeOrderRequest: CustomStringConvertible {
         self.id = id
     }
     
-    static func limitSell(symbol: CryptoSymbol, qty: Decimal, price: Decimal, id: String) -> TradeOrderRequest {
+    static func limitSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
@@ -29,7 +29,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func limitBuy(symbol: CryptoSymbol, qty: Decimal, price: Decimal, id: String) -> TradeOrderRequest {
+    static func limitBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
@@ -38,7 +38,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func marketBuy(symbol: CryptoSymbol, qty: Decimal, id: String) -> TradeOrderRequest {
+    static func marketBuy(symbol: CryptoSymbol, qty: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: nil,
@@ -47,7 +47,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func marketBuy(symbol: CryptoSymbol, value: Decimal, id: String) -> TradeOrderRequest {
+    static func marketBuy(symbol: CryptoSymbol, value: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                value: value,
                                side: .buy,
@@ -55,7 +55,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func marketSell(symbol: CryptoSymbol, qty: Decimal, id: String) -> TradeOrderRequest {
+    static func marketSell(symbol: CryptoSymbol, qty: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: nil,
@@ -64,7 +64,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func stopLossSell(symbol: CryptoSymbol, qty: Decimal, price: Decimal, id: String) -> TradeOrderRequest {
+    static func stopLossSell(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,
@@ -73,7 +73,7 @@ struct TradeOrderRequest: CustomStringConvertible {
                                id: id)
     }
     
-    static func stopLossBuy(symbol: CryptoSymbol, qty: Decimal, price: Decimal, id: String) -> TradeOrderRequest {
+    static func stopLossBuy(symbol: CryptoSymbol, qty: Double, price: Double, id: String) -> TradeOrderRequest {
         return TradeOrderRequest(symbol: symbol,
                                quantity: qty,
                                price: price,

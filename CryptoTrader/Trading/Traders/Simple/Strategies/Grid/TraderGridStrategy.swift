@@ -9,15 +9,15 @@ class TraderGridStrategy: SimpleTraderStrategy {
     private let startDate: Date
     private let dateFactory: DateFactory
     
-    private var currentAskPrice: Decimal = 0
-    private var currentBidPrice: Decimal = 0
-    private let initialBalance: Decimal
-    private var currentBalance: Decimal
-    var balanceValue: Decimal {
+    private var currentAskPrice: Double = 0
+    private var currentBidPrice: Double = 0
+    private let initialBalance: Double
+    private var currentBalance: Double
+    var balanceValue: Double {
         return currentBalance + gridMarketPositions.filter({$0.active}).reduce(0, {result, order in result + order.qty * currentBidPrice})
     }
 
-    private(set) var profits: Decimal
+    private(set) var profits: Double
         
     private(set) var gridMarketPositions: [GridMarketPosition]
     private(set) var orderHistory: [GridTradeRecord]
@@ -27,16 +27,16 @@ class TraderGridStrategy: SimpleTraderStrategy {
         return gridMarketPositions.filter({$0.active}).count
     }
     
-    var orderSize: Decimal {
+    var orderSize: Double {
         if config.orderCount == openOrders { return 0 }
-        return currentBalance / Decimal(config.orderCount -  openOrders)
+        return currentBalance / Double(config.orderCount -  openOrders)
     }
 
     
     init(
         exchange: ExchangeClient,
         config: TraderGridStrategyConfig,
-        initialBalance: Decimal,
+        initialBalance: Double,
         saveStateLocation: String,
         dateFactory: DateFactory? = nil
     ) {
@@ -93,7 +93,7 @@ class TraderGridStrategy: SimpleTraderStrategy {
     
     // MARK: Strategy interface implementation
     
-    func updateTicker(bid: Decimal, ask: Decimal) {
+    func updateTicker(bid: Double, ask: Double) {
         currentAskPrice = ask
         currentBidPrice = bid
         updateGrid()
@@ -177,7 +177,7 @@ class TraderGridStrategy: SimpleTraderStrategy {
     
     // MARK: Market decision making
     
-    private func shouldBuy(order: GridMarketPosition, askPrice: Decimal) -> Bool {
+    private func shouldBuy(order: GridMarketPosition, askPrice: Double) -> Bool {
         guard order.active == false else { return false }
         guard orderSize > 0 else { return false }
         
@@ -186,7 +186,7 @@ class TraderGridStrategy: SimpleTraderStrategy {
         return askPrice < order.targetPriceBottom && askPrice > order.targetPriceBottom -% config.gridSizePercent
     }
     
-    private func shouldSell(order: GridMarketPosition, bidPrice: Decimal)  -> Bool {
+    private func shouldSell(order: GridMarketPosition, bidPrice: Double)  -> Bool {
         guard order.active == true else { return false }
         
         if order.profitStopLoss == 0 {

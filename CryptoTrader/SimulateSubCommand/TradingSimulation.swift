@@ -3,8 +3,8 @@ import Foundation
 
 struct TradingSimulationResults {
     let simulationLog: String
-    let accumulatedProfits: Decimal
-    let currentValue: Decimal
+    let accumulatedProfits: Double
+    let currentValue: Double
     let openOrderCount: Int
 }
 
@@ -13,12 +13,12 @@ class TradingSimulation {
     let symbol: CryptoSymbol
     let simulatedExchange: SimulatedExchange
     let dateFactory: DateFactory
-    let initialBalance: Decimal
+    let initialBalance: Double
     
     var shouldPrint = true
     
     
-    init(symbol: CryptoSymbol, simulatedExchange: SimulatedExchange, dateFactory: DateFactory, initialBalance: Decimal) {
+    init(symbol: CryptoSymbol, simulatedExchange: SimulatedExchange, dateFactory: DateFactory, initialBalance: Double) {
         self.symbol = symbol
         self.simulatedExchange = simulatedExchange
         self.dateFactory = dateFactory

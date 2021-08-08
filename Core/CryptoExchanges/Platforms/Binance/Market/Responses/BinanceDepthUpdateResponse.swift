@@ -60,11 +60,11 @@ struct BinanceDepthUpdateResponse: Decodable {
 }
 
 class BinanceDepthUpdateElementResponse {
-    let priceLevel: Decimal
-    let quantity: Decimal
+    let priceLevel: Double
+    let quantity: Double
     
     init(array: [String]) {
-        priceLevel = Decimal(array[0])!
-        quantity = Decimal(array[1])!
+        priceLevel = Double(array[0])!
+        quantity = Double(array[1])!
     }
 }

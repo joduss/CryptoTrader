@@ -6,15 +6,15 @@ class GridMarketPosition: Codable {
         return qty > 0
     }
     
-    var targetPriceBottom: Decimal
+    var targetPriceBottom: Double
     
-    var qty: Decimal = 0
-    var price: Decimal = 0
-    var value: Decimal = 0
+    var qty: Double = 0
+    var price: Double = 0
+    var value: Double = 0
     
-    var profitStopLoss: Decimal = 0
+    var profitStopLoss: Double = 0
     
-    func sell(at sellPrice: Decimal, value sellValue: Decimal, date: Date) -> GridTradeRecord {
+    func sell(at sellPrice: Double, value sellValue: Double, date: Date) -> GridTradeRecord {
         let record = GridTradeRecord(date: date, qty: qty, buyPrice: price, buyValue: value, sellPrice: sellPrice, sellValue: sellValue)
         
         qty = 0
@@ -25,7 +25,7 @@ class GridMarketPosition: Codable {
         return record
     }
     
-    init(targetPriceBottom: Decimal) {
+    init(targetPriceBottom: Double) {
         self.targetPriceBottom = targetPriceBottom
     }
 }

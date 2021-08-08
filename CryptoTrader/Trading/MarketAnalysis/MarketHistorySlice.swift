@@ -27,24 +27,24 @@ open class MarketHistorySlice {
 //        return firstRecord.date <= DateFactory.now.advanced(by: -interval )
 //    }
     
-    final public func average() -> Decimal {
+    final public func average() -> Double {
         computeBasic()
-        return Decimal(self.averagePrice)
+        return self.averagePrice
     }
     
-    final public func maxPrice() -> Decimal {
+    final public func maxPrice() -> Double {
         computeBasic()
-        return Decimal(self.max)
+        return self.max
     }
     
-    final public func minPrice() -> Decimal {
+    final public func minPrice() -> Double {
         computeBasic()
-        return Decimal(self.min)
+        return self.min
     }
 
     /// Computes the slope between the beginning of the market history slice and the end, by averaging the first, respectively last
     /// samples withing a range of size 'averageInterval' at the beginning, respectivelly end of the market history slice.
-    final func slope() -> Decimal {
+    final func slope() -> Double {
         
         guard let firstTrade = prices.first, let lastTrade = prices.last else {
             return 0
@@ -78,7 +78,7 @@ open class MarketHistorySlice {
 //
 //        return slope
         
-        return (lastPartInterval.average() - firstPartInterval.average()) / Decimal(totalTimeInterval)
+        return (lastPartInterval.average() - firstPartInterval.average()) / Double(totalTimeInterval)
     }
     
 //    func isTrendUpwards() -> Bool {

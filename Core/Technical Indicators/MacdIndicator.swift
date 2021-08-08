@@ -2,8 +2,8 @@ import Foundation
 
 /// Oldest to newest
 struct Macd {
-    var macdLine: [Decimal]
-    var signalLine: [Decimal]
+    var macdLine: [Double]
+    var signalLine: [Double]
 }
 
 struct MacdIndicator {
@@ -16,12 +16,12 @@ struct MacdIndicator {
     private let longPeriodEma: EMAIndicator
     private let signalPeriodEma: EMAIndicator
     
-    private var smoothingFactorShort: Decimal {
-        return 2.0 / Decimal(shortPeriod + 1)
+    private var smoothingFactorShort: Double {
+        return 2.0 / Double(shortPeriod + 1)
     }
     
-    private var smoothingFactorLong: Decimal {
-        return 2.0 / Decimal(longPeriod + 1)
+    private var smoothingFactorLong: Double {
+        return 2.0 / Double(longPeriod + 1)
     }
     
     
@@ -35,7 +35,7 @@ struct MacdIndicator {
     }
     
     /// Data: Values from the oldest to the newest
-    public func compute(on data: [Decimal]) -> Macd {
+    public func compute(on data: [Double]) -> Macd {
         let emaLong = longPeriodEma.compute(on: data)
         let emaShort = shortPeriodEma.compute(on: data)
         
@@ -49,8 +49,8 @@ struct MacdIndicator {
     
     // MARK: - Moving Average
     
-    private static func ma(data: [Decimal], period: Int) -> [Decimal] {
-        var maValues: [Decimal] = []
+    private static func ma(data: [Double], period: Int) -> [Double] {
+        var maValues: [Double] = []
         maValues.reserveCapacity(data.count - period + 1)
         
         data.withUnsafeBufferPointer {dataUnsafe in
@@ -68,12 +68,12 @@ struct MacdIndicator {
         return maValues
     }
     
-    private static func ma(data: ArraySlice<Decimal>) -> Decimal {
-        var average: Decimal = 0.0
+    private static func ma(data: ArraySlice<Double>) -> Double {
+        var average = 0.0
         
         data.withUnsafeBufferPointer { dataUnsafe in
             for value in dataUnsafe {
-                average += value / Decimal(data.count)
+                average += value / Double(data.count)
             }
             
         }
@@ -82,12 +82,12 @@ struct MacdIndicator {
     }
     
     /// a - b = c
-    private static func arraySubstract(a: [Decimal], b:[Decimal]) -> [Decimal] {
+    private static func arraySubstract(a: [Double], b:[Double]) -> [Double] {
         if (a.count != b.count) {
             fatalError("Both arrays must be of same dimension.")
         }
         
-        var result: [Decimal] = []
+        var result: [Double] = []
         result.reserveCapacity(a.count)
         
         var idx = 0
