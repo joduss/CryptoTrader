@@ -4,10 +4,17 @@ class TraderGridStrategyConfig {
     
     public var orderCount = 30
      
-    public var gridSizePercent: Percent = 1
-    public var profitMin: Percent = 1.25
-    public var profitStopLoss: Percent = -0.25
-    public var profitStopLossUpdate: Percent = 0.05
+    public var gridSizePercent: Percent = 3
+    public var gridSizeScenarioPriceDropPercent: Percent = 2
+    public var scenarioPriceDropThresholdPercent: Percent = -4
+
+    public var profitMinPercent: Percent = 2.5
     
-    public var stopLoss: Percent = -0.5
+    public var profitStopLossPercent: Percent = 0.4
+
+
+    public var buyStopLossPercent: Percent = 0.5
+
+    
+    //public var stopLossPercent: Percent = -0.5
 }

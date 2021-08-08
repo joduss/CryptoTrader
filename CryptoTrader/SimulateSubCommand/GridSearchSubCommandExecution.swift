@@ -44,7 +44,7 @@ class GridSearchSubCommandExecution {
             case .macd:
                 return gridSearchMacd()
             case .gridtrader:
-                fatalError("NOT IMPLEMENTED")
+                gridSearchGrid()
         }
     }
     
@@ -61,6 +61,17 @@ class GridSearchSubCommandExecution {
     
     /// Returns (profits, summary)
     func executeBTS(config: TraderBTSStrategyConfig, dateFactory: DateFactory) -> TradingSimulationResults {
+        
+        let simulation = TradingSimulation(symbol: symbol,
+                                           simulatedExchange: createSimulatedExchange(dateFactory: dateFactory),
+                                           dateFactory: dateFactory,
+                                           initialBalance: initialBalance)
+        simulation.shouldPrint = false
+        
+        return simulation.simulate(config: config)
+    }
+    
+    func executeGrid(config: TraderGridStrategyConfig, dateFactory: DateFactory) -> TradingSimulationResults {
         
         let simulation = TradingSimulation(symbol: symbol,
                                            simulatedExchange: createSimulatedExchange(dateFactory: dateFactory),
@@ -400,6 +411,126 @@ class GridSearchSubCommandExecution {
                     + "########################################\n\n"
                     + "Profits => \(r.accumulatedProfits) / Balance => \(r.currentValue) / OpenOrders: \(r.openOrderCount)\n\n"
                     + r.simulationLog
+            })
+            .joined(separator: "\n")
+            .data(using: .utf8)!.write(to: URL(fileURLWithPath: outputPath))
+        
+        TraderMain.exit()
+    }
+    
+    
+    private func gridSearchGrid() {
+        
+        print("Simulation with initial balance: \(initialBalance)")
+        
+        sourcePriceHidden = true
+        
+        var results: [TradingSimulationResults] = []
+        
+        let queue = OperationQueue()
+        let group = DispatchGroup()
+        
+        queue.maxConcurrentOperationCount = 16
+        
+        var parametersAndProfits = [String]()
+        var operationCount = 0
+        
+        parametersAndProfits.append("orderCount,"
+                                    + "gridSizePercent,"
+                                    + "gridSizeScenarioPriceDropPercent,"
+                                    + "scenarioPriceDropThresholdPercent,"
+                                    + "profitMinPercent,"
+                                    + "profitStopLossPercent,"
+                                    + "buyStopLossPercent,"
+                                    + "openOrders,"
+                                    + "accumulatedProfits,"
+                                    + "currentValue")
+        
+        // BTC
+        for orderCount in [20, 25, 30] {
+            for gridSizePercent in [1, 1.5, 2, 2.5, 3] {
+                for gridSizeScenarioPriceDropPercent in [2, 2.5, 3, 3.5, 4] {
+                    for scenarioPriceDropThresholdPercent in [-3.0, -4, -5, -7] {
+                        for profitMinPercent in [0.5, 1, 1.5, 2] {
+                            for profitStopLossPercent in [0.5, 1, 1.5] {
+                                for buyStopLossPercent in [0.5, 1, 1.5] {
+                                    
+                                    
+                                    operationCount += 1
+                                    queue.progress.totalUnitCount = Int64(operationCount)
+                                    
+                                    group.enter()
+                                    
+                                    var config = TraderGridStrategyConfig()
+                                    config.orderCount = orderCount
+                                    config.gridSizePercent = Percent(gridSizePercent)
+                                    config.gridSizeScenarioPriceDropPercent = Percent(gridSizeScenarioPriceDropPercent)
+                                    config.scenarioPriceDropThresholdPercent = Percent(scenarioPriceDropThresholdPercent)
+                                    
+                                    config.profitMinPercent = Percent(profitMinPercent)
+                                    config.profitStopLossPercent = Percent(profitStopLossPercent)
+                                    config.buyStopLossPercent = Percent(buyStopLossPercent)
+                                    
+                                    var operationId = operationCount
+                                    
+                                    queue.addOperation {
+                                        print("Starting operation \(operationId)")
+                                        let dateFactory = DateFactory()
+                                        dateFactory.now = self.tickers.first!.date
+                                        
+                                        let simulationResults = self.executeGrid(config: config, dateFactory: dateFactory)
+                                        
+                                        self.testSema.wait()
+                                        results.append(simulationResults)
+                                        print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                        
+                                        let parameters: String =
+                                        "\(orderCount),"
+                                        + "\(gridSizePercent),"
+                                        + "\(gridSizeScenarioPriceDropPercent),"
+                                        + "\(scenarioPriceDropThresholdPercent),"
+                                        + "\(profitMinPercent),"
+                                        + "\(profitStopLossPercent),"
+                                        + "\(buyStopLossPercent),"
+                                        + "\(simulationResults.openOrderCount),"
+                                        + "\(simulationResults.accumulatedProfits),"
+                                        + "\(simulationResults.currentValue),"
+                                        
+                                        parametersAndProfits.append(parameters)
+                                        
+                                        self.testSema.signal()
+                                        group.leave()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+            
+        
+        print("Total operations: \(queue.operationCount)")
+        
+        queue.waitUntilAllOperationsAreFinished()
+        group.wait()
+        print(parametersAndProfits)
+        
+        let parametersPath = ("~/Desktop/parameters_grid.csv" as NSString).expandingTildeInPath
+        let outputPath = ("~/Desktop/output_grid.txt" as NSString).expandingTildeInPath
+        
+        try! parametersAndProfits.joined(separator: "\n")
+            .data(using: .utf8)!
+            .write(to: URL(fileURLWithPath: parametersPath))
+        
+        try! results.map(
+            { r in
+                "########################################\n"
+                + "Result\n"
+                + "########################################\n\n"
+                + "Profits => \(r.accumulatedProfits) / Balance => \(r.currentValue) / OpenOrders: \(r.openOrderCount)\n\n"
+                + r.simulationLog
             })
             .joined(separator: "\n")
             .data(using: .utf8)!.write(to: URL(fileURLWithPath: outputPath))

@@ -1,10 +1,12 @@
 import Foundation
 
-class GridMarketPosition: Codable {
+final class GridMarketPosition: Codable {
         
-    var active: Bool {
+    var open: Bool {
         return qty > 0
     }
+    
+    var openable: Bool = false
     
     var targetPriceBottom: Double
     
@@ -12,7 +14,8 @@ class GridMarketPosition: Codable {
     var price: Double = 0
     var value: Double = 0
     
-    var profitStopLoss: Double = 0
+    var stopLoss: Double = 0
+    var openDate: Date?
     
     func sell(at sellPrice: Double, value sellValue: Double, date: Date) -> GridTradeRecord {
         let record = GridTradeRecord(date: date, qty: qty, buyPrice: price, buyValue: value, sellPrice: sellPrice, sellValue: sellValue)
@@ -20,7 +23,9 @@ class GridMarketPosition: Codable {
         qty = 0
         price = 0
         value = 0
-        profitStopLoss = 0
+        stopLoss = 0
+        openable = false
+        openDate = nil
 
         return record
     }
