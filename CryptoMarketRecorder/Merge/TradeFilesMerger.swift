@@ -11,8 +11,8 @@ final class TradeFilesMerger: FileMerger {
     }
     
     override public func objectId(inLine line: String) throws -> Int {
-        guard let id = (try? jsonDecoder.decode(MarketAggregatedTrade.self, from: line.data(using: .utf8)!))?.id else {
-            sourcePrint("Cannot decode json of type 'MarketAggregatedTrade' from line \(line)")
+        guard let id = (try? jsonDecoder.decode(MarketFullAggregatedTrade.self, from: line.data(using: .utf8)!))?.id else {
+            sourcePrint("Cannot decode json of type 'MarketAggregtedTrade' from line \(line)")
             throw ExitCode.failure
         }
         

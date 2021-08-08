@@ -69,7 +69,7 @@ class AggregatedTradeToOHLCDataTransformer {
         outputFileHandle.closeFile()
     }
 
-    private func intervalOf(trade: BasicTrade, lastInterval: Date) -> Date {
+    private func intervalOf(trade: MarketMinimalAggregatedTrade, lastInterval: Date) -> Date {
         let nextInterval = Date(
             timeIntervalSinceReferenceDate:
                 floor(trade.time.timeIntervalSinceReferenceDate / 60) * 60
@@ -110,9 +110,9 @@ class AggregatedTradeToOHLCDataTransformer {
     private func deserialize(line: String) -> MarketMinimalAggregatedTrade {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
 
-        return BasicTrade(
-            price: Double(values[0])!,
-            quantity: Double(values[1])!,
+        return MarketMinimalAggregatedTrade(
+            price: Decimal(String(values[0]))!,
+            quantity: Decimal(String(values[1]))!,
             time: Date(timeIntervalSince1970: TimeInterval(values[2])!)
         )
     }

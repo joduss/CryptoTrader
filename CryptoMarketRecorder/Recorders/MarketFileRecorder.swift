@@ -25,7 +25,7 @@ final class MarketFileRecorder: MarketRecorder {
 
 
     private var tickersCache: [MarketTicker] = []
-    private var tradesCache: [MarketAggregatedTrade] = []
+    private var tradesCache: [MarketFullAggregatedTrade] = []
     private var depthsCache: [MarketDepth] = []
 
     private var tickerCount = 0
@@ -153,7 +153,7 @@ final class MarketFileRecorder: MarketRecorder {
     
     // MARK: Trades
     
-    func process(trade: MarketAggregatedTrade) {
+    func process(trade: MarketFullAggregatedTrade) {
         tradesQueue.async {
             self.tradeFileSemaphore.wait()
             self.processThreadSafe(trade: trade)
@@ -161,7 +161,7 @@ final class MarketFileRecorder: MarketRecorder {
         }
     }
     
-    func processThreadSafe(trade: MarketAggregatedTrade) {
+    func processThreadSafe(trade: MarketFullAggregatedTrade) {
         tradeCount += 1
         tradesCache.append(trade)
 
