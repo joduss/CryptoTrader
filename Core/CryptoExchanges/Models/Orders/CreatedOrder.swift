@@ -18,6 +18,6 @@ struct CreatedOrder: CustomStringConvertible {
     let time: Date
     
     var description: String {
-        return "CreatedOrder: \(side) \(type) \(originalQty)@\(price)=\(cummulativeQuoteQty)"
+        return "CreatedOrder: \(side) \(type) \(originalQty £ 5) @ \(price £ 2) = \(cummulativeQuoteQty £ 5)"
     }
 }
