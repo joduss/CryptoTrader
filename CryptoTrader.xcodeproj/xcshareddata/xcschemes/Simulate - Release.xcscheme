@@ -53,6 +53,10 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "simulate --btc_usd --macd -b 100 -s 50000000 -k 3 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/trades_binance_eth-usd-14-05-2021_ticker-from-trades_1sec-avg.csv"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "simulate --btc_usd --gridtrader -b 100 -s 5000000 -e 7000000 -k 3 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/trades_binance_eth-usd-14-05-2021_ticker-from-trades_1sec-avg.csv"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

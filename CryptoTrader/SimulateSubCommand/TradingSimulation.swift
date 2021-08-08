@@ -76,4 +76,26 @@ class TradingSimulation {
                                         openOrderCount: strategy.openOrders)
     }
     
+    func simulate(config: TraderGridStrategyConfig) -> TradingSimulationResults {
+        let strategy = TraderGridStrategy(exchange: simulatedExchange,
+                                          config: config,
+                                          initialBalance: initialBalance,
+                                          saveStateLocation: FileManager.default.temporaryDirectory.absoluteString,
+                                          dateFactory: self.dateFactory)
+        strategy.saveEnabled = false
+        _ = SimpleTrader(client: simulatedExchange, strategy: strategy)
+        simulatedExchange.start()
+        
+        let log =
+            """
+            CONFIG: \(config)
+            
+            \(strategy.summary(shouldPrint: true))
+            """
+        return TradingSimulationResults(simulationLog: log,
+                                        accumulatedProfits: strategy.profits,
+                                        currentValue: strategy.balanceValue,
+                                        openOrderCount: strategy.openOrders)
+    }
+    
 }

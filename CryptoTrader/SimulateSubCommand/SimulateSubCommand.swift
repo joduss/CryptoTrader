@@ -39,7 +39,8 @@ extension TraderMain {
                                            initialBalance: Decimal(initialBalance),
                                            dataLocation: dataLocation,
                                            dataStartIdx: startIdx,
-                                           dataEndIdx: endIdx)
+                                           dataEndIdx: endIdx,
+                                           keepEvery: keepEvery)
             
             simulation.execute(strategy: strategy)
         }

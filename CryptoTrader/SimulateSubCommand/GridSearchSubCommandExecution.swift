@@ -43,6 +43,8 @@ class GridSearchSubCommandExecution {
                 gridSearchBTS()
             case .macd:
                 return gridSearchMacd()
+            case .gridtrader:
+                fatalError("NOT IMPLEMENTED")
         }
     }
     

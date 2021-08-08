@@ -46,6 +46,8 @@ class SimulateSubCommandExecution {
                 return executeBTS(printPrice: true)
             case .macd:
                 return executeMacd(printPrice: true)
+            case .gridtrader:
+                return executeGridTrader(printPrice: true)
         }
     }
     
@@ -85,6 +87,24 @@ class SimulateSubCommandExecution {
                 
         return simulation.simulate(config: config)
     }
+    
+    /// Returns (profits, summary)
+    func executeGridTrader(printPrice: Bool = true, config: TraderGridStrategyConfig? = nil) -> TradingSimulationResults {
+        var config: TraderGridStrategyConfig!  = config
+        
+        if config == nil {
+            config = TraderGridStrategyConfig()
+        }
+        
+        let simulation = TradingSimulation(symbol: symbol,
+                                           simulatedExchange: createSimulatedExchange(),
+                                           dateFactory: dateFactory,
+                                           initialBalance: initialBalance)
+        
+        return simulation.simulate(config: config)
+    }
+    
+    // MARK: Simulated exchange
     
     private func createSimulatedExchange() -> SimulatedExchange {
         if tickers.count == 0 {

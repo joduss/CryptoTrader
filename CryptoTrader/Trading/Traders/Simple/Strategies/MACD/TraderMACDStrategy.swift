@@ -30,12 +30,8 @@ class TraderMACDStrategy: SimpleTraderStrategy {
     var currentDate: Date { return dateFactory.now }
     
     private var initialBalance: Decimal
-    
     private var currentBalance: Decimal = 0
-    
-//    private var currentBalance: Double {
-//        didSet { sourcePrint("Current Balance: \(oldValue) -> \(currentBalance)") }
-//    }
+
     
     private(set) var profits: Decimal = 0
     var balanceValue: Decimal {

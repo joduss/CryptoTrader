@@ -19,6 +19,8 @@ protocol SimpleTraderStrategy {
     func summary(shouldPrint: Bool) -> String
     
     var profits: Decimal { get }
+    
+    // Net worth
     var balanceValue: Decimal { get }
     var openOrders: Int { get }
 }
