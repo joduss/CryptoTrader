@@ -16,6 +16,8 @@ class PercentTests: XCTestCase {
         XCTAssertEqual(30, 40 -% percent)
         XCTAssertEqual(10, 40 * percent)
         XCTAssertEqual(10, percent * 40)
+        XCTAssertEqual(44, 40 % Percent(10))
+        XCTAssertEqual(36, 40 % Percent(-10))
 
         XCTAssertEqual(Percent(55), (percent + Percent(30)))
         XCTAssertEqual(Percent(20), (percent - Percent(5)))
@@ -27,6 +29,8 @@ class PercentTests: XCTestCase {
 
         XCTAssertEqual(Percent(50), Percent(ratioOf: 100, to: 200))
         XCTAssertEqual(Percent(200), Percent(ratioOf: 200, to: 100))
+        
+        
     }
     
     func testExpressibleByFloatLiteral() throws {

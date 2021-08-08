@@ -4,6 +4,7 @@ import Foundation
 
 infix operator -% : AdditionPrecedence
 infix operator +% : AdditionPrecedence
+infix operator % : MultiplicationPrecedence
 
 
 struct Percent: Comparable, CustomStringConvertible {
@@ -54,6 +55,10 @@ struct Percent: Comparable, CustomStringConvertible {
 
     static func -%(lhs: Double, rhs: Percent) -> Double {
         return lhs * (Percent(100) - rhs)
+    }
+    
+    static func %(lhs: Double, rhs: Percent) -> Double {
+        return lhs * (Percent(100) + rhs)
     }
 
     // Operations  between Percents
