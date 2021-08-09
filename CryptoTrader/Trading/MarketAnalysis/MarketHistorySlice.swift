@@ -122,6 +122,26 @@ open class MarketHistorySlice {
         return true
     }
     
+    /// Threshold: Percent of change in price to consider a difference of price as a negative trend.
+    final func trend() -> Percent {
+        guard let firstTrade = prices.first, let lastTrade = prices.last else {
+            return Percent(0)
+        }
+        
+        let intervalSlots = 4.0
+        
+        let totalTimeInterval = lastTrade.date - firstTrade.date
+        let intervalSlotDuration = totalTimeInterval / intervalSlots
+        
+        let firstPartInterval = self.pricesInInterval(beginDate: firstTrade.date, endDate: firstTrade.date + intervalSlotDuration)
+        let lastPartInterval = self.pricesInInterval(beginDate: lastTrade.date - intervalSlotDuration, endDate: lastTrade.date)
+        
+        let lastPartIntervalAvg = lastPartInterval.average()
+        let firstPartIntervalAvg = firstPartInterval.average()
+        
+        return Percent(differenceOf: lastPartIntervalAvg, from: firstPartIntervalAvg)
+    }
+    
 //    func variability() -> Variability {
 //        computeBasic()
 //
