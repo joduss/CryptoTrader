@@ -3,6 +3,7 @@ import Foundation
 
 struct OHLCRecord {
     
+    
 /// Open - The first traded price
 /// High - The highest traded price
 /// Low - The lowest traded price
@@ -36,6 +37,16 @@ struct OHLCRecord {
         low = ohlc.low
         volume = 0
         trades = 0
+    }
+    
+    internal init(open: Double, high: Double, low: Double, close: Double, volume: Double, trades: Int, time: Date) {
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
+        self.volume = volume
+        self.trades = trades
+        self.time = time
     }
     
     mutating func update(with trade: MarketMinimalAggregatedTrade) {

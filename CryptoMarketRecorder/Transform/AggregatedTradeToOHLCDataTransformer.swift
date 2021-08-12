@@ -27,7 +27,9 @@ class AggregatedTradeToOHLCDataTransformer {
             time: intervalOf(trade: firstTrade, lastInterval: Date.init(timeIntervalSinceReferenceDate: 0)),
             trade: firstTrade
         )
-
+        // We go over each record.
+        // All data are aggregated in interval, which is aggregated by flooring its time.
+        // By aggregating by 60 seconds, 13:01:35, 13:01:45 are aggregated at 13:01:00 but 13:02:01 is 13:02.
         while let line: String = reader.readLine() {
             lineCount += 1
 
@@ -46,15 +48,14 @@ class AggregatedTradeToOHLCDataTransformer {
                 // Prepare next interval
                 previousOhlcRecord = currentOhlcRecord
 
-                let newInterval = intervalOf(trade: trade, lastInterval: Date(timeIntervalSinceReferenceDate: 0))
-                currentOhlcRecord = OHLCRecord(time: newInterval, trade: trade)
+                currentOhlcRecord = OHLCRecord(time: currentInterval, trade: trade)
 
                 // Fill all the interval between last and the new one
 
-                if newInterval - currentInterval > aggregationInterval {
+                if currentInterval - lastInterval > aggregationInterval {
                     fill(with: previousOhlcRecord,
                          from: previousOhlcRecord.time,
-                         to: newInterval,
+                         to: currentInterval,
                          aggregationInterval: aggregationInterval,
                          to: outputFileHandle
                     )
@@ -66,13 +67,16 @@ class AggregatedTradeToOHLCDataTransformer {
             currentOhlcRecord.update(with: trade)
         }
 
+        // Writing last record
+        write(record: currentOhlcRecord, file: outputFileHandle)
+        
         outputFileHandle.closeFile()
     }
 
     private func intervalOf(trade: MarketMinimalAggregatedTrade, lastInterval: Date) -> Date {
         let nextInterval = Date(
             timeIntervalSinceReferenceDate:
-                floor(trade.time.timeIntervalSinceReferenceDate / 60) * 60
+                floor(trade.time.timeIntervalSinceReferenceDate / 60.0) * 60.0
         )
 
         guard nextInterval >= lastInterval else {
@@ -99,7 +103,7 @@ class AggregatedTradeToOHLCDataTransformer {
         var currentInterval = beginFillInterval + aggregationInterval
 
         while currentInterval < toFillInterval {
-            let fillRecord = OHLCRecord(time: currentInterval, ohlc: previousRecord)
+            let fillRecord = createEmptyFrom(record: previousRecord, for: currentInterval)
             write(record: fillRecord, file: file)
             currentInterval += aggregationInterval
         }
@@ -115,5 +119,15 @@ class AggregatedTradeToOHLCDataTransformer {
             quantity: Double(String(values[1]))!,
             time: Date(timeIntervalSince1970: TimeInterval(values[2])!)
         )
+    }
+    
+    private func createEmptyFrom(record: OHLCRecord, for interval: Date) -> OHLCRecord {
+        return OHLCRecord(open: record.close,
+                          high: record.close,
+                          low: record.close,
+                          close: record.close,
+                          volume: 0,
+                          trades: 0,
+                          time: interval)
     }
 }
