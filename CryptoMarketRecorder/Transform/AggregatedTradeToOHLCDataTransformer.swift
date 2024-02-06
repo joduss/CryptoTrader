@@ -21,10 +21,13 @@ class AggregatedTradeToOHLCDataTransformer {
         let reader = TextFileReader.openFile(at: tradesFile)
         let firstTrade = deserialize(line: reader.readLine()!)
         var lineCount = 0
+        var currentId = firstTrade.id
 
         var previousOhlcRecord: OHLCRecord!
         var currentOhlcRecord: OHLCRecord = OHLCRecord(
-            time: intervalOf(trade: firstTrade, lastInterval: Date.init(timeIntervalSinceReferenceDate: 0)),
+            time: intervalOf(trade: firstTrade,
+                             lastInterval: Date.init(timeIntervalSinceReferenceDate: 0),
+                             aggregationInterval: aggregationInterval),
             trade: firstTrade
         )
         // We go over each record.
@@ -35,8 +38,18 @@ class AggregatedTradeToOHLCDataTransformer {
 
             let trade = deserialize(line: line)
             let lastInterval = currentOhlcRecord.time
+            
+            if (trade.id <= currentId) {
+                throw NSError(domain: "OHLC Transformer failed: duplicated id.", code: 1, userInfo: nil)
+            }
+            else if (trade.id > currentId + 1) {
+                throw NSError(domain: "OHLC Transformer failed: missing id.", code: 1, userInfo: nil)
+            }
+            currentId = trade.id
 
-            let currentInterval = intervalOf(trade: trade, lastInterval: lastInterval)
+            let currentInterval = intervalOf(trade: trade,
+                                             lastInterval: lastInterval,
+                                             aggregationInterval: aggregationInterval)
 
             if lineCount % 500000 == 0 && lineCount > 0 {
                 print("Lines processed: \(lineCount). Current date: \(trade.time)")
@@ -73,14 +86,16 @@ class AggregatedTradeToOHLCDataTransformer {
         outputFileHandle.closeFile()
     }
 
-    private func intervalOf(trade: MarketMinimalAggregatedTrade, lastInterval: Date) -> Date {
+    private func intervalOf(trade: MarketMinimalAggregatedTrade, lastInterval: Date, aggregationInterval: TimeInterval) -> Date {
         let nextInterval = Date(
             timeIntervalSinceReferenceDate:
-                floor(trade.time.timeIntervalSinceReferenceDate / 60.0) * 60.0
+                floor(trade.time.timeIntervalSinceReferenceDate / aggregationInterval) * aggregationInterval
         )
 
         guard nextInterval >= lastInterval else {
-            fatalError("Current interval is before the previous one.")
+            print("Warning: aggregated trade \(trade.id) has time \(trade.time), which is less than last interval \(lastInterval). The trade will be aggregated in ohlc of interval \(lastInterval)")
+            //fatalError("Current interval is before the previous one.")
+            return lastInterval
         }
 
         return nextInterval
@@ -115,6 +130,7 @@ class AggregatedTradeToOHLCDataTransformer {
         let values = line.substring(start: 0, end: line.count - 1).split(separator: ",")
 
         return MarketMinimalAggregatedTrade(
+            id: Int(String(values[3]))!,
             price: Double(String(values[0]))!,
             quantity: Double(String(values[1]))!,
             time: Date(timeIntervalSince1970: TimeInterval(values[2])!)

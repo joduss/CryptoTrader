@@ -91,7 +91,7 @@ class GridSearchSubCommandExecution {
     /// Grid search for BTS Strategy
     private func gridSearchBTS() {
         
-        print("Simulation with initial balance: \(initialBalance)")
+        Swift.print("Simulation with initial balance: \(initialBalance)")
         
         sourcePriceHidden = true
         
@@ -442,70 +442,74 @@ class GridSearchSubCommandExecution {
                                     + "profitMinPercent,"
                                     + "profitStopLossPercent,"
                                     + "buyStopLossPercent,"
+                                    + "sellStopLossPercent"
                                     + "openOrders,"
                                     + "accumulatedProfits,"
                                     + "currentValue")
         
         // BTC
-        for orderCount in [20, 25, 30] {
-            for gridSizePercent in [1, 1.5, 2, 2.5, 3] {
-                for gridSizeScenarioPriceDropPercent in [2, 2.5, 3, 3.5, 4] {
+        for orderCount in [20] {
+            for gridSizePercent in [0.5, 1, 2, 3] {
+                for gridSizeScenarioPriceDropPercent in [3.0, 4] {
                     for scenarioPriceDropThresholdPercent in [-3.0, -4, -5, -7] {
-                        for profitMinPercent in [0.5, 1, 1.5, 2] {
+                        for profitMinPercent in [0.3, 0.5, 1, 1.5, 2] {
                             for profitStopLossPercent in [0.5, 1, 1.5] {
                                 for buyStopLossPercent in [0.5, 1, 1.5] {
-                                    
-                                    
-                                    operationCount += 1
-                                    queue.progress.totalUnitCount = Int64(operationCount)
-                                    
-                                    group.enter()
-                                    
-                                    var config = TraderGridStrategyConfig()
-                                    config.orderCount = orderCount
-                                    config.gridSizePercent = Percent(gridSizePercent)
-                                    config.gridSizeScenarioPriceDropPercent = Percent(gridSizeScenarioPriceDropPercent)
-                                    config.scenarioPriceDropThresholdPercent = Percent(scenarioPriceDropThresholdPercent)
-                                    
-                                    config.profitMinPercent = Percent(profitMinPercent)
-                                    config.profitStopLossPercent = Percent(profitStopLossPercent)
-                                    config.buyStopLossPercent = Percent(buyStopLossPercent)
-                                    
-                                    var operationId = operationCount
-                                    
-                                    queue.addOperation {
-                                        print("Starting operation \(operationId)")
-                                        let dateFactory = DateFactory()
-                                        dateFactory.now = self.tickers.first!.date
+                                    for sellStopLossPercent in [-0.2, -0.3, -0.5] {
                                         
-                                        let simulationResults = self.executeGrid(config: config, dateFactory: dateFactory)
                                         
-                                        self.testSema.wait()
-                                        results.append(simulationResults)
-                                        print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                        operationCount += 1
+                                        queue.progress.totalUnitCount = Int64(operationCount)
                                         
-                                        let parameters: String =
-                                        "\(orderCount),"
-                                        + "\(gridSizePercent),"
-                                        + "\(gridSizeScenarioPriceDropPercent),"
-                                        + "\(scenarioPriceDropThresholdPercent),"
-                                        + "\(profitMinPercent),"
-                                        + "\(profitStopLossPercent),"
-                                        + "\(buyStopLossPercent),"
-                                        + "\(simulationResults.openOrderCount),"
-                                        + "\(simulationResults.accumulatedProfits),"
-                                        + "\(simulationResults.currentValue),"
+                                        group.enter()
                                         
-                                        parametersAndProfits.append(parameters)
+                                        var config = TraderGridStrategyConfig()
+                                        config.orderCount = orderCount
+                                        config.gridSizePercent = Percent(gridSizePercent)
+                                        config.gridSizeScenarioPriceDropPercent = Percent(gridSizeScenarioPriceDropPercent)
+                                        config.scenarioPriceDropThresholdPercent = Percent(scenarioPriceDropThresholdPercent)
                                         
-                                        self.testSema.signal()
-                                        group.leave()
+                                        config.profitMinPercent = Percent(profitMinPercent)
+                                        config.profitStopLossPercent = Percent(profitStopLossPercent)
+                                        config.buyStopLossPercent = Percent(buyStopLossPercent)
+                                        config.sellStopLossPercent=Percent(sellStopLossPercent)
+                                        
+                                        var operationId = operationCount
+                                        
+                                        queue.addOperation {
+                                            print("Starting operation \(operationId)")
+                                            let dateFactory = DateFactory()
+                                            dateFactory.now = self.tickers.first!.date
+                                            
+                                            let simulationResults = self.executeGrid(config: config, dateFactory: dateFactory)
+                                            
+                                            self.testSema.wait()
+                                            results.append(simulationResults)
+                                            print("Progress: \(queue.progress.completedUnitCount) / \(queue.progress.totalUnitCount) (\(queue.progress.fractionCompleted * 100)%)")
+                                            
+                                            let parameters: String =
+                                            "\(orderCount),"
+                                            + "\(gridSizePercent),"
+                                            + "\(gridSizeScenarioPriceDropPercent),"
+                                            + "\(scenarioPriceDropThresholdPercent),"
+                                            + "\(profitMinPercent),"
+                                            + "\(profitStopLossPercent),"
+                                            + "\(buyStopLossPercent),"
+                                            + "\(sellStopLossPercent),"
+                                            + "\(simulationResults.openOrderCount),"
+                                            + "\(simulationResults.accumulatedProfits),"
+                                            + "\(simulationResults.currentValue),"
+                                            
+                                            parametersAndProfits.append(parameters)
+                                            
+                                            self.testSema.signal()
+                                            group.leave()
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    
                 }
             }
         }

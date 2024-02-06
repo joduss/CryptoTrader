@@ -39,6 +39,7 @@ class TraderGridStrategy: SimpleTraderStrategy {
 
     private var gridSizePercent: Percent
     
+    
     init(
         exchange: ExchangeClient,
         config: TraderGridStrategyConfig,
@@ -157,13 +158,17 @@ class TraderGridStrategy: SimpleTraderStrategy {
         }
         
         summaryString += "==========================================\n"
-        summaryString += "Open Orders\n"
+        summaryString += "General\n"
         summaryString += "==========================================\n"
         
+        let maxPrice = gridMarketPositions.filter({$0.open}).max(by: {$0.price < $1.price})?.price ?? 0
+        
+        summaryString += "Duration: \((dateFactory.now - startDate)/3600/24) days.\n"
         summaryString += "Open orders: \(openOrders) / \(config.orderCount)\n"
         summaryString += "Current price: \(currentBidPrice.format(decimals: 3))\n"
         summaryString += "Initial balance: \(initialBalance.format(decimals: 3))\n"
         summaryString += "Net worth: \(balanceValue £ 3)\n"
+        summaryString += "Net worth at max price: \(gridMarketPositions.reduce(0.0, {$0 + $1.qty}) * maxPrice + currentBalance)\n"
         summaryString += "Profits: \(profits £ 2)\n"
 
         return summaryString
@@ -273,6 +278,11 @@ class TraderGridStrategy: SimpleTraderStrategy {
     
     private func shouldSell(position: GridMarketPosition, bidPrice: Double)  -> Bool {
         guard position.open == true else { return false }
+        
+        if Percent(differenceOf: bidPrice, from: position.price) < config.sellStopLossPercent {
+            // stop loss
+            return  true
+        }
         
         if position.stopLoss == 0 {
             if Percent(differenceOf: bidPrice, from: position.price) > config.profitMinPercent {

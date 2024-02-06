@@ -738,7 +738,7 @@ class TraderBTSStrategy: SimpleTraderStrategy {
     
     @discardableResult
     func summary(shouldPrint: Bool = true) -> String {
-        let currentPrice = marketAnalyzer.prices(last: TimeInterval.fromMinutes(1), before: currentDate).average()
+        let currentPrice = marketAnalyzer.prices.last!.price
         let coins: Double = openBTSSellOperations.reduce(
             0.0,
             { result, newItem in return result + (newItem.initialTrade.quantity) }

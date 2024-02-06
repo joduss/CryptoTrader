@@ -31,7 +31,7 @@ class MarketMinimalAggregatedTradeDeserializer {
         return trades
     }
     
-    class func loadTradesAsTickers(from file: String, startIdx: Int, endIdx: Int, keepEvery: Int, symbol: CryptoSymbol) -> ContiguousArray<MarketTicker>{
+    class func loadTradesAsTickers(from file: String, startIdx: Int, endIdx: Int, keepEvery: Int, symbol: CryptoSymbol) -> ContiguousArray<MarketTicker> {
         let reader = TextFileReader.openFile(at: file)
         var idx = 0
         

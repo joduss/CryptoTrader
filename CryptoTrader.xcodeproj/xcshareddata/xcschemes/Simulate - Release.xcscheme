@@ -56,7 +56,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "simulate --btc_usd --gridtrader -b 100 -s 5000000 -k 1 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-usd_tickers-from-trades_10sec_binance_01-06-2021.csv"
+            argument = "simulate --btc_usd --gridtrader -b 100 -k 1 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-ucd_ohlc_1min_binance_08-08-2021.csv"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

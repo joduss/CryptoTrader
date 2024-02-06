@@ -129,11 +129,11 @@ extension CryptoMarketRecorder {
         @Option(name: [.customShort("t"), .long])
         var tradeCsvFile: String
         
-        @Option(name: [.customShort("i"), .long], help: "What the OHLC interval. Default 60 seconds")
-        var interval: TimeInterval = 60
+        @Option(name: [.customShort("i"), .long], help: "What the OHLC interval in seconds.")
+        var interval: TimeInterval
         
         mutating func run() throws {
-            print("Transformation started")
+            print("Transformation of trades to OHLC with interval \(interval)s started")
 
             let tradeCsv = self.tradeCsvFile.expandedPath()
             let resultingFile = ohlcOutputFile.expandedPath()
@@ -142,7 +142,7 @@ extension CryptoMarketRecorder {
             
             FileManager.default.createFile(atPath: resultingFile, contents: nil, attributes: nil)
             try transformer.transform(outputFileHandle: FileHandle(forWritingAtPath: resultingFile)!,
-                                  aggregationInterval: TimeInterval.fromMinutes(1))
+                                  aggregationInterval: TimeInterval.fromMilliseconds(1000 * interval))
             
             print("Transformation done")
         }

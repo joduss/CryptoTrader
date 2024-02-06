@@ -52,15 +52,15 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "simulate --btc_usd --macd -b 100 -s 50000000 -k 3 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/trades_binance_eth-usd-14-05-2021_ticker-from-trades_1sec-avg.csv"
+            argument = "simulate --btc_usd --macd -b 100 -k 1 -s 1000000 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-ucd_ohlc_1min_binance_08-08-2021.csv"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "simulate --btc_usd --gridtrader -b 100 -s 50000000 -k 3 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/trades_binance_eth-usd-14-05-2021_ticker-from-trades_1sec-avg.csv"
+            argument = "simulate --btc_usd --bts -b 100 -k 1 -s 1000000 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-ucd_ohlc_1min_binance_08-08-2021.csv"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "simulate --btc_usd --gridtrader -b 100 -s 10000000 -k 1 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-usd_tickers-from-trades_10sec_binance_01-06-2021.csv"
+            argument = "simulate --btc_usd --gridtrader -b 100 -k 1 -s 1000000 /Users/jonathanduss/jo_dev/CryptoTrader/CryptoData/btc-ucd_ohlc_1min_binance_08-08-2021.csv"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -183,6 +183,7 @@
 		6B67AAA726C5B42B007406B5 /* AggregatedTradeToOHLCDataTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B096C402617C37F00EDFB18 /* AggregatedTradeToOHLCDataTransformer.swift */; };
 		6B67AAA826C5B44D007406B5 /* MarketMinimalAggregatedTrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B096C61261B38CE00EDFB18 /* MarketMinimalAggregatedTrade.swift */; };
 		6B67AAA926C5B45E007406B5 /* OHLCRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B096C512617C81900EDFB18 /* OHLCRecord.swift */; };
+		6B67AAAC26C70EC1007406B5 /* OHLCDeserializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B67AAAB26C70EC1007406B5 /* OHLCDeserializer.swift */; };
 		6B7116D925BB1DE300D34447 /* MarketTicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7116D825BB1DE300D34447 /* MarketTicker.swift */; };
 		6B7116E325BB25BA00D34447 /* CryptoSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7116E225BB25B900D34447 /* CryptoSymbol.swift */; };
 		6B7116EE25BB360900D34447 /* WebSocketHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7116ED25BB360900D34447 /* WebSocketHandler.swift */; };
@@ -395,6 +396,7 @@
 		6B67AAA126C5B0FA007406B5 /* TradeToOHLCTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeToOHLCTransformerTests.swift; sourceTree = "<group>"; };
 		6B67AAA326C5B107007406B5 /* trades-for-ohlc.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "trades-for-ohlc.csv"; sourceTree = "<group>"; };
 		6B67AAA526C5B2C0007406B5 /* ohlc-expected.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ohlc-expected.csv"; sourceTree = "<group>"; };
+		6B67AAAB26C70EC1007406B5 /* OHLCDeserializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OHLCDeserializer.swift; sourceTree = "<group>"; };
 		6B7116D825BB1DE300D34447 /* MarketTicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketTicker.swift; sourceTree = "<group>"; };
 		6B7116E225BB25B900D34447 /* CryptoSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoSymbol.swift; sourceTree = "<group>"; };
 		6B7116ED25BB360900D34447 /* WebSocketHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketHandler.swift; sourceTree = "<group>"; };
@@ -695,6 +697,7 @@
 				6B7F2DC72624C92100F31149 /* SimulateSubCommandExecution.swift */,
 				6B7F2DCE2624CB3800F31149 /* TradingSimulation.swift */,
 				6B482555265130EF00A85BB3 /* SimulationOHLCTrader.swift */,
+				6B67AAAB26C70EC1007406B5 /* OHLCDeserializer.swift */,
 			);
 			path = SimulateSubCommand;
 			sourceTree = "<group>";
@@ -1219,6 +1222,7 @@
 				6B48DAE225A9FDB200F2CD6D /* Kraken.swift in Sources */,
 				6B7B6AE425DC2DD000801750 /* OrderExecutionReport.swift in Sources */,
 				6BAC336625E448DC0066D080 /* BinanceCreateOrderFullResponse.swift in Sources */,
+				6B67AAAC26C70EC1007406B5 /* OHLCDeserializer.swift in Sources */,
 				6BD3CE9F25D4814400524386 /* BinanceEmptyResponse.swift in Sources */,
 				6B20105825D30F3C000124D8 /* BinanceApiFragment.swift in Sources */,
 				6B5664F125D9A24300177B33 /* ExchangeClient.swift in Sources */,

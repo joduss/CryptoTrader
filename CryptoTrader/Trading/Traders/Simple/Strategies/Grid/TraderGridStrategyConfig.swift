@@ -2,7 +2,7 @@ import Foundation
 
 class TraderGridStrategyConfig {
     
-    public var orderCount = 30
+    public var orderCount = 25
      
     public var gridSizePercent: Percent = 3
     public var gridSizeScenarioPriceDropPercent: Percent = 2
@@ -15,6 +15,7 @@ class TraderGridStrategyConfig {
 
     public var buyStopLossPercent: Percent = 0.5
 
+    public var sellStopLossPercent: Percent = -0.2
     
     //public var stopLossPercent: Percent = -0.5
 }

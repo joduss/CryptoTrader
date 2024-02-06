@@ -27,6 +27,13 @@ class SimulateSubCommandExecution {
                                                                 startIdx: startIdx,
                                                                 endIdx: endIdx)
         }
+        else if dataLocation.contains("ohlc") {
+            self.tickers = OHLCDeserializer.loadOHLCAsTickers(from: dataLocation,
+                                                              startIdx: startIdx,
+                                                              endIdx: endIdx,
+                                                              keepEvery: keepEvery,
+                                                              symbol: symbol)
+        }
         else {
             self.tickers = MarketMinimalAggregatedTradeDeserializer.loadTradesAsTickers(from: dataLocation,
                                                                                         startIdx: startIdx,
